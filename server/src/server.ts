@@ -3,6 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 import { connectDatabase } from "./config/database.js";
+import projectRoutes from "./routes/projectRoutes.js";
+import messageRoutes from "./routes/messageRoutes.js";
 
 dotenv.config();
 
@@ -15,6 +17,8 @@ app.use(
 );
 
 app.use(express.json());
+app.use("/api/projects", projectRoutes);
+app.use("/api/messages", messageRoutes);
 
 app.get("/api/health", (_req, res) => {
   res.json({
