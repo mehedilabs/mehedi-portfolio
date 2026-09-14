@@ -1,0 +1,26 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+:root {
+  font-family: Inter, Arial, sans-serif;
+  color: #111827;
+  background: #ffffff;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.gradient-text {
+  background: linear-gradient(to right, #2563eb, #7c3aed);
+  background-clip: text;
+  color: transparent;
+}
