@@ -1,2 +1,90 @@
 @import "tailwindcss";
 
+:root {
+  --background: #0a0d14;
+  --foreground: #f1f5f9;
+  --card: #0f1622;
+  --card-foreground: #f8fafc;
+  --popover: #0f1622;
+  --popover-foreground: #f8fafc;
+  --primary: #10b981;
+  --primary-foreground: #022c22;
+  --secondary: #172033;
+  --secondary-foreground: #e2e8f0;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --accent: #06b6d4;
+  --accent-foreground: #083344;
+  --border: #1e293b;
+  --input: #1e293b;
+  --ring: #10b981;
+}
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hind Siliguri", "Noto Sans Bengali", sans-serif;
+  overflow-x: hidden;
+}
+
+/* Bangla typography enhancement */
+[lang="bn"],
+.locale-bn {
+  font-family: "Hind Siliguri", "Noto Sans Bengali", "Inter", sans-serif;
+  line-height: 1.75;
+  letter-spacing: 0.01em;
+}
+
+[lang="bn"] h1,
+[lang="bn"] h2,
+[lang="bn"] h3,
+[lang="bn"] h4,
+.locale-bn h1,
+.locale-bn h2,
+.locale-bn h3,
+.locale-bn h4 {
+  line-height: 1.45;
+  letter-spacing: normal;
+}
+
+/* Monospace font stack for developer aesthetics */
+code,
+pre,
+.font-mono {
+  font-family: "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+/* Terminal scanline subtle visual texture */
+.terminal-grid {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+.terminal-dots {
+  background-image: radial-gradient(rgba(16, 185, 129, 0.12) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Custom terminal scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0d14;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
