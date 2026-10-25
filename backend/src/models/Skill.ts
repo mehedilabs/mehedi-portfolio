@@ -23,3 +23,4 @@ const SkillSchema = new Schema<ISkill & Document>(
 export const SkillModel =
   mongoose.models.Skill ||
   mongoose.model<ISkill & Document>("Skill", SkillSchema);
+

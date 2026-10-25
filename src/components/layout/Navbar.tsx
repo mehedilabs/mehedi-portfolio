@@ -134,3 +134,4 @@ export function Navbar({ locale, dict }: NavbarProps) {
     </header>
   );
 }
+

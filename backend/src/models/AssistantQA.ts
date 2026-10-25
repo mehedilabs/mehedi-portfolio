@@ -28,3 +28,4 @@ const AssistantQASchema = new Schema<IAssistantQA & Document>(
 export const AssistantQAModel =
   mongoose.models.AssistantQA ||
   mongoose.model<IAssistantQA & Document>("AssistantQA", AssistantQASchema);
+

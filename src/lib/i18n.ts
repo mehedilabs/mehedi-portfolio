@@ -57,3 +57,4 @@ export function getLocalizedPath(path: string, locale: Locale): string {
   }
   return `/${locale}${cleanPath === "/" ? "" : cleanPath}`;
 }
+

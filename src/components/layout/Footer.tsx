@@ -140,3 +140,4 @@ export function Footer({ dict }: FooterProps) {
     </footer>
   );
 }
+

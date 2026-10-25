@@ -80,3 +80,4 @@ Legend:
 - [ ] Open Graph & Twitter dynamic preview cards.
 - [ ] Rate limiting, audit logs, and security headers (Helmet, CSRF protection).
 - [ ] Production build optimization, caching strategies, and deployment documentation.
+

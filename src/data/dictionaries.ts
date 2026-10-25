@@ -547,3 +547,4 @@ export const dictionaries: Record<Locale, Dictionary> = {
     },
   },
 };
+

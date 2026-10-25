@@ -27,3 +27,4 @@ const EducationSchema = new Schema<IEducation & Document>(
 export const EducationModel =
   mongoose.models.Education ||
   mongoose.model<IEducation & Document>("Education", EducationSchema);
+

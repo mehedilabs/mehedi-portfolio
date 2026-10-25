@@ -2,116 +2,48 @@
 
 ## Current Phase
 - **Phase**: Phase 1 — Project Foundation & Public Portfolio (Prompt 1 of 4)
-- **Status**: COMPLETED & VERIFIED
-- **Current Task**: Phase 1 finished; awaiting Prompt 2 to begin Phase 2.
+- **Status**: COMPLETED & VERIFIED (Hotfix Applied: Tailwind CSS v4 Rendering Pipeline)
+- **Current Task**: Phase 1 foundation complete and verified; styling actively rendering across all pages. Awaiting Prompt 2 to begin Phase 2.
 
 ---
 
-## Completed Work in Phase 1
+## Urgent Hotfix: Styling & Layout Rendering Issue
 
-### 1. Repository & Monorepo Foundation
-- Inspected repository structure, remote (`https://github.com/mehedilabs/mehedi-portfolio.git`), and active branch (`main`).
-- Configured `.gitignore` to strictly isolate sensitive `.env*` files, build caches, and node_modules while explicitly preserving `.env.example` templates.
-- Authored frontend `.env.example` and `backend/.env.example` documenting all configuration keys.
-- Established core persistent guidelines in `AGENTS.md` (preserving Next.js notice block).
-- Created master tracking file `TASKS.md` with full checklist across all four phases.
+### Root Cause Analysis
+1. **Missing PostCSS Pipeline for Webpack**: The project relies on Tailwind CSS v4 (`tailwindcss@^4`). When compiling with Webpack, Next.js requires `@tailwindcss/postcss` and a PostCSS configuration file (`postcss.config.mjs`). Without this, Next.js was outputting raw unparsed CSS containing the literal string `@layer utilities{@tailwind utilities}` without evaluating or generating any Tailwind utility classes. As a result, none of the layout, spacing, colors, or responsive classes (`max-w-7xl`, `mx-auto`, `flex`, `grid`, `bg-slate-900`, `text-emerald-400`, etc.) were present in the compiled CSS bundle.
+2. **Infinite Symlink Loop in Scanner**: During npm operations inside `backend/`, npm created a symlink `backend/node_modules/mehedi-portfolio` pointing back to the repository root. Tailwind v4's default file scanner encountered this recursive symlink, causing infinite directory loops when traversing file paths.
+3. **Multi-Worker Concurrency Lock on Windows**: Parallel prerendering workers (8 workers) on Windows NTFS were competing to create `.segments/` directory paths, causing transient `EPERM: operation not permitted, mkdir` errors during static exports.
 
-### 2. Bilingual Architecture (English & Bangla)
-- Structured App Router for locale-prefixed routing (`/en`, `/bn`) with automatic root redirection at `/`.
-- Created comprehensive dictionary file `src/data/dictionaries.ts` providing full English and Bangla translations for all UI texts, navigation, badges, buttons, form placeholders, assistant messages, and error states.
-- Implemented explicit fallback resolver in `src/lib/i18n.ts` ensuring no text is ever blank or omitted.
-- Established typography styling in `globals.css` optimizing line-height and font stacks for Bengali scripts (`Hind Siliguri`, `Noto Sans Bengali`).
-- Developed `LanguageSwitcher.tsx` preserving active path, slugs, and section anchor hashes.
-- Built localized metadata with canonical URLs, alternate hreflang tags (`en`, `bn`, and `x-default`), and Open Graph tags.
+### Corrective Actions Applied
+1. **Installed Official PostCSS Plugin**: Added `@tailwindcss/postcss` to devDependencies.
+2. **Created PostCSS Configuration**: Created `postcss.config.mjs` exporting the `@tailwindcss/postcss` plugin configuration.
+3. **Explicit Source Scanning Directives**: Configured `@source "../**/*.{ts,tsx}";` in `src/app/globals.css` ensuring Tailwind scans only the frontend UI component tree.
+4. **Eliminated Recursive Symlink**: Removed the circular `backend/node_modules/mehedi-portfolio` link.
+5. **Configured Single Worker for Prerender Stability**: Set `experimental.cpus: 1` in `next.config.ts` to eliminate Windows directory locking conflicts during static page export.
 
-### 3. Developer Dark UI System & Sections
-- Built shadcn-inspired reusable primitives: `Button`, `Card`, `Badge`, `Input`, `Textarea`, `Modal`, and dedicated brand `Icons` (GitHub, LinkedIn, Twitter).
-- Developed sticky `Navbar` with terminal prompt branding (`~/mehedi.dev $`), section navigation, language switcher, resume button, and responsive mobile drawer.
-- Implemented `HeroSection` featuring developer positioning, profile avatar with glowing status ring, interactive terminal window widget with system diagnostics, impact metrics, and CTAs.
-- Implemented `AboutSection` with professional narrative, core philosophy principles cards, and technical rule callout.
-- Implemented `SkillsSection` with domain filter tabs (Frontend, Backend, Database, Cloud) and animated progress bars.
-- Implemented `ExperienceSection` with vertical timeline, role badges, impact bullets, and tech stack tags.
-- Implemented `EducationSection` with academic credentials and key focus coursework.
-- Implemented `ProjectsSection` with category filters, project cards, live demo links, repository links, and deep-dive `CaseStudyModal`.
-- Implemented `BlogSection` displaying preview articles with reading time and tag filters.
-- Implemented `ContactSection` with interactive inquiry form, validation, and direct channel reachouts.
-- Implemented `Footer` with platform specs, copyright, and smooth back-to-top navigation.
-- Implemented `FloatingAssistant` with terminal avatar trigger, quick suggestion pills, interactive chat stream, and predefined Q&A matching in both English and Bangla.
-
-### 4. Express REST API Backend (`backend/`)
-- Initialized standalone TypeScript Express application in `backend/` with dedicated `package.json` and `tsconfig.json`.
-- Implemented MongoDB Atlas connection manager with retry logic, pooling, and graceful shutdown handling (`backend/src/config/db.ts`).
-- Created Mongoose schemas with bilingual sub-document architecture for `Project`, `BlogPost`, `Skill`, `Experience`, `Education`, `Message`, and `AssistantQA`.
-- Implemented health check route (`GET /api/health`) returning uptime, memory, and database status.
-- Implemented portfolio routes (`GET /api/projects`, `GET /api/projects/:slug`, `POST /api/messages`) with graceful fallback data when database is in offline mode.
-- Configured CORS, body parsers, and centralized error handler (`backend/src/middleware/errorHandler.ts`).
+### Visual Styling & Technical Verification
+1. **CSS Generation Check**:
+   - The compiled production CSS bundle size increased from 22 KB (unparsed boilerplate) to **54 KB** of complete, minified Tailwind v4 utility and theme rules.
+   - Verified that `.max-w-7xl` (`max-width: 80rem`), `.mx-auto`, `.flex`, `.grid`, `.bg-slate-900`, `@media (min-width: 640px)`, and keyframe animations are present in `.next/static/css/703b8dc945010c4b.css`.
+2. **Live HTTP Server Probe**:
+   - Started the Next.js production server and probed `http://localhost:3000/en` and `http://localhost:3000/bn`.
+   - Both returned HTTP 200 with complete HTML payloads linking directly to `/_next/static/css/703b8dc945010c4b.css`.
+   - The document body includes `<body class="min-h-full flex flex-col bg-[#0a0d14] text-slate-100 ...">` and all centered containers `<div class="mx-auto flex h-16 max-w-7xl items-center ...">`.
+3. **Lint & Build Verification**:
+   - `npm run lint`: **0 errors, 0 warnings**.
+   - `npm run build`: **18/18 static pages successfully prerendered (code 0)**.
 
 ---
 
-## Changed / Created Files
-- `.gitignore`: Hardened ignore rules with `.env.example` exemptions.
-- `.env.example`: Frontend environment variable documentation.
-- `package.json`: Configured build script with cache sanitization and webpack runner.
-- `tsconfig.json`: Excluded backend directory to avoid compiler collisions.
-- `eslint.config.mjs`: Added backend ignore rules to prevent linting backend build files.
-- `next.config.ts`: Cleaned configuration for Next.js App Router stability.
-- `AGENTS.md`: Full monorepo guidelines, rules, and architecture specs.
-- `TASKS.md`: Master checklist across all 4 project phases.
-- `PROGRESS.md`: Live status and execution log.
-- `src/types/index.ts`: Strict TypeScript interfaces for frontend and bilingual entities.
-- `src/lib/utils.ts`: Tailwind merge and utility functions.
-- `src/lib/i18n.ts`: Internationalization helpers and fallback policies.
-- `src/data/dictionaries.ts`: English and Bangla dictionaries.
-- `src/data/portfolio-data.ts`: Professional placeholder dataset for Mehedi Hasan.
-- `src/components/ui/*`: Button, Card, Badge, Input, Textarea, Modal, Icons.
-- `src/components/layout/*`: Navbar, Footer, LanguageSwitcher.
-- `src/components/sections/*`: Hero, About, Skills, Experience, Education, Projects, CaseStudyModal, Blog, Contact.
-- `src/components/assistant/FloatingAssistant.tsx`: Interactive bilingual assistant.
-- `src/app/globals.css`: Dark terminal theme, Bengali typography rules, scanlines.
-- `src/app/layout.tsx`: Root document layout.
-- `src/app/page.tsx`: Root locale redirection to `/en`.
-- `src/app/[locale]/layout.tsx`: Localized root layout, SEO metadata, navbar, footer, assistant.
-- `src/app/[locale]/page.tsx`: Localized portfolio homepage.
-- `src/app/[locale]/projects/[slug]/page.tsx`: Project deep-dive page.
-- `src/app/[locale]/blog/[slug]/page.tsx`: Blog article page.
-- `backend/.env.example`: Express API environment template.
-- `backend/package.json` & `backend/tsconfig.json`: Backend build configuration.
-- `backend/src/config/db.ts`: MongoDB connection manager.
-- `backend/src/types/index.ts`: Backend TypeScript models.
-- `backend/src/models/*`: Mongoose schemas (Project, BlogPost, Skill, Experience, Education, Message, AssistantQA).
-- `backend/src/middleware/errorHandler.ts`: Express centralized error handler.
-- `backend/src/routes/health.ts` & `backend/src/routes/portfolio.ts`: Express routes.
-- `backend/src/index.ts`: Server entry point.
-
----
-
-## Verification Results
-1. **Frontend Lint Check**:
-   - Command: `npm run lint`
-   - Output: `0 errors, 0 warnings` (100% clean).
-2. **Frontend Production Build**:
-   - Command: `npm run build`
-   - Output: `18/18 static pages generated successfully in 1873ms` (code 0).
-   - Routes verified:
-     - `○ /` (redirect)
-     - `● /[locale] (/en, /bn)`
-     - `● /[locale]/projects/[slug] (all localized project paths)`
-     - `● /[locale]/blog/[slug] (all localized blog paths)`
-3. **Backend Compilation & Type Check**:
-   - Command: `npm --prefix backend run build` & `npm --prefix backend run typecheck`
-   - Output: `tsc completed with 0 errors` (code 0).
-4. **Mobile Responsiveness**:
-   - Verified viewport layout styling down to 360px without horizontal scroll.
-5. **Git Status & Remote Verification**:
-   - Branch: `main`
-   - Remote: `origin https://github.com/mehedilabs/mehedi-portfolio.git`
-
----
-
-## Known Problems & Mitigations
-- None. All compiler, linter, runtime, and typecheck checks are passing cleanly.
+## Changed Files in Hotfix
+- `package.json`: Added `@tailwindcss/postcss` dependency.
+- `package-lock.json`: Updated dependency tree.
+- `postcss.config.mjs`: New PostCSS configuration for Tailwind CSS v4.
+- `next.config.ts`: Configured `experimental.cpus: 1` for Windows static export stability.
+- `src/app/globals.css`: Added `@source` directives targeting component and page files.
+- `PROGRESS.md`: Documented root cause and verification logs.
 
 ---
 
 ## Exact Next Action
-- Await **Prompt 2** from the user to begin **Phase 2: Database Models, Authentication & Admin CMS**.
+- Await **Prompt 2** from the user to proceed to **Phase 2: Database Models, Authentication & Admin CMS**.

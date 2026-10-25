@@ -137,3 +137,4 @@ export interface IUser {
   role: "admin" | "demo";
   createdAt: Date;
 }
+

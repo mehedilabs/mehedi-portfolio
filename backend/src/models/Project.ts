@@ -50,3 +50,4 @@ ProjectSchema.index({ "bn.slug": 1 });
 export const ProjectModel =
   mongoose.models.Project ||
   mongoose.model<IProject & Document>("Project", ProjectSchema);
+

@@ -35,3 +35,4 @@ BlogPostSchema.index({ "bn.slug": 1 });
 export const BlogPostModel =
   mongoose.models.BlogPost ||
   mongoose.model<IBlogPost & Document>("BlogPost", BlogPostSchema);
+

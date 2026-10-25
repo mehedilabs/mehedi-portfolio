@@ -279,3 +279,4 @@ export function FloatingAssistant({ locale, dict }: FloatingAssistantProps) {
     </aside>
   );
 }
+
