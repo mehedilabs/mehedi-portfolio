@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { User, Sparkles, ArrowRight } from "lucide-react";
+import { Laptop, ArrowRight } from "lucide-react";
 import { Locale } from "@/types";
 import { Dictionary } from "@/data/dictionaries";
 import { Button } from "@/components/ui/Button";
@@ -9,6 +9,135 @@ import { Button } from "@/components/ui/Button";
 interface AboutSectionProps {
   locale?: Locale;
   dict: Dictionary;
+}
+
+// Visual illustration showing a developer working at a computer/laptop
+function DeveloperWorkingIllustration() {
+  return (
+    <svg
+      viewBox="0 0 380 300"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="w-full h-full object-contain select-none"
+      aria-hidden="true"
+    >
+      {/* Background ambient lighting */}
+      <circle cx="190" cy="130" r="90" fill="#10b981" fillOpacity="0.08" />
+      <circle cx="230" cy="110" r="70" fill="#06b6d4" fillOpacity="0.06" />
+
+      {/* Desk surface */}
+      <rect x="30" y="230" width="320" height="8" rx="4" fill="#1e293b" />
+      <rect x="55" y="238" width="6" height="55" rx="2" fill="#0f172a" />
+      <rect x="319" y="238" width="6" height="55" rx="2" fill="#0f172a" />
+
+      {/* Warm Coffee Mug on Desk */}
+      <rect x="55" y="212" width="14" height="18" rx="2.5" fill="#334155" />
+      <path
+        d="M69 216 C74 216, 74 224, 69 224"
+        stroke="#475569"
+        strokeWidth="1.5"
+        fill="none"
+      />
+      <path
+        d="M60 206 Q63 202, 61 198"
+        stroke="#10b981"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        opacity="0.6"
+      />
+
+      {/* Laptop Base on Desk */}
+      <path
+        d="M105 226 L225 226 L218 230 L112 230 Z"
+        fill="#334155"
+        stroke="#475569"
+        strokeWidth="1.2"
+      />
+
+      {/* Laptop Screen with Code Editor Lines */}
+      <rect
+        x="115"
+        y="142"
+        width="100"
+        height="84"
+        rx="6"
+        fill="#090d16"
+        stroke="#334155"
+        strokeWidth="1.8"
+      />
+      <rect x="122" y="150" width="86" height="68" rx="3" fill="#050811" />
+      {/* Window Controls */}
+      <circle cx="129" cy="156" r="2" fill="#ef4444" />
+      <circle cx="135" cy="156" r="2" fill="#f59e0b" />
+      <circle cx="141" cy="156" r="2" fill="#10b981" />
+      {/* Code Syntax Lines */}
+      <rect x="128" y="165" width="34" height="2.5" rx="1.2" fill="#10b981" />
+      <rect x="128" y="172" width="54" height="2.5" rx="1.2" fill="#38bdf8" />
+      <rect x="134" y="179" width="42" height="2.5" rx="1.2" fill="#94a3b8" />
+      <rect x="134" y="186" width="28" height="2.5" rx="1.2" fill="#10b981" />
+      <rect x="128" y="193" width="38" height="2.5" rx="1.2" fill="#38bdf8" />
+      <rect x="128" y="200" width="48" height="2.5" rx="1.2" fill="#a78bfa" />
+
+      {/* Ergonomic Office Chair */}
+      <rect x="238" y="155" width="8" height="75" rx="4" fill="#1e293b" />
+      <path d="M234 230 L252 230" stroke="#1e293b" strokeWidth="3" strokeLinecap="round" />
+      <rect x="241" y="230" width="5" height="62" fill="#0f172a" />
+
+      {/* Seated Developer Body */}
+      <path
+        d="M214 168 Q230 164, 238 178 L238 230 L202 230 Q204 192, 214 168 Z"
+        fill="#1e293b"
+      />
+
+      {/* Head & Hair */}
+      <circle cx="222" cy="136" r="15" fill="#334155" />
+      <path
+        d="M210 132 C210 120, 234 120, 235 132"
+        fill="#10b981"
+        fillOpacity="0.8"
+      />
+
+      {/* Headphones */}
+      <path
+        d="M208 135 C206 128, 211 122, 222 122 C233 122, 238 128, 236 135"
+        stroke="#10b981"
+        strokeWidth="2.5"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <rect x="207" y="133" width="3.5" height="9" rx="1.5" fill="#10b981" />
+      <rect x="234" y="133" width="3.5" height="9" rx="1.5" fill="#10b981" />
+
+      {/* Typing Arms reaching toward keyboard */}
+      <path
+        d="M218 182 Q198 196, 180 216 L196 218 Q210 203, 228 190 Z"
+        fill="#334155"
+      />
+      <circle cx="178" cy="216" r="4.5" fill="#475569" />
+
+      {/* Floating Syntax Elements */}
+      <g opacity="0.35">
+        <text
+          x="270"
+          y="110"
+          fill="#10b981"
+          fontSize="14"
+          fontFamily="monospace"
+        >
+          {"</>"}
+        </text>
+        <text
+          x="55"
+          y="125"
+          fill="#38bdf8"
+          fontSize="13"
+          fontFamily="monospace"
+        >
+          {"{ }"}
+        </text>
+      </g>
+    </svg>
+  );
 }
 
 export function AboutSection({ locale, dict }: AboutSectionProps) {
@@ -39,32 +168,29 @@ export function AboutSection({ locale, dict }: AboutSectionProps) {
 
         {/* Balanced Two-Column Layout (Desktop) / Natural Stack (Mobile) */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-14 items-center">
-          {/* Column 1: Dedicated Neutral Profile Photo Placeholder */}
+          {/* Column 1: Separate Developer-At-Work Image / Illustration (Not Profile Photo) */}
           <div className="md:col-span-5 flex justify-center">
-            <div className="relative w-full max-w-[320px] sm:max-w-[360px] aspect-square rounded-2xl border border-slate-800 bg-[#0c101a] p-4 shadow-2xl flex flex-col items-center justify-center text-center overflow-hidden group">
+            <div className="relative w-full max-w-[340px] sm:max-w-[380px] aspect-[4/3] sm:aspect-square rounded-2xl border border-slate-800 bg-[#0c101a] p-4 sm:p-5 shadow-2xl flex flex-col items-center justify-between overflow-hidden group">
               {/* Subtle background glow */}
               <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/10 via-transparent to-cyan-500/10 opacity-60 pointer-events-none" />
               <div className="absolute inset-0 terminal-grid opacity-20 pointer-events-none" />
 
-              {/* Neutral Avatar Placeholder */}
-              <div className="relative z-10 w-28 h-28 sm:w-32 sm:h-32 rounded-full border-2 border-emerald-500/30 bg-slate-900/90 flex items-center justify-center text-emerald-400 shadow-[0_0_30px_rgba(16,185,129,0.15)] mb-4 group-hover:scale-105 transition-transform">
-                <User className="w-14 h-14 sm:w-16 sm:h-16 text-slate-400" />
+              {/* Developer Working At Computer Illustration */}
+              <div className="relative z-10 w-full flex-1 flex items-center justify-center p-2 group-hover:scale-[1.02] transition-transform duration-300">
+                <DeveloperWorkingIllustration />
               </div>
 
-              {/* Identity Details */}
-              <div className="relative z-10 space-y-1">
-                <h3 className="text-lg font-bold text-white font-mono">
-                  Mehedi Hasan
-                </h3>
-                <p className="text-xs font-mono text-emerald-400">
-                  Full-Stack Developer
-                </p>
-                <div className="pt-2">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-900/80 border border-slate-800 text-[11px] font-mono text-slate-400">
-                    <Sparkles className="w-3 h-3 text-emerald-400" />
-                    <span>Profile Photo Placeholder</span>
+              {/* Separate Developer Workspace Caption */}
+              <div className="relative z-10 w-full pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs font-mono text-slate-400">
+                <div className="flex items-center gap-1.5">
+                  <Laptop className="w-3.5 h-3.5 text-emerald-400" />
+                  <span className="text-slate-300 font-medium">
+                    {locale === "bn" ? "ডেভেলপমেন্ট স্পেস" : "Developer at Work"}
                   </span>
                 </div>
+                <span className="text-[11px] text-emerald-400/90 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded">
+                  Coding & Building
+                </span>
               </div>
             </div>
           </div>
@@ -73,7 +199,7 @@ export function AboutSection({ locale, dict }: AboutSectionProps) {
           <div className="md:col-span-7 space-y-5 text-left">
             <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight leading-snug">
               {locale === "bn"
-                ? "পরিচ্ছন্ন, আধুনিক ও ব্যবহারকারী-বান্ধব ওয়েব অ্যাপ্লিকেশন নির্মাণে নিবেদিত。"
+                ? "পরিচ্ছন্ন, আধুনিক ও ব্যবহারকারী-বান্ধব ওয়েব অ্যাপ্লিকেশন নির্মাণে নিবেদিত।"
                 : "Building clean, modern, and user-friendly web applications."}
             </h3>
 
