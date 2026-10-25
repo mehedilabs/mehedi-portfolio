@@ -63,22 +63,57 @@ Legend:
 - [x] Simplified Skills section into 3 clean groups (Frontend, Backend & Database, Tools & Platforms) with recognizable SVG logos and zero fake percentages.
 - [x] Fixed Laptop Video Showcase: eliminated heading overlap, resolved screen bezel alignment, and corrected 3D Z-layering so the keyboard never covers the video.
 
-### 6. Verification & Git
-- [x] Run root Next.js ESLint (`npm run lint` -> 0 errors, 0 warnings).
-- [x] Run root Next.js production build (`npm run build` -> 18/18 static pages generated cleanly).
-- [x] Run backend TypeScript compilation (`npm --prefix backend run build` & `npm --prefix backend run typecheck` -> 0 errors).
-- [x] Verify mobile responsiveness down to 360px viewport width.
-- [x] Create structured Git commits and push to `origin main`.
-- [x] Update `PROGRESS.md` and `TASKS.md` with final Phase 1 verification results.
-
 ---
 
-## Phase 2: Database Models, Authentication & Admin CMS (Prompt 2 — Upcoming)
-- [ ] Secure JWT authentication and role-based access control (Admin / Read-Only Demo).
-- [ ] Database-driven Admin Dashboard for managing portfolio content.
-- [ ] Cloudinary media upload integration with drag-and-drop media library.
-- [ ] CRUD interfaces for Projects, Case Studies, Skills, Experience, and Education.
-- [ ] Read-only demo account with isolated test data.
+## Phase 2: Backend, Database, Authentication & Account Settings (Prompt 2) — COMPLETED
+
+### 1. Configuration & Security Infrastructure
+- [x] Centralized environment configuration and safe startup validation logging only missing variable NAMES (`backend/src/config/env.ts`).
+- [x] Resilient MongoDB Atlas connection management and readiness probe without exposing secrets (`backend/src/config/db.ts`, `backend/src/routes/health.ts`).
+- [x] Security headers with Helmet and strict CORS validation against frontend origin.
+- [x] Rate limiting: authentication limiter (10 attempts / 15m), sensitive action limiter (15 requests / 15m), and contact form limiter (10 submissions / hr).
+- [x] Centralized Zod request validation schemas and error formatting (`backend/src/validation/schemas.ts`).
+
+### 2. Comprehensive Data Models
+- [x] `User`: Owner/admin accounts with bcryptjs salt-12 hashing, tokenVersion tracking, role enforcement, and excluded password hashes.
+- [x] `Session`: Active login session tracking with MongoDB TTL expiration.
+- [x] `SiteSettings`: Global configuration (active sections, navigation, video showcase settings, global SEO).
+- [x] `Profile`: Professional bio, contact info, localized summaries, social links, resume URL.
+- [x] `Project`: Bilingual project records with case studies, tech stack, and category indices.
+- [x] `BlogPost`: Bilingual articles, tags, read times, and publication states.
+- [x] `Skill`: Categorized competencies with order indices.
+- [x] `Experience` & `Education`: Localized career timeline and academic achievements.
+- [x] `Certification`: Professional credentials with verified URLs.
+- [x] `MediaAsset`: Media metadata references and Cloudinary identifiers.
+- [x] `Page`: Custom localized pages with SEO metadata.
+- [x] `Message`: Contact inquiries with status tracking, audit logging, and IP attribution.
+- [x] `AssistantQA`: Bilingual assistant questions and structured answers.
+- [x] `AuditLog`: Security audit trails (logins, password changes, email changes, settings modifications).
+
+### 3. Authentication & Account Management
+- [x] JWT token generation with user claims, role, and cryptographic tokenVersion check (`backend/src/middleware/auth.ts`).
+- [x] HTTP-only secure cookie support (`mehedi_admin_token`) with cross-domain fallback to Bearer header.
+- [x] Token revocation: advancing `tokenVersion` on password or email change instantly invalidates all existing sessions.
+- [x] Dedicated owner login endpoint (`POST /api/auth/login`) with audit logging.
+- [x] Session status endpoint (`GET /api/auth/me`).
+- [x] Session logout endpoint (`POST /api/auth/logout`) clearing authentication cookies.
+- [x] Change password endpoint (`POST /api/auth/change-password`) with mandatory current password verification and session invalidation.
+- [x] Change email endpoint (`POST /api/auth/change-email`) with mandatory current password re-authentication and duplicate email protection.
+- [x] Safe initial owner setup endpoint (`POST /api/auth/setup-initial-admin`) locked permanently once any user exists.
+- [x] Startup auto-seeding support via optional environment variables (`ADMIN_INITIAL_EMAIL`, `ADMIN_INITIAL_PASSWORD`).
+
+### 4. Frontend Integration
+- [x] Centralized typed API client (`src/lib/api-client.ts`) with custom error classes and credentials management.
+- [x] Dedicated Admin Login page (`/admin/login`) matching the developer terminal aesthetic with loading, error, and initial setup modes.
+- [x] Dedicated Account Settings portal (`/admin/settings`) with Change Password, Change Email, Session Info, and live Health check.
+- [x] Root admin redirect (`/admin`) routing to settings or login.
+
+### 5. Verification & Testing
+- [x] Automated backend test suite (`backend/src/__tests__/auth-and-api.test.ts` -> 8/8 tests passed).
+- [x] Frontend ESLint verification (`npm run lint` -> 0 errors, 0 warnings).
+- [x] Frontend production build (`npm run build` -> 23/23 static pages generated cleanly).
+- [x] Backend TypeScript typecheck and build (`npm --prefix backend run typecheck` & `build` -> 0 errors).
+- [x] Environment documentation in root `.env.example` and `backend/.env.example`.
 
 ---
 
@@ -93,6 +128,4 @@ Legend:
 ## Phase 4: Production Polish, SEO, Performance & Deployment (Prompt 4 — Upcoming)
 - [ ] Dynamic sitemap.xml and robots.txt generation for all localized routes.
 - [ ] Open Graph & Twitter dynamic preview cards.
-- [ ] Rate limiting, audit logs, and security headers (Helmet, CSRF protection).
 - [ ] Production build optimization, caching strategies, and deployment documentation.
-

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { env } from "./env.js";
 
 let isConnected = false;
 
@@ -7,13 +8,10 @@ export async function connectDatabase(): Promise<void> {
     return;
   }
 
-  const mongoUri =
-    process.env.MONGODB_URI || "mongodb://localhost:27017/mehedi_portfolio";
-
   try {
-    const conn = await mongoose.connect(mongoUri, {
+    const conn = await mongoose.connect(env.MONGODB_URI, {
       serverSelectionTimeoutMS: 5000,
-      autoIndex: process.env.NODE_ENV !== "production",
+      autoIndex: env.NODE_ENV !== "production",
     });
 
     isConnected = conn.connections[0].readyState === 1;
@@ -43,6 +41,22 @@ export function isDatabaseConnected(): boolean {
   return isConnected && mongoose.connection.readyState === 1;
 }
 
+export function getDatabaseHealth(): {
+  status: "connected" | "disconnected";
+  readyState: number;
+  host?: string;
+  name?: string;
+} {
+  const readyState = mongoose.connection.readyState;
+  const isReady = readyState === 1;
+  return {
+    status: isReady ? "connected" : "disconnected",
+    readyState,
+    host: isReady ? mongoose.connection.host : undefined,
+    name: isReady ? mongoose.connection.name : undefined,
+  };
+}
+
 export async function closeDatabase(): Promise<void> {
   if (isConnected) {
     await mongoose.connection.close();
@@ -50,4 +64,3 @@ export async function closeDatabase(): Promise<void> {
     console.log("[Database] MongoDB connection gracefully closed.");
   }
 }
-

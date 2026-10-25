@@ -61,6 +61,8 @@ export interface ISkill {
   iconName: string;
   highlight: boolean;
   order: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface IExperience {
@@ -84,6 +86,8 @@ export interface IExperience {
     description: string;
     achievements: string[];
   };
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface IEducation {
@@ -103,6 +107,26 @@ export interface IEducation {
     description: string;
     courses: string[];
   };
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface ICertification {
+  name: string;
+  issuer: string;
+  issueDate: string;
+  credentialUrl?: string;
+  order: number;
+  en: {
+    title: string;
+    description: string;
+  };
+  bn: {
+    title: string;
+    description: string;
+  };
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface IMessage {
@@ -113,7 +137,10 @@ export interface IMessage {
   message: string;
   isRead: boolean;
   isArchived: boolean;
+  repliedAt?: Date;
+  ipAddress?: string;
   createdAt: Date;
+  updatedAt?: Date;
 }
 
 export interface IAssistantQA {
@@ -128,13 +155,152 @@ export interface IAssistantQA {
     question: string;
     answer: string;
   };
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface IUser {
-  username: string;
+  _id?: string;
+  name: string;
   email: string;
   passwordHash: string;
-  role: "admin" | "demo";
+  role: "owner" | "admin" | "demo";
+  tokenVersion: number;
+  lastLogin?: Date;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ISession {
+  userId: string;
+  userAgent?: string;
+  ipAddress?: string;
+  isValid: boolean;
+  expiresAt: Date;
   createdAt: Date;
 }
 
+export interface IProfile {
+  name: string;
+  email: string;
+  phone?: string;
+  location: string;
+  avatarUrl?: string;
+  aboutPhotoUrl?: string;
+  resumeUrl?: string;
+  socialLinks: {
+    github?: string;
+    linkedin?: string;
+    twitter?: string;
+    youtube?: string;
+  };
+  en: {
+    title: string;
+    bio: string;
+    aboutHeadline: string;
+    aboutParagraphs: string[];
+  };
+  bn: {
+    title: string;
+    bio: string;
+    aboutHeadline: string;
+    aboutParagraphs: string[];
+  };
+  updatedAt: Date;
+}
+
+export interface IVideoShowcaseSettings {
+  videoUrl: string;
+  posterUrl?: string;
+  aspectRatio: string;
+  autoPlay: boolean;
+  loop: boolean;
+  muted: boolean;
+  en: {
+    badge: string;
+    headingHighlight: string;
+    headingNormal: string;
+    subheading?: string;
+  };
+  bn: {
+    badge: string;
+    headingHighlight: string;
+    headingNormal: string;
+    subheading?: string;
+  };
+}
+
+export interface ISiteSettings {
+  siteName: string;
+  brandTagline: string;
+  maintenanceMode: boolean;
+  activeSections: {
+    hero: boolean;
+    about: boolean;
+    skills: boolean;
+    videoShowcase: boolean;
+    projects: boolean;
+    experience: boolean;
+    education: boolean;
+    blog: boolean;
+    contact: boolean;
+    assistant: boolean;
+  };
+  videoShowcase: IVideoShowcaseSettings;
+  seo: {
+    defaultTitle: string;
+    defaultDescription: string;
+    ogImage?: string;
+    keywords: string[];
+  };
+  updatedAt: Date;
+}
+
+export interface IMediaAsset {
+  filename: string;
+  publicId?: string;
+  url: string;
+  format: string;
+  bytes: number;
+  width?: number;
+  height?: number;
+  category: "avatar" | "project" | "blog" | "video" | "document" | "other";
+  altText: {
+    en: string;
+    bn: string;
+  };
+  uploadedBy?: string;
+  createdAt: Date;
+}
+
+export interface IPage {
+  slug: string;
+  isPublished: boolean;
+  en: {
+    title: string;
+    content: string;
+    seoTitle?: string;
+    seoDescription?: string;
+  };
+  bn: {
+    title: string;
+    content: string;
+    seoTitle?: string;
+    seoDescription?: string;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IAuditLog {
+  action: string;
+  resource: string;
+  resourceId?: string;
+  userId?: string;
+  userEmail?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  details?: Record<string, unknown>;
+  createdAt: Date;
+}

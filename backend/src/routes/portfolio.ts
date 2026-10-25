@@ -2,6 +2,8 @@ import { Router, Request, Response, NextFunction } from "express";
 import { ProjectModel } from "../models/Project.js";
 import { MessageModel } from "../models/Message.js";
 import { isDatabaseConnected } from "../config/db.js";
+import { contactFormLimiter } from "../middleware/rateLimiter.js";
+import { validateBody, messageSchema } from "../validation/schemas.js";
 
 const router = Router();
 
@@ -100,59 +102,48 @@ router.get("/projects/:slug", async (req: Request, res: Response, next: NextFunc
 
 /**
  * POST /api/messages
- * Validate and stage contact inquiry messages
+ * Validate, rate-limit, and store contact inquiry messages
  */
-router.post("/messages", async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { name, email, subject, inquiryType, message } = req.body;
+router.post(
+  "/messages",
+  contactFormLimiter,
+  validateBody(messageSchema),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { name, email, subject, inquiryType, message } = req.body;
 
-    // Validate required fields
-    if (!name || !email || !subject || !message) {
-      return res.status(400).json({
-        success: false,
-        error: "Missing required fields: name, email, subject, and message are required.",
-      });
-    }
+      const newMessageData = {
+        name,
+        email,
+        subject,
+        inquiryType: inquiryType || "job",
+        message,
+        isRead: false,
+        isArchived: false,
+        ipAddress: req.ip,
+        createdAt: new Date(),
+      };
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid email address format.",
-      });
-    }
+      if (isDatabaseConnected()) {
+        const created = await MessageModel.create(newMessageData);
+        return res.status(201).json({
+          success: true,
+          message: "Message received and stored in database successfully.",
+          data: { id: created._id },
+        });
+      }
 
-    const newMessageData = {
-      name: String(name).trim(),
-      email: String(email).trim().toLowerCase(),
-      subject: String(subject).trim(),
-      inquiryType: inquiryType || "job",
-      message: String(message).trim(),
-      isRead: false,
-      isArchived: false,
-      createdAt: new Date(),
-    };
-
-    if (isDatabaseConnected()) {
-      const created = await MessageModel.create(newMessageData);
-      return res.status(201).json({
+      // In fallback mode when database connection is offline
+      res.status(201).json({
         success: true,
-        message: "Message received and stored in database successfully.",
-        data: { id: created._id },
+        source: "staged",
+        message: "Message validated and staged successfully.",
+        data: newMessageData,
       });
+    } catch (error) {
+      next(error);
     }
-
-    // In fallback mode when database connection is pending
-    console.log("[Message Staged]", newMessageData);
-    res.status(201).json({
-      success: true,
-      source: "staged",
-      message: "Message validated and staged successfully.",
-      data: newMessageData,
-    });
-  } catch (error) {
-    next(error);
   }
-});
+);
 
 export default router;

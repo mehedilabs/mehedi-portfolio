@@ -1,9 +1,54 @@
 # PROGRESS.md — Project Status & Live Execution Log
 
 ## Current Phase
-- **Phase**: Phase 1 — Project Foundation & Public Portfolio (Prompt 1 of 4)
-- **Status**: COMPLETED & VERIFIED (Milestone: Functional Video Playback Controls)
-- **Current Task**: Added fully functional Play/Pause, Seek bar, Volume slider with Mute toggle, and Time display to the video showcase.
+- **Phase**: Phase 2 — Backend, Database, Authentication & Account Settings (Prompt 2 of 4)
+- **Status**: COMPLETED & VERIFIED
+- **Next Phase**: Phase 3 — Blog CMS, Dynamic Assistant & Contact Inquiries (Awaiting Prompt 3)
+
+---
+
+## Milestone: Backend, Database, Authentication & Account Settings (Phase 2)
+
+### Implemented Enhancements & Architecture
+1. **Centralized Safe Configuration & Environment Validation**:
+   - Built `backend/src/config/env.ts` with strict startup validation.
+   - Logs only missing variable *names*, never their secret values.
+   - Fully documented `.env.example` at repository root and `backend/.env.example`.
+2. **MongoDB Atlas Connection & Readiness Probes**:
+   - Built `backend/src/config/db.ts` with connection pooling, automatic reconnection, and graceful fallback when offline.
+   - Built `backend/src/routes/health.ts` exposing `GET /api/health` and `GET /api/ready` without leaking credentials or internal connection strings.
+3. **Comprehensive Data Models**:
+   - `User`: Owner/admin accounts, bcryptjs salt-12 password hashing, and cryptographic `tokenVersion` for instantaneous multi-device session revocation.
+   - `Session`: Tracks active login sessions with MongoDB TTL expiration.
+   - `SiteSettings`: Controls active sections, navigation, video showcase properties, and SEO defaults.
+   - `Profile`: Localized professional bio, contact channels, avatar/workspace photo paths, and resume URL.
+   - `Project`: Bilingual project records with architecture case studies, metrics, and technology badges.
+   - `BlogPost`: Bilingual articles, publication timestamps, tags, and read times.
+   - `Skill`, `Experience`, `Education`, `Certification`, `MediaAsset`, `Page`, `Message`, `AssistantQA`, `AuditLog`.
+4. **Cryptographic Authentication & Authorization Engine**:
+   - Built `backend/src/middleware/auth.ts`: Signs and verifies JWT session tokens with user claims and `tokenVersion`.
+   - Supports both HTTP-only secure cookies (`mehedi_admin_token`) and `Authorization: Bearer <token>` headers.
+   - Role-based authorization (`owner`, `admin`, `demo`).
+   - Rate limiting: `authLimiter` (10 attempts / 15m), `sensitiveActionLimiter` (15 requests / 15m), and `contactFormLimiter` (10 submissions / hr).
+   - Input validation: Zod schemas in `backend/src/validation/schemas.ts` for login, password change, email change, initial setup, and contact inquiries.
+5. **Account Settings & Security Endpoints**:
+   - `POST /api/auth/login`: Authenticates credentials, sets HTTP-only cookie, logs audit event.
+   - `POST /api/auth/logout`: Clears session cookie and invalidates client session.
+   - `GET /api/auth/me`: Verifies active session token.
+   - `POST /api/auth/change-password`: Verifies current password, checks complexity, updates hash, and increments `tokenVersion` to immediately invalidate all other active sessions.
+   - `POST /api/auth/change-email`: Reauthenticates owner with current password, validates format and uniqueness, updates email, and logs audit trail.
+   - `POST /api/auth/setup-initial-admin`: One-time setup endpoint permanently locked once any account exists.
+   - Optional environment auto-seed (`ADMIN_INITIAL_EMAIL`, `ADMIN_INITIAL_PASSWORD`).
+6. **Frontend Integration & Dedicated Admin UI**:
+   - Built centralized typed API client `src/lib/api-client.ts` with custom `ApiError` class.
+   - Dedicated Admin Login page at `/admin/login` matching the dark developer aesthetic with TLS indicator, loading states, and initial setup mode.
+   - Dedicated Account Settings page at `/admin/settings` with Change Password, Change Email, Session Info, and live Health check.
+   - Auto-redirection at `/admin` routing to settings or login.
+7. **Verification Outcomes**:
+   - Automated backend test suite (`backend/src/__tests__/auth-and-api.test.ts`): **8/8 tests passed** (Bcrypt comparison, JWT signing, token revocation, schema validation).
+   - Frontend ESLint (`npm run lint`): **0 errors, 0 warnings**.
+   - Frontend production build (`npm run build`): **23/23 static pages generated cleanly in 1043ms**.
+   - Backend TypeScript compilation (`npm --prefix backend run build`): **Exited code 0**.
 
 ---
 
