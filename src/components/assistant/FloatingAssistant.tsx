@@ -1,13 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  X,
-  Send,
-  Terminal,
-  Bot,
-  User,
-} from "lucide-react";
+import { X, Send, Terminal, Bot, User } from "lucide-react";
 import { Locale } from "@/types";
 import { Dictionary } from "@/data/dictionaries";
 import { ASSISTANT_QA_DATA } from "@/data/portfolio-data";
@@ -116,8 +110,8 @@ export function FloatingAssistant({ locale, dict }: FloatingAssistantProps) {
       // Default fallback response if no direct match
       const fallbackText =
         locale === "bn"
-          ? "ধন্যবাদ প্রশ্নের জন্য। মেহেদীর সাথে সরাসরি কথা বলতে নিচের 'যোগাযোগ' ফর্মটি ব্যবহার করুন অথবা contact.mehedi.dev@gmail.com ঠিকানায় ইমেইল করুন।"
-          : "Thank you for asking! For detailed discussions or specific opportunities, feel free to use the contact form below or reach Mehedi directly at contact.mehedi.dev@gmail.com.";
+          ? "ধন্যবাদ প্রশ্নের জন্য। মেহেদীর সাথে সরাসরি কথা বলতে নিচের 'যোগাযোগ' ফর্মটি ব্যবহার করুন অথবা mehedi.hasan.bd.dev@gmail.com ঠিকানায় ইমেইল করুন।"
+          : "Thank you for asking! For detailed discussions or specific opportunities, feel free to use the contact form below or reach Mehedi directly at mehedi.hasan.bd.dev@gmail.com.";
 
       const botReply = matchedQA
         ? locale === "bn"
@@ -137,7 +131,10 @@ export function FloatingAssistant({ locale, dict }: FloatingAssistantProps) {
   };
 
   return (
-    <aside aria-label="Interactive Portfolio Assistant" className="fixed bottom-5 right-5 z-50">
+    <aside
+      aria-label="Interactive Portfolio Assistant"
+      className="fixed bottom-5 right-5 z-50"
+    >
       {/* Floating Trigger Button with Avatar and Pulse */}
       {!isOpen && (
         <button
@@ -199,7 +196,9 @@ export function FloatingAssistant({ locale, dict }: FloatingAssistantProps) {
                 key={msg.id}
                 className={cn(
                   "flex gap-2 max-w-[88%]",
-                  msg.sender === "user" ? "ml-auto flex-row-reverse" : "mr-auto"
+                  msg.sender === "user"
+                    ? "ml-auto flex-row-reverse"
+                    : "mr-auto",
                 )}
               >
                 <div
@@ -207,7 +206,7 @@ export function FloatingAssistant({ locale, dict }: FloatingAssistantProps) {
                     "flex h-6 w-6 shrink-0 items-center justify-center rounded text-[10px]",
                     msg.sender === "user"
                       ? "bg-slate-800 text-slate-200"
-                      : "bg-emerald-950/60 border border-emerald-500/30 text-emerald-400"
+                      : "bg-emerald-950/60 border border-emerald-500/30 text-emerald-400",
                   )}
                 >
                   {msg.sender === "user" ? (
@@ -221,7 +220,7 @@ export function FloatingAssistant({ locale, dict }: FloatingAssistantProps) {
                     "p-2.5 rounded-lg leading-relaxed shadow-sm",
                     msg.sender === "user"
                       ? "bg-emerald-600/20 text-emerald-200 border border-emerald-500/30 rounded-tr-none"
-                      : "bg-slate-900/80 text-slate-200 border border-slate-800 rounded-tl-none"
+                      : "bg-slate-900/80 text-slate-200 border border-slate-800 rounded-tl-none",
                   )}
                 >
                   {msg.text}
@@ -279,4 +278,3 @@ export function FloatingAssistant({ locale, dict }: FloatingAssistantProps) {
     </aside>
   );
 }
-

@@ -2,8 +2,42 @@
 
 ## Current Phase
 - **Phase**: Phase 1 — Project Foundation & Public Portfolio (Prompt 1 of 4)
-- **Status**: COMPLETED & VERIFIED (Milestone: Simplified, Visual, Professional Projects Experience)
-- **Current Task**: Projects experience simplified across Homepage, View All Projects, and Individual Project Details pages. Ready for Phase 2.
+- **Status**: COMPLETED & VERIFIED (Milestone: Scroll-Driven Video Showcase)
+- **Current Task**: Scroll-driven video showcase implemented with single video presentation across 3 states. Ready for Phase 2.
+
+---
+
+## Milestone: Scroll-Driven Video Showcase (MacBook Presentation)
+
+### Implemented Enhancements
+1. **Three-State Scroll Animation Architecture**:
+   - **Screenshot 1 (Initial State, progress = 0)**:
+     - Heading "Full-Stack Development Solutions" (bilingual) prominent at top.
+     - 3D perspective MacBook laptop with dark chassis, recessed keyboard, backlit keys, and trackpad.
+     - Video sits flush inside the laptop screen lid (`scale: 1.0`, `rotateX: -8deg`, `translateY: 0px`).
+   - **Screenshot 2 (Intermediate State, progress = 0.5)**:
+     - Heading fades and scrolls upward.
+     - The single video element lifts forward out of the laptop screen, scaling up (`scale: 1.28`), translating downward (`translateY: 60px`), and tilting in 3D perspective (`rotateX: +22deg`) with rounded corners.
+     - Laptop lid back is revealed with "Mehedi Hasan" branding at the top bezel.
+   - **Screenshot 3 (Final State, progress = 1.0)**:
+     - The video expands to full foreground presentation size (`scale: 1.62` on desktop, `translateY: 135px`, `rotateX: 0deg`), perfectly flat and perpendicular to the camera.
+     - Settles directly in front of the laptop keyboard with deep ambient drop shadows.
+     - Full video playback controls become active with interactive play/pause, time, volume, and fullscreen.
+2. **Strict Single Video Presentation**:
+   - Exactly ONE `<video>` element in the entire section. No cloned cards or simulated video swaps.
+   - Responsive and fluid transform interpolation using lightweight `requestAnimationFrame` on scroll.
+3. **Local Creative Commons Demo Video Asset**:
+   - Added temporary demo video `public/videos/demo-showcase.mp4` (~1.1 MB, reliable CC0 MP4).
+   - Starts autoplaying muted (browser-compliant) with a floating quick-toggle sound button and native controls upon settling.
+   - Isolated and easy to replace in Phase 2 with production Cloudinary assets.
+4. **MacBook Component & Responsive Usability**:
+   - Built `src/components/ui/MacbookKeyboard.tsx` with function row, number keys, QWERTY, space bar, and inverted-T arrow keys.
+   - Fully responsive down to 360px mobile viewports without horizontal overflow.
+   - Full accessibility support: respects `prefers-reduced-motion` via `React.useSyncExternalStore` (instantly renders final readable state without forcing scroll).
+5. **Verification Outcomes**:
+   - `npm run lint`: **0 errors, 0 warnings** (exited code 0).
+   - `npm run build`: **20/20 static pages generated in 810ms** (exited code 0).
+   - `npm --prefix backend run build`: Backend TypeScript compiles cleanly (exited code 0).
 
 ---
 

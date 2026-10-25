@@ -1,224 +1,278 @@
 "use client";
 
 import * as React from "react";
-import {
-  Play,
-  Video,
-  Clock,
-  Sparkles,
-  X,
-  Terminal,
-} from "lucide-react";
+import { Volume2, VolumeX, Sparkles } from "lucide-react";
 import { Locale } from "@/types";
 import { Dictionary } from "@/data/dictionaries";
-import { Button } from "@/components/ui/Button";
+import { MacbookKeyboard } from "@/components/ui/MacbookKeyboard";
 
 interface VideoShowcaseSectionProps {
   locale: Locale;
   dict: Dictionary;
 }
 
+// Media Query External Store Listeners
+const subscribeReducedMotion = (callback: () => void) => {
+  if (typeof window === "undefined") return () => {};
+  const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+  mq.addEventListener("change", callback);
+  return () => mq.removeEventListener("change", callback);
+};
+
+const getReducedMotionSnapshot = () => {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+};
+
+const subscribeMobile = (callback: () => void) => {
+  if (typeof window === "undefined") return () => {};
+  const mq = window.matchMedia("(max-width: 639px)");
+  mq.addEventListener("change", callback);
+  return () => mq.removeEventListener("change", callback);
+};
+
+const getMobileSnapshot = () => {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(max-width: 639px)").matches;
+};
+
+const getServerSnapshot = () => false;
+
 export function VideoShowcaseSection({
   locale,
   dict,
 }: VideoShowcaseSectionProps) {
-  const [isPlaying, setIsPlaying] = React.useState(false);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const videoRef = React.useRef<HTMLVideoElement>(null);
 
-  // Configurable video data structure (ready for future Phase 2 Admin Panel CMS integration)
-  const videoConfig = {
-    title: dict.videoShowcase.videoTitle,
-    description: dict.videoShowcase.videoDesc,
-    duration: dict.videoShowcase.duration,
-    category: dict.videoShowcase.category,
-    // Real video URL placeholder (honest placeholder as requested; no fake link)
-    videoUrl: "",
-    thumbnail: "/images/video/architecture-thumbnail.png",
-    chapters: [
-      {
-        timestamp: "00:00",
-        title: locale === "bn" ? "ভূমিকা ও আর্কিটেকচার ওভারভিউ" : "Introduction & Monorepo Overview",
-      },
-      {
-        timestamp: "03:45",
-        title: locale === "bn" ? "Next.js ১৬ ও দ্বিভাষিক রাউটিং" : "Next.js 16 App Router & Bilingual Setup",
-      },
-      {
-        timestamp: "07:20",
-        title: locale === "bn" ? "Express REST API ও MongoDB পুলিং" : "Express.js REST Gateway & MongoDB Pooling",
-      },
-      {
-        timestamp: "10:15",
-        title: locale === "bn" ? "ডকার কন্টেইনার ও ক্লাউড ডেপ্লয়মেন্ট" : "Docker Containers & Cloud Deployment",
-      },
-    ],
+  const [rawProgress, setRawProgress] = React.useState(0);
+  const [isMuted, setIsMuted] = React.useState(true);
+
+  // Synchronize system preferences without cascading renders
+  const reducedMotion = React.useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotionSnapshot,
+    getServerSnapshot
+  );
+
+  const isMobile = React.useSyncExternalStore(
+    subscribeMobile,
+    getMobileSnapshot,
+    getServerSnapshot
+  );
+
+  const progress = reducedMotion ? 1 : rawProgress;
+
+  // Track scroll progression smoothly
+  React.useEffect(() => {
+    let rafId: number;
+
+    const handleScroll = () => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const totalScrollable = rect.height - window.innerHeight;
+
+      if (totalScrollable <= 0) return;
+
+      const current = -rect.top;
+      const p = Math.max(0, Math.min(1, current / totalScrollable));
+
+      rafId = requestAnimationFrame(() => {
+        setRawProgress(p);
+      });
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    rafId = requestAnimationFrame(handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(rafId);
+    };
+  }, []);
+
+  // Toggle audio
+  const toggleMute = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
   };
 
+  // Interpolated Animation Values based on the 3 reference states
+  // State 1 (progress = 0): Resting inside laptop screen
+  // State 2 (progress = 0.5): Lifting forward, scaling up, tilting in 3D perspective
+  // State 3 (progress = 1.0): Fully expanded, flat facing camera, positioned in foreground
+  const maxScale = isMobile ? 1.18 : 1.62;
+  const midScale = isMobile ? 1.08 : 1.28;
+
+  const maxTranslateY = isMobile ? 70 : 135;
+  const midTranslateY = isMobile ? 35 : 60;
+
+  let currentScale = 1;
+  let currentTranslateY = 0;
+  let currentRotateX = -8;
+
+  if (progress <= 0.5) {
+    const localP = progress / 0.5;
+    currentScale = 1 + (midScale - 1) * localP;
+    currentTranslateY = midTranslateY * localP;
+    currentRotateX = -8 + 30 * localP; // -8deg -> +22deg (tilt forward)
+  } else {
+    const localP = (progress - 0.5) / 0.5;
+    currentScale = midScale + (maxScale - midScale) * localP;
+    currentTranslateY = midTranslateY + (maxTranslateY - midTranslateY) * localP;
+    currentRotateX = 22 - 22 * localP; // +22deg -> 0deg (flat)
+  }
+
+  // Heading opacity & translation: fades out as user scrolls past 35%
+  const headingOpacity = Math.max(0, 1 - progress * 2.8);
+  const headingTranslateY = -progress * 120;
+
+  const isFinalState = progress > 0.85;
+
   return (
-    <section id="showcase" className="py-20 border-t border-slate-900 relative">
-      <div className="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-8 xl:px-10 space-y-10">
-        {/* Section Heading */}
-        <div className="space-y-2">
-          <div className="inline-flex items-center gap-2 font-mono text-xs text-emerald-400 font-semibold tracking-wider uppercase">
+    <section
+      id="showcase"
+      ref={containerRef}
+      className="relative h-[230vh] sm:h-[270vh] bg-[#050811] text-white"
+    >
+      {/* Sticky Fullscreen Presentation Stage */}
+      <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center overflow-hidden px-4">
+        {/* Subtle Background Ambience */}
+        <div className="absolute inset-0 terminal-grid opacity-20 pointer-events-none" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none" />
+
+        {/* Section Heading (Matches Reference Screenshot 1 & fades on scroll) */}
+        <div
+          className="absolute top-8 sm:top-12 text-center z-10 space-y-1 sm:space-y-2 pointer-events-none transition-transform duration-75"
+          style={{
+            opacity: headingOpacity,
+            transform: `translate3d(0, ${headingTranslateY}px, 0)`,
+          }}
+        >
+          <div className="inline-flex items-center gap-2 font-mono text-[11px] sm:text-xs text-emerald-400 font-semibold tracking-wider uppercase mb-1">
             <span className="w-2 h-2 rounded bg-emerald-500" />
-            {dict.videoShowcase.sectionTag}
+            <span>{dict.videoShowcase.sectionTag}</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white">
-            {dict.videoShowcase.title}
+
+          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
+            <span className="block text-emerald-400 drop-shadow-[0_0_25px_rgba(16,185,129,0.35)]">
+              {locale === "bn" ? "সিস্টেম আর্কিটেকচার" : "Full-Stack"}
+            </span>
+            <span className="block text-white mt-0.5 sm:mt-1">
+              {locale === "bn" ? "ডেভেলপমেন্ট সল্যুশনস" : "Development Solutions"}
+            </span>
           </h2>
-          <p className="text-slate-400 text-sm sm:text-base lg:text-[17px] max-w-3xl leading-relaxed">
-            {dict.videoShowcase.subtitle}
-          </p>
         </div>
 
-        {/* Video Player Showcase Card (Mihir Das Inspired) */}
-        <div className="rounded-2xl border border-slate-800 bg-[#0c101a] shadow-2xl overflow-hidden group">
-          {/* Window Header */}
-          <div className="flex items-center justify-between px-4 sm:px-6 py-3 bg-slate-900/90 border-b border-slate-800 text-xs font-mono text-slate-400">
-            <div className="flex items-center gap-2">
-              <Video className="w-4 h-4 text-emerald-400" />
-              <span className="text-slate-300">~/media/architecture-walkthrough.mp4</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] px-2 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono">
-                {videoConfig.category}
-              </span>
-            </div>
-          </div>
-
-          {/* Interactive Video Stage / Canvas */}
-          <div className="relative aspect-video max-h-[540px] w-full bg-gradient-to-br from-[#0c121e] via-[#090d16] to-[#070a10] overflow-hidden flex items-center justify-center">
-            {/* Background Grid & Texture */}
-            <div className="absolute inset-0 terminal-grid opacity-30 pointer-events-none" />
-
-            {/* Stage Graphic Elements */}
-            <div className="absolute inset-0 flex flex-col justify-between p-6 sm:p-10 pointer-events-none">
-              <div className="flex items-center justify-between">
-                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/90 border border-slate-700/80 text-emerald-400 text-xs font-mono backdrop-blur-sm">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Interactive Walkthrough</span>
-                </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-slate-950/80 border border-slate-800 text-slate-300 text-xs font-mono">
-                  <Clock className="w-3.5 h-3.5 text-slate-400" />
-                  <span>{videoConfig.duration}</span>
-                </span>
-              </div>
-
-              {/* Bottom Video Meta Description */}
-              <div className="space-y-1.5 max-w-xl">
-                <h3 className="text-xl sm:text-2xl font-bold text-white font-mono drop-shadow-md">
-                  {videoConfig.title}
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-300 line-clamp-2 leading-relaxed drop-shadow">
-                  {videoConfig.description}
-                </p>
-              </div>
-            </div>
-
-            {/* Glowing Center Play Button */}
-            <button
-              type="button"
-              onClick={() => setIsPlaying(true)}
-              aria-label={dict.videoShowcase.watchDemo}
-              className="relative z-20 group/play flex items-center justify-center h-20 w-20 sm:h-24 sm:w-24 rounded-full border-2 border-emerald-400/80 bg-emerald-950/60 text-emerald-400 shadow-[0_0_40px_rgba(16,185,129,0.35)] hover:scale-110 hover:border-emerald-300 hover:bg-emerald-900/60 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-emerald-500/50"
-            >
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400/40 opacity-50 pointer-events-none" />
-              <Play className="h-8 w-8 sm:h-10 sm:w-10 fill-emerald-400 text-emerald-400 ml-1 group-hover/play:scale-110 transition-transform" />
-            </button>
-          </div>
-
-          {/* Chapters / Key Milestones Bar */}
-          <div className="border-t border-slate-800/80 p-5 sm:p-6 bg-slate-950/60">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              {videoConfig.chapters.map((chap, idx) => (
-                <div
-                  key={idx}
-                  className="rounded-xl border border-slate-800/80 bg-slate-900/40 p-3 hover:border-slate-700 transition-colors flex items-center gap-2.5 font-mono text-xs"
-                >
-                  <span className="px-1.5 py-0.5 rounded bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 font-bold text-[11px] shrink-0">
-                    {chap.timestamp}
-                  </span>
-                  <span className="text-slate-300 truncate font-sans text-xs">
-                    {chap.title}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Video Player Modal Dialog */}
-        {isPlaying && (
+        {/* 3D Laptop Perspective Stage */}
+        <div
+          className="relative flex flex-col items-center justify-center mt-12 sm:mt-16"
+          style={{
+            perspective: "1200px",
+            transformStyle: "preserve-3d",
+          }}
+        >
+          {/* Laptop Base (3D Tilted Chassis & Keyboard) */}
           <div
-            role="dialog"
-            aria-modal="true"
-            aria-label={videoConfig.title}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
+            className="relative flex flex-col items-center transition-transform duration-75"
+            style={{
+              transform: "rotateX(20deg)",
+              transformStyle: "preserve-3d",
+            }}
           >
-            <div className="relative w-full max-w-4xl rounded-2xl border border-slate-700 bg-[#090d16] shadow-2xl overflow-hidden space-y-4">
-              {/* Modal Header Bar */}
-              <div className="flex items-center justify-between px-5 py-3.5 bg-slate-900/90 border-b border-slate-800">
-                <div className="flex items-center gap-2 text-xs font-mono text-slate-300 truncate">
-                  <Video className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span className="truncate">{videoConfig.title}</span>
+            {/* Laptop Lid Screen Backing (Frame where video initially lives) */}
+            <div className="relative w-[300px] sm:w-[480px] md:w-[580px] aspect-[16/10] rounded-t-2xl bg-[#090a0f] border-2 border-[#1c1d27] p-2.5 sm:p-3 pb-3 flex flex-col justify-between shadow-2xl">
+              {/* Top Bezel with Camera dot & Branding */}
+              <div className="flex items-center justify-between px-2 text-[10px] font-mono text-slate-500">
+                <span className="opacity-0">sys</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#202230]" />
+                  <span className="text-[10px] text-slate-500 uppercase tracking-widest font-mono">
+                    Mehedi Hasan
+                  </span>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setIsPlaying(false)}
-                  className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-                  aria-label={dict.videoShowcase.closeDemo}
-                >
-                  <X className="w-5 h-5" />
-                </button>
+                <span className="opacity-0">sys</span>
               </div>
 
-              {/* Video Player Display Container */}
-              <div className="p-4 sm:p-6 space-y-4">
-                <div className="relative aspect-video rounded-xl bg-slate-950 border border-slate-800 flex flex-col items-center justify-center p-6 text-center overflow-hidden">
-                  <div className="absolute inset-0 terminal-grid opacity-30 pointer-events-none" />
-
-                  <div className="relative z-10 max-w-md space-y-3">
-                    <div className="h-14 w-14 rounded-full border border-emerald-500/40 bg-emerald-950/40 text-emerald-400 flex items-center justify-center mx-auto shadow-lg">
-                      <Terminal className="h-7 w-7" />
-                    </div>
-
-                    <h4 className="text-base sm:text-lg font-bold text-white font-mono">
-                      {locale === "bn"
-                        ? "আর্কিটেকচার ভিডিও ডেমো প্লেয়ার"
-                        : "Architecture Video Walkthrough Player"}
-                    </h4>
-
-                    {/* Tasteful and Truthful Notice */}
-                    <p className="text-xs sm:text-sm text-slate-400 leading-relaxed font-sans">
-                      {dict.videoShowcase.placeholderNotice}
-                    </p>
-
-                    <div className="pt-2 inline-flex items-center gap-2 text-[11px] font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-500/30 px-3 py-1 rounded-full">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                      <span>Ready for Phase 2 Cloudinary Upload</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Footer Controls & Close */}
-                <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-                  <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
-                    <Clock className="w-3.5 h-3.5 text-slate-500" />
-                    <span>Duration: {videoConfig.duration}</span>
-                  </div>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsPlaying(false)}
-                    className="gap-1.5 text-xs text-slate-300"
-                  >
-                    <span>{dict.videoShowcase.closeDemo}</span>
-                  </Button>
-                </div>
+              {/* Inside Screen Well (Recessed Screen Surface) */}
+              <div className="w-full flex-1 rounded-lg bg-black border border-[#1b1c26] relative overflow-hidden flex items-center justify-center">
+                <div className="absolute inset-0 terminal-grid opacity-15 pointer-events-none" />
+                <span className="text-[11px] font-mono text-slate-600">
+                  ~/media/showcase.mp4
+                </span>
               </div>
             </div>
+
+            {/* Laptop Keyboard Chassis Base */}
+            <div className="w-[320px] sm:w-[520px] md:w-[630px] h-[150px] sm:h-[220px] md:h-[260px] rounded-b-2xl sm:rounded-b-[24px] bg-gradient-to-b from-[#14151c] via-[#0f1016] to-[#0a0b10] border border-[#222432] p-2 sm:p-3.5 shadow-[0_25px_50px_rgba(0,0,0,0.9)] flex flex-col justify-between relative">
+              {/* Display Hinge Cutout */}
+              <div className="w-24 sm:w-36 h-1.5 sm:h-2.5 rounded-b-md bg-[#08080c] mx-auto mb-1 border-b border-[#1f202b]" />
+
+              {/* Recessed Keyboard Well */}
+              <div className="w-full flex-1 rounded-xl bg-[#06070a] border border-[#1a1b24] p-1.5 sm:p-2 shadow-inner">
+                <MacbookKeyboard />
+              </div>
+
+              {/* Trackpad Area */}
+              <div className="w-24 sm:w-36 md:w-44 h-10 sm:h-16 rounded-lg bg-[#0c0d13] border border-[#20212d] mx-auto mt-2 shadow-inner" />
+
+              {/* Front Lip Opening Notch */}
+              <div className="w-12 sm:w-16 h-1 rounded-full bg-[#1c1d29] mx-auto mt-1" />
+            </div>
           </div>
-        )}
+
+          {/* EXACTLY ONE ANIMATED VIDEO ELEMENT (Transforms smoothly across States 1 -> 2 -> 3) */}
+          <div
+            className="absolute top-0 z-30 flex items-center justify-center pointer-events-auto w-[300px] sm:w-[480px] md:w-[580px] aspect-[16/10]"
+            style={{
+              transform: `translate3d(0, ${currentTranslateY}px, 0) scale(${currentScale}) rotateX(${currentRotateX}deg)`,
+              transformStyle: "preserve-3d",
+              transition: "box-shadow 0.2s ease",
+              boxShadow: isFinalState
+                ? "0 30px 70px -15px rgba(0, 0, 0, 0.95), 0 0 35px rgba(16, 185, 129, 0.2)"
+                : "0 15px 35px -10px rgba(0, 0, 0, 0.8)",
+            }}
+          >
+            <div className="relative w-full h-full rounded-xl sm:rounded-2xl overflow-hidden border border-slate-700/80 bg-black group shadow-2xl">
+              <video
+                ref={videoRef}
+                src="/videos/demo-showcase.mp4"
+                playsInline
+                muted={isMuted}
+                autoPlay
+                loop
+                controls={isFinalState}
+                className="w-full h-full object-cover"
+              />
+
+              {/* Floating Quick Mute / Audio Toggle */}
+              <button
+                onClick={toggleMute}
+                aria-label={isMuted ? "Unmute audio" : "Mute audio"}
+                className="absolute top-3 right-3 z-40 p-2 rounded-full bg-slate-900/80 hover:bg-slate-800 text-white border border-slate-700/70 backdrop-blur-md transition-all shadow-lg hover:scale-105"
+              >
+                {isMuted ? (
+                  <VolumeX className="w-4 h-4 text-slate-300" />
+                ) : (
+                  <Volume2 className="w-4 h-4 text-emerald-400" />
+                )}
+              </button>
+
+              {/* Status Badge in Initial State */}
+              {!isFinalState && (
+                <div className="absolute bottom-3 left-3 z-30 pointer-events-none opacity-80 group-hover:opacity-100 transition-opacity">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-950/80 border border-slate-800 text-emerald-300 text-[10px] font-mono backdrop-blur-sm">
+                    <Sparkles className="w-3 h-3 text-emerald-400" />
+                    <span>Demo Walkthrough</span>
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

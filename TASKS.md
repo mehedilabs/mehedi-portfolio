@@ -60,7 +60,7 @@ Legend:
 - [x] Individual project details pages (`/[locale]/projects/[slug]`): prominent 16:9 preview mockup, plain-English overview, key features with checkmarks, actual technology stack, and verified live/code links without unnecessary jargon.
 - [x] Redesigned About section with profile identity card, verified metrics (6+ Years, 40+ Systems, 99.98% Uptime, B.Sc. CSE), core focus chips, narrative journey & academic cards, Rule 0 callout, and 4-column engineering principles grid.
 - [x] Redesigned Skills section eliminating fake percentage bars; organized into clean category tabs with recognizable SVG logos (React, Next.js, TypeScript, Node, Tailwind, Mongo, Docker, Postgres, Redis, Express) and production status tags.
-- [x] Video Showcase section with terminal window bar, duration tag, glowing play button, chapters timeline, and modal player.
+- [x] Scroll-driven 3D MacBook video showcase section animating smoothly across initial (screen lid), intermediate (3D tilt lift), and final (foreground flat expanded) states with temporary local CC0 video asset.
 
 ### 6. Verification & Git
 - [x] Run root Next.js ESLint (`npm run lint` -> 0 errors, 0 warnings).
