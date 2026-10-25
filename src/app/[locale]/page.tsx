@@ -35,9 +35,9 @@ export default async function LocalizedHomePage({
       <HeroSection locale={locale} dict={dict} />
       <AboutSection locale={locale} dict={dict} />
       <SkillsSection locale={locale} dict={dict} />
+      <ProjectsSection locale={locale} dict={dict} />
       <ExperienceSection locale={locale} dict={dict} />
       <EducationSection locale={locale} dict={dict} />
-      <ProjectsSection locale={locale} dict={dict} />
       <VideoShowcaseSection locale={locale} dict={dict} />
       <BlogSection locale={locale} dict={dict} />
       <ContactSection locale={locale} dict={dict} />

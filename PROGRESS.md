@@ -2,8 +2,36 @@
 
 ## Current Phase
 - **Phase**: Phase 1 — Project Foundation & Public Portfolio (Prompt 1 of 4)
-- **Status**: COMPLETED & VERIFIED (Milestone: Laptop Video Showcase 3 Bugs Fix)
-- **Current Task**: Fixed the 3 laptop video showcase bugs (screen bezel alignment, heading separation, seamless exit into BlogSection).
+- **Status**: COMPLETED & VERIFIED (Milestone: Functional Video Playback Controls)
+- **Current Task**: Added fully functional Play/Pause, Seek bar, Volume slider with Mute toggle, and Time display to the video showcase.
+
+---
+
+## Milestone: Functional Video Playback Controls
+
+### Implemented Enhancements
+1. **Play/Pause Control**:
+   - Interactive button toggling between `Play` and `Pause` states.
+   - Synchronized with `<video>` `onPlay` and `onPause` events.
+   - Center ripple Play overlay appears when paused for clear visual feedback and quick resume.
+   - Clicking directly on the video body toggles playback.
+2. **Interactive Seek Bar**:
+   - Functional range slider showing current playback progress with dynamic emerald gradient track fill.
+   - Users can drag or click anywhere on the seek bar to scrub forward and backward in real time.
+   - Prevents scroll bubbling and maintains smooth interaction during all scroll states.
+3. **Volume & Mute Control**:
+   - Dynamic volume button with 3 states (`Volume2`, `Volume1`, `VolumeX`).
+   - Clicking toggles mute/unmute while restoring the previous volume level.
+   - Continuous volume slider allowing users to adjust volume from 0% to 100% with live gradient track fill.
+4. **Time Display**:
+   - Formatted `mm:ss / mm:ss` tabular-numeric readout showing live `currentTime` and total `duration`.
+5. **Aesthetics & Layout Preservation**:
+   - Integrated into a sleek bottom control bar with subtle backdrop gradient (`from-black/95 via-black/70 to-transparent`).
+   - Does not obscure the subject, does not alter laptop screen aspect ratio or 3D scroll animation, and remains completely accessible whether the video is resting inside the laptop or floating in zoomed state.
+6. **Verification Outcomes**:
+   - `npm run lint`: **0 errors, 0 warnings** (clean code 0).
+   - `npm run build`: **20/20 static pages generated cleanly** (clean code 0).
+   - `npm --prefix backend run build`: Backend TypeScript compiles cleanly (clean code 0).
 
 ---
 
