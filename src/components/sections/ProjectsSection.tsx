@@ -40,7 +40,7 @@ export function ProjectsSection({ locale, dict }: ProjectsSectionProps) {
 
   return (
     <section id="projects" className="py-20 border-t border-slate-900 relative">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* Section Heading */}
         <div className="space-y-2 mb-10">
           <div className="inline-flex items-center gap-2 font-mono text-xs text-emerald-400 font-semibold tracking-wider uppercase">
@@ -50,7 +50,7 @@ export function ProjectsSection({ locale, dict }: ProjectsSectionProps) {
           <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-white">
             {dict.projects.title}
           </h2>
-          <p className="text-slate-400 text-sm sm:text-base max-w-2xl">
+          <p className="text-slate-400 text-sm sm:text-base lg:text-[17px] max-w-3xl leading-relaxed">
             {dict.projects.subtitle}
           </p>
         </div>
@@ -79,7 +79,7 @@ export function ProjectsSection({ locale, dict }: ProjectsSectionProps) {
             {dict.projects.emptyState}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
             {filteredProjects.map((project) => {
               const projectContent = locale === "bn" ? project.bn : project.en;
 
@@ -103,21 +103,21 @@ export function ProjectsSection({ locale, dict }: ProjectsSectionProps) {
                       )}
                     </div>
 
-                    <CardHeader className="p-6 pb-3 space-y-2">
-                      <CardTitle className="text-lg font-bold text-white hover:text-emerald-400 transition-colors">
+                    <CardHeader className="p-6 sm:p-7 pb-3 space-y-2">
+                      <CardTitle className="text-lg sm:text-xl font-bold text-white hover:text-emerald-400 transition-colors">
                         {projectContent.title}
                       </CardTitle>
-                      <p className="text-xs font-mono text-emerald-400">
+                      <p className="text-xs sm:text-sm font-mono text-emerald-400">
                         {projectContent.tagline}
                       </p>
-                      <p className="text-sm text-slate-300 leading-relaxed pt-1">
+                      <p className="text-sm sm:text-base lg:text-[17px] text-slate-300 leading-[1.7] pt-1">
                         {projectContent.description}
                       </p>
                     </CardHeader>
 
-                    <CardContent className="px-6 py-3 space-y-4">
+                    <CardContent className="px-6 sm:px-7 py-3 space-y-4">
                       {/* Architecture Highlights */}
-                      <div className="space-y-1.5 bg-slate-950/40 p-3.5 rounded-lg border border-slate-800/80 text-xs text-slate-300">
+                      <div className="space-y-1.5 bg-slate-950/40 p-3.5 rounded-lg border border-slate-800/80 text-xs sm:text-sm text-slate-300">
                         <p className="font-mono text-[11px] uppercase tracking-wider text-slate-400 font-semibold mb-1">
                           {dict.projects.keyHighlights}
                         </p>

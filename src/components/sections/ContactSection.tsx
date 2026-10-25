@@ -74,7 +74,7 @@ export function ContactSection({ dict }: ContactSectionProps) {
 
   return (
     <section id="contact" className="py-20 border-t border-slate-900 relative">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* Section Heading */}
         <div className="space-y-2 mb-12">
           <div className="inline-flex items-center gap-2 font-mono text-xs text-emerald-400 font-semibold tracking-wider uppercase">
@@ -84,7 +84,7 @@ export function ContactSection({ dict }: ContactSectionProps) {
           <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-white">
             {dict.contact.title}
           </h2>
-          <p className="text-slate-400 text-sm sm:text-base max-w-2xl">
+          <p className="text-slate-400 text-sm sm:text-base lg:text-[17px] max-w-3xl leading-relaxed">
             {dict.contact.subtitle}
           </p>
         </div>
@@ -103,13 +103,13 @@ export function ContactSection({ dict }: ContactSectionProps) {
                   {dict.contact.availabilityStatus}
                 </span>
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
                 {dict.contact.availabilityNote}
               </p>
             </div>
 
             {/* Direct Channel Cards */}
-            <div className="space-y-3 font-mono text-xs">
+            <div className="space-y-3 font-mono text-xs sm:text-sm">
               <h3 className="uppercase tracking-wider text-slate-400 font-semibold">
                 {dict.contact.directTitle}
               </h3>
@@ -123,8 +123,8 @@ export function ContactSection({ dict }: ContactSectionProps) {
                   <Mail className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-[10px] text-slate-500 uppercase">{dict.contact.emailTitle}</p>
-                  <p className="text-xs font-mono text-slate-200 mt-0.5">{CONTACT_INFO.email}</p>
+                  <p className="text-[10px] sm:text-xs text-slate-500 uppercase">{dict.contact.emailTitle}</p>
+                  <p className="text-xs sm:text-sm font-mono text-slate-200 mt-0.5">{CONTACT_INFO.email}</p>
                 </div>
               </a>
 
@@ -139,8 +139,8 @@ export function ContactSection({ dict }: ContactSectionProps) {
                   <GithubIcon className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-[10px] text-slate-500 uppercase">{dict.contact.githubTitle}</p>
-                  <p className="text-xs font-mono text-slate-200 mt-0.5">github.com/mehedilabs</p>
+                  <p className="text-[10px] sm:text-xs text-slate-500 uppercase">{dict.contact.githubTitle}</p>
+                  <p className="text-xs sm:text-sm font-mono text-slate-200 mt-0.5">github.com/mehedilabs</p>
                 </div>
               </a>
 
@@ -155,8 +155,8 @@ export function ContactSection({ dict }: ContactSectionProps) {
                   <LinkedinIcon className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-[10px] text-slate-500 uppercase">{dict.contact.linkedinTitle}</p>
-                  <p className="text-xs font-mono text-slate-200 mt-0.5">linkedin.com/in/mehedihasan-dev</p>
+                  <p className="text-[10px] sm:text-xs text-slate-500 uppercase">{dict.contact.linkedinTitle}</p>
+                  <p className="text-xs sm:text-sm font-mono text-slate-200 mt-0.5">linkedin.com/in/mehedihasan-dev</p>
                 </div>
               </a>
 
@@ -166,8 +166,8 @@ export function ContactSection({ dict }: ContactSectionProps) {
                   <MapPin className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-[10px] text-slate-500 uppercase">{dict.contact.locationTitle}</p>
-                  <p className="text-xs font-mono text-slate-200 mt-0.5">{CONTACT_INFO.location}</p>
+                  <p className="text-[10px] sm:text-xs text-slate-500 uppercase">{dict.contact.locationTitle}</p>
+                  <p className="text-xs sm:text-sm font-mono text-slate-200 mt-0.5">{CONTACT_INFO.location}</p>
                 </div>
               </div>
             </div>

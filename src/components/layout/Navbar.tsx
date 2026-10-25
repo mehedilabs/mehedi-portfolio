@@ -90,7 +90,7 @@ export function Navbar({ locale, dict }: NavbarProps) {
           : "border-transparent bg-[#0a0d14]/40 backdrop-blur-sm"
       )}
     >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-16 max-w-[1360px] items-center justify-between px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* Terminal Brand Logo */}
         <Link
           href={`/${locale}`}

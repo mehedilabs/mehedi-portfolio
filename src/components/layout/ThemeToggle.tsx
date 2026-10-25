@@ -31,8 +31,16 @@ function getServerSnapshot(): "dark" | "light" {
   return "dark";
 }
 
-export function ThemeToggle({ className, showLabel = false, onToggle }: ThemeToggleProps) {
-  const theme = React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+export function ThemeToggle({
+  className,
+  showLabel = false,
+  onToggle,
+}: ThemeToggleProps) {
+  const theme = React.useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
+  );
 
   const toggleTheme = () => {
     const nextTheme = theme === "dark" ? "light" : "dark";
@@ -66,8 +74,10 @@ export function ThemeToggle({ className, showLabel = false, onToggle }: ThemeTog
       className={cn(
         "inline-flex items-center justify-center rounded-lg border p-2 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50",
         "border-slate-800 bg-slate-900/90 text-slate-300 hover:text-white hover:border-slate-700",
-        showLabel ? "gap-2 px-3 py-1.5 w-full justify-start text-xs font-mono" : "h-9 w-9",
-        className
+        showLabel
+          ? "gap-2 px-3 py-1.5 w-full justify-start text-xs font-mono"
+          : "h-9 w-9",
+        className,
       )}
     >
       {isDark ? (

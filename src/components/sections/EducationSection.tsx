@@ -16,7 +16,7 @@ interface EducationSectionProps {
 export function EducationSection({ locale, dict }: EducationSectionProps) {
   return (
     <section id="education" className="py-20 border-t border-slate-900 bg-[#080b12]/50 relative">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* Section Heading */}
         <div className="space-y-2 mb-10">
           <div className="inline-flex items-center gap-2 font-mono text-xs text-emerald-400 font-semibold tracking-wider uppercase">
@@ -26,30 +26,30 @@ export function EducationSection({ locale, dict }: EducationSectionProps) {
           <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-white">
             {dict.education.title}
           </h2>
-          <p className="text-slate-400 text-sm sm:text-base max-w-2xl">
+          <p className="text-slate-400 text-sm sm:text-base lg:text-[17px] max-w-3xl leading-relaxed">
             {dict.education.subtitle}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
           {EDUCATION_DATA.map((item) => {
             const edu = locale === "bn" ? item.bn : item.en;
 
             return (
               <Card key={item.id} glow="cyan" className="bg-[#0c101a] border-slate-800">
-                <CardContent className="p-6 space-y-4">
+                <CardContent className="p-6 sm:p-7 space-y-4">
                   <div className="flex items-start gap-3">
                     <div className="p-2.5 rounded-lg bg-cyan-950/40 border border-cyan-500/30 text-cyan-400">
                       <GraduationCap className="w-5 h-5" />
                     </div>
                     <div className="space-y-1">
-                      <h3 className="text-base font-bold text-white">
+                      <h3 className="text-base sm:text-lg font-bold text-white">
                         {edu.degree}
                       </h3>
-                      <p className="text-xs sm:text-sm font-mono text-emerald-400">
+                      <p className="text-xs sm:text-sm lg:text-[14.5px] font-mono text-emerald-400">
                         {edu.institution}
                       </p>
-                      <div className="flex items-center gap-3 text-xs font-mono text-slate-400 pt-1">
+                      <div className="flex items-center gap-3 text-xs sm:text-sm font-mono text-slate-400 pt-1">
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3.5 h-3.5 text-slate-500" />
                           {item.period}
@@ -63,12 +63,12 @@ export function EducationSection({ locale, dict }: EducationSectionProps) {
                     </div>
                   </div>
 
-                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed pt-2 border-t border-slate-800/80">
+                  <p className="text-sm sm:text-base lg:text-[15.5px] text-slate-300 leading-[1.7] pt-2 border-t border-slate-800/80">
                     {edu.description}
                   </p>
 
                   <div className="space-y-2 pt-1">
-                    <p className="text-xs font-mono uppercase tracking-wider text-slate-400">
+                    <p className="text-xs sm:text-sm font-mono uppercase tracking-wider text-slate-400">
                       {dict.education.coursesLabel}
                     </p>
                     <div className="flex flex-wrap gap-1.5">

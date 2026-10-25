@@ -2,12 +2,41 @@
 
 ## Current Phase
 - **Phase**: Phase 1 — Project Foundation & Public Portfolio (Prompt 1 of 4)
-- **Status**: COMPLETED & VERIFIED (Milestone: Typography, Theme Toggle & Responsive Navbar Usability)
-- **Current Task**: Completed font standardization (`Inter` + `Hind Siliguri`), dark/light theme toggle with zero FOUC, and mobile three-dot overflow navbar. Awaiting Prompt 2 to begin Phase 2.
+- **Status**: COMPLETED & VERIFIED (Milestone: Desktop Readability & Content Width Improvements)
+- **Current Task**: All Phase 1 public portfolio work complete. Awaiting Prompt 2 to begin Phase 2 (Database, Authentication & Admin CMS).
 
 ---
 
-## Milestone: Typography, Theme Toggle & Responsive Navbar Usability
+## Milestone: Desktop Readability & Content Width Improvements
+
+### Implemented Enhancements
+1. **Desktop Body Typography**:
+   - Body font-size raised from implicit 16px to `1.0625rem` (~17px) at `lg:` breakpoints, with `line-height: 1.7` for comfortable reading.
+   - All `p` elements set `line-height: 1.7` globally.
+   - Mobile stays at 16px / 1.6 — existing mobile readability preserved.
+2. **Desktop Container Width** (1360px max, 24–40px balanced padding):
+   - All section containers (`HeroSection`, `AboutSection`, `SkillsSection`, `ExperienceSection`, `ProjectsSection`, `EducationSection`, `BlogSection`, `ContactSection`) updated from `max-w-7xl` (1280px) to `max-w-[1360px]` with `xl:px-10` (40px) side padding.
+   - Navbar and Footer also widened to match at `max-w-[1360px]`.
+   - Blog and Project detail pages widened (`max-w-3xl xl:max-w-4xl`, `max-w-4xl xl:max-w-5xl`).
+   - Mobile layout (down to 360px) unchanged — `px-4` still applies at small viewports.
+3. **Section Content Readability**:
+   - Section subtitle/description paragraphs: raised from `text-sm sm:text-base` to `text-sm sm:text-base lg:text-[17px]` with `max-w-3xl` (previously `max-w-2xl`) to allow wider, more readable text blocks.
+   - Card body text in `AboutSection`, `ExperienceSection`, `EducationSection`, `ProjectsSection`, `BlogSection`: raised to `text-sm sm:text-base lg:text-[17.5px]` with `leading-[1.72]`.
+   - Achievement bullet lists, experience descriptions, and bio paragraphs: raised to `lg:text-[15.5px]–[17px]`.
+   - Card headers and skill/education item titles: raised to `sm:text-lg` for visual hierarchy.
+4. **Fonts Confirmed Loading via CSS @import**:
+   - `globals.css` retains `@import url(...)` for Inter, Hind Siliguri, and Fira Code at line 1.
+   - Preconnect `<link>` tags in `layout.tsx` remain for DNS prefetch performance.
+   - No ESLint warnings — `0 errors, 0 warnings`.
+
+### Verification Outcomes
+1. **Lint**: `npm run lint` → **0 errors, 0 warnings** (exited code 0).
+2. **Production Build**: `npm run build` → **18/18 static pages generated in 669ms** (exited code 0).
+3. **TypeScript**: All types clean — no type errors in compilation.
+4. **Mobile (360px)**: Padding stays at `px-4` (16px); no horizontal overflow introduced.
+5. **Bilingual**: `/en` and `/bn` routes both prerendered cleanly.
+
+---
 
 ### Implemented Enhancements
 1. **Font Standardization**:

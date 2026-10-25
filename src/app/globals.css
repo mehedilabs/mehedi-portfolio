@@ -51,11 +51,55 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Base English Font: Inter */
+/* Standardized Content Container (1280px-1400px with balanced 24-40px side padding) */
+.site-container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1360px;
+  padding-left: 1rem; /* 16px on mobile (prevents overflow down to 360px) */
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .site-container {
+    padding-left: 1.5rem; /* 24px */
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .site-container {
+    padding-left: 2rem; /* 32px */
+    padding-right: 2rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .site-container {
+    padding-left: 2.5rem; /* 40px balanced padding */
+    padding-right: 2.5rem;
+  }
+}
+
+/* Base English Font: Inter & Responsive Body Typography */
 body {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow-x: hidden;
+  font-size: 1rem; /* 16px on mobile */
+  line-height: 1.6;
   transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+@media (min-width: 1024px) {
+  body {
+    font-size: 1.0625rem; /* 17px-18px desktop reading size */
+    line-height: 1.7; /* Comfortable line-height around 1.7 */
+  }
+}
+
+p {
+  line-height: 1.7;
 }
 
 html.dark body {
@@ -71,13 +115,11 @@ html.light body {
 /* Bangla Font & Typography: Hind Siliguri */
 [lang="bn"],
 .locale-bn,
-.locale-bn body,
-.locale-bn h1,
-.locale-bn h2,
-.locale-bn h3,
-.locale-bn h4,
-.locale-bn h5,
-.locale-bn h6,
+.locale-bn body {
+  font-family: "Hind Siliguri", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.75;
+}
+
 .locale-bn p,
 .locale-bn span,
 .locale-bn a,
@@ -87,8 +129,13 @@ html.light body {
 .locale-bn select,
 .locale-bn div {
   font-family: "Hind Siliguri", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  line-height: 1.75;
-  letter-spacing: 0.01em;
+}
+
+@media (min-width: 1024px) {
+  .locale-bn body {
+    font-size: 1.0625rem; /* 17px-18px for Bangla */
+    line-height: 1.75;
+  }
 }
 
 [lang="bn"] h1,
@@ -99,7 +146,7 @@ html.light body {
 .locale-bn h2,
 .locale-bn h3,
 .locale-bn h4 {
-  line-height: 1.45;
+  line-height: 1.4;
   letter-spacing: normal;
 }
 
@@ -331,3 +378,5 @@ html.light .bg-rose-950\/10 {
 .terminal-console * {
   color: inherit;
 }
+
+

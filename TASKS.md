@@ -30,6 +30,8 @@ Legend:
 - [x] Implement terminal-inspired dark developer theme and high-contrast polished light theme.
 - [x] Add Sun/Moon one-click theme toggle with persistent `localStorage`, OS preference detection, and inline anti-FOUC script.
 - [x] Implement responsive navbar: desktop shows language switcher and theme toggle; mobile viewports collapse both into a compact three-dot (`⋮`) overflow menu.
+- [x] Improve desktop readability: body font 17px at `lg:`, line-height 1.7, section paragraph text raised to 17–17.5px.
+- [x] Expand desktop content container from `max-w-7xl` to `max-w-[1360px]` with 40px balanced side padding; all sections, navbar, footer, and detail pages updated.
 - [x] Build shadcn-inspired primitives: `Button`, `Card`, `Badge`, `Input`, `Textarea`, `Modal`, `Icons`.
 - [x] Build responsive layout components: `Navbar`, `Footer`, `LanguageSwitcher`, `ThemeToggle`.
 - [x] Build prominent Hero section with profile photo, terminal status box, CTA buttons, and social links.

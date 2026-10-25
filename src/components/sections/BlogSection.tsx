@@ -16,7 +16,7 @@ interface BlogSectionProps {
 export function BlogSection({ locale, dict }: BlogSectionProps) {
   return (
     <section id="blog" className="py-20 border-t border-slate-900 bg-[#080b12]/50 relative">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* Section Heading */}
         <div className="space-y-2 mb-10">
           <div className="inline-flex items-center gap-2 font-mono text-xs text-emerald-400 font-semibold tracking-wider uppercase">
@@ -26,13 +26,13 @@ export function BlogSection({ locale, dict }: BlogSectionProps) {
           <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-white">
             {dict.blog.title}
           </h2>
-          <p className="text-slate-400 text-sm sm:text-base max-w-2xl">
+          <p className="text-slate-400 text-sm sm:text-base lg:text-[17px] max-w-3xl leading-relaxed">
             {dict.blog.subtitle}
           </p>
         </div>
 
         {/* Blog Posts Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
           {BLOG_POSTS_DATA.map((post) => {
             const postContent = locale === "bn" ? post.bn : post.en;
 
@@ -43,7 +43,7 @@ export function BlogSection({ locale, dict }: BlogSectionProps) {
                 className="bg-[#0b0f19] border-slate-800 flex flex-col justify-between"
               >
                 <div>
-                  <CardHeader className="p-6 pb-2 space-y-3">
+                  <CardHeader className="p-6 sm:p-7 pb-2 space-y-3">
                     <div className="flex items-center gap-3 text-xs font-mono text-slate-400">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3.5 h-3.5 text-slate-500" />
@@ -56,13 +56,13 @@ export function BlogSection({ locale, dict }: BlogSectionProps) {
                       </span>
                     </div>
 
-                    <CardTitle className="text-lg font-bold text-white hover:text-cyan-400 transition-colors">
+                    <CardTitle className="text-lg sm:text-xl font-bold text-white hover:text-cyan-400 transition-colors">
                       {postContent.title}
                     </CardTitle>
                   </CardHeader>
 
-                  <CardContent className="px-6 py-2 space-y-3">
-                    <p className="text-sm text-slate-300 leading-relaxed">
+                  <CardContent className="px-6 sm:px-7 py-2 space-y-3">
+                    <p className="text-sm sm:text-base lg:text-[17px] text-slate-300 leading-[1.7]">
                       {postContent.excerpt}
                     </p>
 
@@ -76,7 +76,7 @@ export function BlogSection({ locale, dict }: BlogSectionProps) {
                   </CardContent>
                 </div>
 
-                <CardFooter className="p-6 pt-4 border-t border-slate-800/80">
+                <CardFooter className="p-6 sm:p-7 pt-4 border-t border-slate-800/80">
                   <span className="inline-flex items-center gap-1.5 text-xs font-mono text-emerald-400 group cursor-pointer hover:underline">
                     <span>{dict.blog.readArticle}</span>
                     <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />

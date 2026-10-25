@@ -77,7 +77,7 @@ export default async function ProjectDetailPage({
   const study = content.caseStudy;
 
   return (
-    <article className="py-16 mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 space-y-10">
+    <article className="py-16 mx-auto max-w-4xl xl:max-w-5xl px-4 sm:px-6 lg:px-8 xl:px-10 space-y-10">
       {/* Return Back Link */}
       <Link
         href={`/${locale}#projects`}
@@ -137,7 +137,7 @@ export default async function ProjectDetailPage({
             <span className="w-2 h-2 rounded bg-emerald-500" />
             Executive Summary
           </h2>
-          <p className="text-base text-slate-300 leading-relaxed bg-[#0c101a] p-6 rounded-xl border border-slate-800">
+          <p className="text-base sm:text-lg lg:text-[17px] text-slate-300 leading-[1.7] bg-[#0c101a] p-6 rounded-xl border border-slate-800">
             {content.description}
           </p>
         </div>
@@ -149,7 +149,7 @@ export default async function ProjectDetailPage({
                 <h3 className="font-mono text-xs uppercase tracking-wider text-rose-400 font-semibold">
                   Architectural Challenge
                 </h3>
-                <div className="p-5 rounded-lg border border-rose-950/40 bg-rose-950/10 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                <div className="p-5 rounded-lg border border-rose-950/40 bg-rose-950/10 text-sm sm:text-base text-slate-300 leading-[1.7]">
                   {study.challenge}
                 </div>
               </div>
@@ -158,7 +158,7 @@ export default async function ProjectDetailPage({
                 <h3 className="font-mono text-xs uppercase tracking-wider text-emerald-400 font-semibold">
                   Engineering Solution
                 </h3>
-                <div className="p-5 rounded-lg border border-emerald-950/40 bg-emerald-950/10 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                <div className="p-5 rounded-lg border border-emerald-950/40 bg-emerald-950/10 text-sm sm:text-base text-slate-300 leading-[1.7]">
                   {study.solution}
                 </div>
               </div>
@@ -169,7 +169,7 @@ export default async function ProjectDetailPage({
                 <Network className="w-4 h-4 text-cyan-400" />
                 Architecture & Data Flow
               </h3>
-              <div className="p-5 rounded-lg border border-slate-800 bg-slate-900/60 font-mono text-xs text-slate-300 leading-relaxed">
+              <div className="p-5 rounded-lg border border-slate-800 bg-slate-900/60 font-mono text-xs sm:text-sm text-slate-300 leading-relaxed">
                 {study.architecture}
               </div>
             </div>
@@ -181,7 +181,7 @@ export default async function ProjectDetailPage({
               </h3>
               <ul className="space-y-2 bg-[#0c101a] p-5 rounded-lg border border-slate-800">
                 {study.results.map((res, idx) => (
-                  <li key={idx} className="flex items-start gap-2 text-sm text-slate-300">
+                  <li key={idx} className="flex items-start gap-2 text-sm sm:text-base text-slate-300">
                     <span className="text-emerald-400 font-bold">✓</span>
                     <span>{res}</span>
                   </li>

@@ -37,7 +37,7 @@ export function SkillsSection({ locale, dict }: SkillsSectionProps) {
 
   return (
     <section id="skills" className="py-20 border-t border-slate-900 bg-[#080b12]/50 relative">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* Section Heading */}
         <div className="space-y-2 mb-10">
           <div className="inline-flex items-center gap-2 font-mono text-xs text-emerald-400 font-semibold tracking-wider uppercase">
@@ -47,7 +47,7 @@ export function SkillsSection({ locale, dict }: SkillsSectionProps) {
           <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-white">
             {dict.skills.title}
           </h2>
-          <p className="text-slate-400 text-sm sm:text-base max-w-2xl">
+          <p className="text-slate-400 text-sm sm:text-base lg:text-[17px] max-w-3xl leading-relaxed">
             {dict.skills.subtitle}
           </p>
         </div>
@@ -94,7 +94,7 @@ export function SkillsSection({ locale, dict }: SkillsSectionProps) {
         </div>
 
         {/* Skills Category Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
           {filteredCategories.map((category) => {
             const IconComp = categoryIcons[category.id] || Terminal;
             const catContent = locale === "bn" ? category.bn : category.en;
@@ -111,10 +111,10 @@ export function SkillsSection({ locale, dict }: SkillsSectionProps) {
                       <IconComp className="w-4 h-4" />
                     </div>
                     <div>
-                      <CardTitle className="text-base font-bold text-slate-100 font-mono">
+                      <CardTitle className="text-base sm:text-lg font-bold text-slate-100 font-mono">
                         {catContent.title}
                       </CardTitle>
-                      <p className="text-xs text-slate-400 mt-0.5">
+                      <p className="text-xs sm:text-sm lg:text-[14.5px] text-slate-400 mt-0.5">
                         {catContent.description}
                       </p>
                     </div>
@@ -124,7 +124,7 @@ export function SkillsSection({ locale, dict }: SkillsSectionProps) {
                 <CardContent className="pt-4 space-y-4">
                   {category.skills.map((skill) => (
                     <div key={skill.name} className="space-y-1.5">
-                      <div className="flex items-center justify-between text-xs font-mono">
+                      <div className="flex items-center justify-between text-xs sm:text-sm font-mono">
                         <span className="flex items-center gap-1.5 text-slate-200">
                           {skill.highlight && (
                             <Zap className="w-3 h-3 text-emerald-400" />

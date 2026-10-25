@@ -16,7 +16,7 @@ interface ExperienceSectionProps {
 export function ExperienceSection({ locale, dict }: ExperienceSectionProps) {
   return (
     <section id="experience" className="py-20 border-t border-slate-900 relative">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* Section Heading */}
         <div className="space-y-2 mb-12">
           <div className="inline-flex items-center gap-2 font-mono text-xs text-emerald-400 font-semibold tracking-wider uppercase">
@@ -26,7 +26,7 @@ export function ExperienceSection({ locale, dict }: ExperienceSectionProps) {
           <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-white">
             {dict.experience.title}
           </h2>
-          <p className="text-slate-400 text-sm sm:text-base max-w-2xl">
+          <p className="text-slate-400 text-sm sm:text-base lg:text-[17px] max-w-3xl leading-relaxed">
             {dict.experience.subtitle}
           </p>
         </div>
@@ -49,11 +49,11 @@ export function ExperienceSection({ locale, dict }: ExperienceSectionProps) {
 
                 {/* Experience Card */}
                 <Card glow="emerald" className="bg-[#0c101a] border-slate-800">
-                  <CardContent className="p-6 space-y-4">
+                  <CardContent className="p-6 sm:p-7 space-y-5">
                     {/* Header: Role, Period, Company */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-4">
                       <div>
-                        <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                        <h3 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
                           <span>{expContent.role}</span>
                           {exp.current && (
                             <Badge variant="terminal" className="text-[10px]">
@@ -61,12 +61,12 @@ export function ExperienceSection({ locale, dict }: ExperienceSectionProps) {
                             </Badge>
                           )}
                         </h3>
-                        <p className="text-emerald-400 font-mono text-xs sm:text-sm mt-0.5">
+                        <p className="text-emerald-400 font-mono text-xs sm:text-sm lg:text-[14.5px] mt-0.5">
                           {expContent.company}
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-3 text-xs font-mono text-slate-400">
+                      <div className="flex items-center gap-3 text-xs sm:text-sm font-mono text-slate-400">
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3.5 h-3.5 text-slate-500" />
                           {exp.period}
@@ -80,20 +80,20 @@ export function ExperienceSection({ locale, dict }: ExperienceSectionProps) {
                     </div>
 
                     {/* Overview Narrative */}
-                    <p className="text-sm text-slate-300 leading-relaxed">
+                    <p className="text-sm sm:text-base lg:text-[17px] text-slate-300 leading-[1.7]">
                       {expContent.description}
                     </p>
 
                     {/* Key Contributions & Achievements */}
-                    <div className="space-y-2 pt-1">
-                      <p className="text-xs font-mono uppercase tracking-wider text-slate-400">
+                    <div className="space-y-2.5 pt-1">
+                      <p className="text-xs sm:text-sm font-mono uppercase tracking-wider text-slate-400 font-semibold">
                         {dict.experience.responsibilitiesLabel}
                       </p>
-                      <ul className="space-y-2 text-xs sm:text-sm text-slate-300">
+                      <ul className="space-y-2.5 text-xs sm:text-sm lg:text-[15.5px] text-slate-300">
                         {expContent.achievements.map((ach, idx) => (
-                          <li key={idx} className="flex items-start gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                            <span className="leading-relaxed">{ach}</span>
+                          <li key={idx} className="flex items-start gap-2.5">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-1" />
+                            <span className="leading-[1.7]">{ach}</span>
                           </li>
                         ))}
                       </ul>
@@ -101,7 +101,7 @@ export function ExperienceSection({ locale, dict }: ExperienceSectionProps) {
 
                     {/* Technologies Tag Array */}
                     <div className="pt-2 border-t border-slate-800/80 flex flex-wrap items-center gap-1.5">
-                      <span className="text-xs font-mono text-slate-500 mr-2">
+                      <span className="text-xs sm:text-sm font-mono text-slate-400 mr-2">
                         {dict.experience.technologiesUsed}
                       </span>
                       {exp.techStack.map((tech) => (

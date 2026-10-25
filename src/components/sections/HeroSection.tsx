@@ -26,7 +26,7 @@ export function HeroSection({ dict }: HeroSectionProps) {
       <div className="absolute -top-40 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute top-1/2 -left-40 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="relative mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-8 xl:px-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left Column: Positioning & CTAs */}
           <div className="lg:col-span-7 space-y-6">
@@ -53,33 +53,33 @@ export function HeroSection({ dict }: HeroSectionProps) {
             </div>
 
             {/* Summary */}
-            <p className="text-base sm:text-lg text-slate-400 max-w-2xl leading-relaxed">
+            <p className="text-base sm:text-lg lg:text-[18px] text-slate-300 max-w-2xl xl:max-w-3xl leading-[1.7]">
               {dict.hero.summary}
             </p>
 
             {/* Quick Metrics Cards */}
-            <div className="grid grid-cols-3 gap-3 pt-2 max-w-lg">
+            <div className="grid grid-cols-3 gap-3.5 pt-2 max-w-lg xl:max-w-xl">
               <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-3 text-center">
-                <p className="text-xl sm:text-2xl font-bold font-mono text-emerald-400">
+                <p className="text-xl sm:text-2xl lg:text-3xl font-bold font-mono text-emerald-400">
                   {dict.hero.yearsExp}
                 </p>
-                <p className="text-[11px] font-mono text-slate-400 uppercase tracking-wider mt-0.5">
+                <p className="text-[11px] sm:text-xs font-mono text-slate-400 uppercase tracking-wider mt-0.5">
                   Experience
                 </p>
               </div>
               <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-3 text-center">
-                <p className="text-xl sm:text-2xl font-bold font-mono text-cyan-400">
+                <p className="text-xl sm:text-2xl lg:text-3xl font-bold font-mono text-cyan-400">
                   {dict.hero.projectsDelivered}
                 </p>
-                <p className="text-[11px] font-mono text-slate-400 uppercase tracking-wider mt-0.5">
+                <p className="text-[11px] sm:text-xs font-mono text-slate-400 uppercase tracking-wider mt-0.5">
                   Production
                 </p>
               </div>
               <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-3 text-center">
-                <p className="text-xl sm:text-2xl font-bold font-mono text-emerald-400">
+                <p className="text-xl sm:text-2xl lg:text-3xl font-bold font-mono text-emerald-400">
                   {dict.hero.uptime}
                 </p>
-                <p className="text-[11px] font-mono text-slate-400 uppercase tracking-wider mt-0.5">
+                <p className="text-[11px] sm:text-xs font-mono text-slate-400 uppercase tracking-wider mt-0.5">
                   Uptime Metric
                 </p>
               </div>
@@ -186,7 +186,7 @@ export function HeroSection({ dict }: HeroSectionProps) {
                   <span>$</span>
                   <span className="text-slate-200">{dict.hero.command}</span>
                 </div>
-                <div className="space-y-1.5 text-slate-400 pt-1 text-[11px] sm:text-xs leading-relaxed">
+                <div className="space-y-1.5 text-slate-400 pt-1 text-xs sm:text-[13px] leading-relaxed">
                   {dict.hero.outputLines.map((line, idx) => (
                     <div
                       key={idx}

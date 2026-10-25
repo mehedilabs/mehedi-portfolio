@@ -67,7 +67,7 @@ export default async function BlogPostDetailPage({
   const content = locale === "bn" ? post.bn : post.en;
 
   return (
-    <article className="py-16 mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 space-y-8">
+    <article className="py-16 mx-auto max-w-3xl xl:max-w-4xl px-4 sm:px-6 lg:px-8 xl:px-10 space-y-8">
       {/* Return to Blog */}
       <Link
         href={`/${locale}#blog`}
@@ -105,12 +105,12 @@ export default async function BlogPostDetailPage({
       </div>
 
       {/* Article Body */}
-      <div className="space-y-6 text-slate-300 leading-relaxed text-base">
-        <p className="text-lg text-slate-200 font-medium leading-relaxed bg-[#0c101a] p-6 rounded-xl border border-slate-800">
+      <div className="space-y-6 text-slate-300 leading-[1.75] text-base sm:text-[17px]">
+        <p className="text-lg sm:text-xl text-slate-200 font-medium leading-relaxed bg-[#0c101a] p-6 rounded-xl border border-slate-800">
           {content.excerpt}
         </p>
 
-        <p>{content.content}</p>
+        <p className="leading-[1.75]">{content.content}</p>
 
         {/* Phase 3 MDX CMS Notice */}
         <div className="mt-12 rounded-lg border border-slate-800 bg-slate-900/60 p-4 font-mono text-xs text-slate-400 flex items-center gap-3">

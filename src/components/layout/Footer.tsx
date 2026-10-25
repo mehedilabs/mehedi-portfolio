@@ -18,8 +18,8 @@ export function Footer({ dict }: FooterProps) {
   };
 
   return (
-    <footer className="w-full border-t border-slate-800/80 bg-[#070a0f] text-slate-400 py-12 px-4 sm:px-6 lg:px-8 mt-24">
-      <div className="mx-auto max-w-7xl">
+    <footer className="w-full border-t border-slate-800/80 bg-[#070a0f] text-slate-400 py-12 px-4 sm:px-6 lg:px-8 xl:px-10 mt-24">
+      <div className="mx-auto max-w-[1360px]">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-10 border-b border-slate-800/80">
           {/* Brand & Philosophy */}
           <div className="md:col-span-2 space-y-4">
@@ -32,7 +32,7 @@ export function Footer({ dict }: FooterProps) {
                 online
               </span>
             </div>
-            <p className="text-sm text-slate-400 max-w-md leading-relaxed">
+            <p className="text-sm sm:text-base text-slate-400 max-w-lg leading-relaxed">
               {dict.site.tagline}
             </p>
             <div className="flex items-center gap-3 pt-2">
