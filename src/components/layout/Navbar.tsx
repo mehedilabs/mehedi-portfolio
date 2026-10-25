@@ -2,10 +2,20 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Terminal, Menu, X, FileText, ArrowUpRight } from "lucide-react";
+import {
+  Terminal,
+  Menu,
+  X,
+  FileText,
+  ArrowUpRight,
+  MoreVertical,
+  Globe,
+  Palette,
+} from "lucide-react";
 import { Locale } from "@/types";
 import { Dictionary } from "@/data/dictionaries";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { ThemeToggle } from "./ThemeToggle";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 
@@ -16,7 +26,11 @@ interface NavbarProps {
 
 export function Navbar({ locale, dict }: NavbarProps) {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [isOverflowOpen, setIsOverflowOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
+
+  const overflowRef = React.useRef<HTMLDivElement>(null);
+  const overflowButtonRef = React.useRef<HTMLButtonElement>(null);
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -25,6 +39,38 @@ export function Navbar({ locale, dict }: NavbarProps) {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Handle click outside to close overflow popover
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      if (
+        overflowRef.current &&
+        !overflowRef.current.contains(event.target as Node) &&
+        overflowButtonRef.current &&
+        !overflowButtonRef.current.contains(event.target as Node)
+      ) {
+        setIsOverflowOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOverflowOpen(false);
+        setIsOpen(false);
+      }
+    };
+
+    if (isOverflowOpen || isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("touchstart", handleClickOutside);
+      document.addEventListener("keydown", handleKeyDown);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOverflowOpen, isOpen]);
 
   const navLinks = [
     { href: `#about`, label: dict.nav.about },
@@ -48,7 +94,7 @@ export function Navbar({ locale, dict }: NavbarProps) {
         {/* Terminal Brand Logo */}
         <Link
           href={`/${locale}`}
-          className="group flex items-center gap-2.5 font-mono text-sm sm:text-base font-bold text-slate-100 transition-colors"
+          className="group flex items-center gap-2.5 font-mono text-sm sm:text-base font-bold text-slate-100 transition-colors shrink-0"
         >
           <div className="flex h-8 w-8 items-center justify-center rounded-md border border-emerald-500/30 bg-emerald-950/40 text-emerald-400 group-hover:border-emerald-400 group-hover:bg-emerald-900/40 transition-all">
             <Terminal className="h-4 w-4" />
@@ -59,7 +105,7 @@ export function Navbar({ locale, dict }: NavbarProps) {
           </span>
         </Link>
 
-        {/* Desktop Navigation */}
+        {/* Desktop Navigation Links */}
         <nav className="hidden lg:flex items-center gap-6" aria-label="Main Navigation">
           {navLinks.map((link) => (
             <a
@@ -72,25 +118,86 @@ export function Navbar({ locale, dict }: NavbarProps) {
           ))}
         </nav>
 
-        {/* Right Controls: Language Switcher + Resume + Mobile Hamburger */}
+        {/* Right Controls Area */}
         <div className="flex items-center gap-2 sm:gap-3">
-          <LanguageSwitcher currentLocale={locale} />
+          {/* Desktop Controls (visible on lg screens) */}
+          <div className="hidden lg:flex items-center gap-2.5">
+            <LanguageSwitcher currentLocale={locale} />
+            <ThemeToggle />
+            <a href="#contact">
+              <Button variant="terminal" size="sm" className="gap-1.5 text-xs">
+                <FileText className="h-3.5 w-3.5" />
+                <span>{dict.nav.resume}</span>
+                <ArrowUpRight className="h-3 w-3 opacity-70" />
+              </Button>
+            </a>
+          </div>
 
-          <a
-            href="#contact"
-            className="hidden sm:inline-flex"
-          >
-            <Button variant="terminal" size="sm" className="gap-1.5 text-xs">
-              <FileText className="h-3.5 w-3.5" />
-              <span>{dict.nav.resume}</span>
-              <ArrowUpRight className="h-3 w-3 opacity-70" />
-            </Button>
-          </a>
+          {/* Mobile Three-Dot Overflow Button */}
+          <div className="relative lg:hidden">
+            <button
+              ref={overflowButtonRef}
+              type="button"
+              onClick={() => {
+                setIsOverflowOpen((prev) => !prev);
+                setIsOpen(false); // Close main nav drawer if opening overflow
+              }}
+              className={cn(
+                "flex h-9 w-9 items-center justify-center rounded-md border text-slate-300 hover:text-white transition-colors",
+                isOverflowOpen
+                  ? "border-emerald-500/50 bg-emerald-950/40 text-emerald-400"
+                  : "border-slate-800 bg-slate-900"
+              )}
+              aria-label="Language and theme preferences"
+              aria-expanded={isOverflowOpen}
+              aria-haspopup="true"
+            >
+              <MoreVertical className="h-4 w-4" />
+            </button>
 
-          {/* Mobile Menu Button */}
+            {/* Mobile Preferences Popover Dropdown */}
+            {isOverflowOpen && (
+              <div
+                ref={overflowRef}
+                role="dialog"
+                aria-label="Preferences Menu"
+                className="absolute right-0 top-11 w-56 rounded-xl border border-slate-800 bg-[#0c101a] p-3 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150 space-y-3 font-mono text-xs"
+              >
+                {/* Language Switcher in Popover */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-slate-400 text-[10px] uppercase tracking-wider px-1">
+                    <span>Language / ভাষা</span>
+                    <Globe className="h-3 w-3 text-emerald-400" />
+                  </div>
+                  <LanguageSwitcher
+                    currentLocale={locale}
+                    className="w-full justify-center"
+                    onSwitch={() => setIsOverflowOpen(false)}
+                  />
+                </div>
+
+                {/* Theme Toggle in Popover */}
+                <div className="pt-2 border-t border-slate-800 space-y-1.5">
+                  <div className="flex items-center justify-between text-slate-400 text-[10px] uppercase tracking-wider px-1">
+                    <span>Theme / থিম</span>
+                    <Palette className="h-3 w-3 text-cyan-400" />
+                  </div>
+                  <ThemeToggle
+                    showLabel
+                    onToggle={() => setIsOverflowOpen(false)}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Mobile Hamburger Navigation Button */}
           <button
             type="button"
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={() => {
+              setIsOpen((prev) => !prev);
+              setIsOverflowOpen(false); // Close overflow popover if opening nav
+            }}
             className="flex h-9 w-9 items-center justify-center rounded-md border border-slate-800 bg-slate-900 text-slate-300 hover:text-white lg:hidden transition-colors"
             aria-label="Toggle navigation menu"
             aria-expanded={isOpen}
@@ -100,7 +207,7 @@ export function Navbar({ locale, dict }: NavbarProps) {
         </div>
       </div>
 
-      {/* Mobile Drawer Overlay */}
+      {/* Mobile Navigation Drawer Overlay (Section Links only) */}
       {isOpen && (
         <div className="lg:hidden border-b border-slate-800 bg-[#0c101a] px-4 pt-3 pb-6 animate-in slide-in-from-top-2 duration-150 shadow-2xl">
           <nav className="flex flex-col space-y-3 font-mono text-sm" aria-label="Mobile Navigation">
@@ -134,4 +241,3 @@ export function Navbar({ locale, dict }: NavbarProps) {
     </header>
   );
 }
-

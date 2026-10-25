@@ -9,11 +9,13 @@ import { cn } from "@/lib/utils";
 interface LanguageSwitcherProps {
   currentLocale: Locale;
   className?: string;
+  onSwitch?: () => void;
 }
 
 export function LanguageSwitcher({
   currentLocale,
   className,
+  onSwitch,
 }: LanguageSwitcherProps) {
   const pathname = usePathname();
   const router = useRouter();
@@ -33,6 +35,10 @@ export function LanguageSwitcher({
     // Preserve current URL hash if any
     const hash = typeof window !== "undefined" ? window.location.hash : "";
     router.push(`${newPath}${hash}`);
+
+    if (onSwitch) {
+      onSwitch();
+    }
   };
 
   return (

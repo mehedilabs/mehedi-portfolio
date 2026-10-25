@@ -22,14 +22,16 @@ Legend:
 ### 2. Bilingual Architecture & Core Routing
 - [x] Implement locale-prefixed routing (`/en` and `/bn`) with automatic root redirect.
 - [x] Implement bilingual dictionary data structures (`en` and `bn`) with explicit fallback policy.
-- [x] Setup Bangla-friendly typography and line-heights in global CSS and layouts.
+- [x] Standardize website-wide typography: `Inter` for English, `Hind Siliguri` for Bangla with unclipped diacritics (`line-height: 1.75`), and `Fira Code` for terminal consoles.
 - [x] Implement dynamic language switcher preserving current route, anchor, and state.
 - [x] Generate localized SEO metadata and hreflang alternate links for all pages.
 
 ### 3. UI/UX Design System & Reusable Components
-- [x] Implement terminal-inspired dark developer theme styling (subtle borders, glowing accents, status badges, monospaced details).
+- [x] Implement terminal-inspired dark developer theme and high-contrast polished light theme.
+- [x] Add Sun/Moon one-click theme toggle with persistent `localStorage`, OS preference detection, and inline anti-FOUC script.
+- [x] Implement responsive navbar: desktop shows language switcher and theme toggle; mobile viewports collapse both into a compact three-dot (`⋮`) overflow menu.
 - [x] Build shadcn-inspired primitives: `Button`, `Card`, `Badge`, `Input`, `Textarea`, `Modal`, `Icons`.
-- [x] Build responsive layout components: `Navbar`, `Footer`, `LanguageSwitcher`.
+- [x] Build responsive layout components: `Navbar`, `Footer`, `LanguageSwitcher`, `ThemeToggle`.
 - [x] Build prominent Hero section with profile photo, terminal status box, CTA buttons, and social links.
 - [x] Build About section with professional summary, core philosophy, and principles cards.
 - [x] Build Skills section categorized by domain (Frontend, Backend, DevOps, Architecture, Database) with animated progress bars.

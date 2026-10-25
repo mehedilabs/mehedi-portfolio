@@ -166,7 +166,7 @@ export function HeroSection({ dict }: HeroSectionProps) {
             </div>
 
             {/* Interactive Terminal Window Widget */}
-            <div className="rounded-xl border border-slate-800 bg-[#0c111c] shadow-2xl overflow-hidden font-mono text-xs">
+            <div className="rounded-xl border border-slate-800 bg-[#0c111c] shadow-2xl overflow-hidden font-mono text-xs terminal-window">
               {/* Window Title Bar */}
               <div className="flex items-center justify-between px-4 py-2.5 bg-slate-900/90 border-b border-slate-800 text-slate-400">
                 <div className="flex items-center gap-1.5">

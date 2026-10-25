@@ -2,8 +2,34 @@
 
 ## Current Phase
 - **Phase**: Phase 1 — Project Foundation & Public Portfolio (Prompt 1 of 4)
-- **Status**: COMPLETED & VERIFIED (Hotfix Applied: Tailwind CSS v4 Rendering Pipeline)
-- **Current Task**: Phase 1 foundation complete and verified; styling actively rendering across all pages. Awaiting Prompt 2 to begin Phase 2.
+- **Status**: COMPLETED & VERIFIED (Milestone: Typography, Theme Toggle & Responsive Navbar Usability)
+- **Current Task**: Completed font standardization (`Inter` + `Hind Siliguri`), dark/light theme toggle with zero FOUC, and mobile three-dot overflow navbar. Awaiting Prompt 2 to begin Phase 2.
+
+---
+
+## Milestone: Typography, Theme Toggle & Responsive Navbar Usability
+
+### Implemented Enhancements
+1. **Font Standardization**:
+   - **English**: Configured `Inter` across all public views, project detail pages, and components.
+   - **Bangla**: Configured `Hind Siliguri` across `.locale-bn` and `[lang="bn"]` elements with generous `line-height: 1.75` and letter-spacing to prevent visual diacritic clipping.
+   - **Monospace Elements**: Terminal window headers, code snippets, status badges, and metrics retain `Fira Code` with `ui-monospace` fallbacks.
+   - Preconnect links for Google Fonts added to root `<head>`.
+2. **Dark / Light Theme System**:
+   - **One-Click ThemeToggle**: Sun/Moon toggle with Lucide icons. Uses `React.useSyncExternalStore` observing `document.documentElement` class changes for tear-free, hydration-safe state synchronization.
+   - **Anti-FOUC Inline Script**: Synchronous script injected into `<head>` reads `localStorage.getItem('theme')` or `window.matchMedia('(prefers-color-scheme: dark)')` to set `html.dark` or `html.light` prior to first paint.
+   - **Comprehensive Light Theme**: Clean, accessible palette with high contrast (`#f8fafc` background, `#0f172a` text, `#ffffff` cards, subtle borders, light terminal grid textures, and preserved dark terminal consoles for code blocks).
+3. **Responsive Navbar with Mobile Overflow Menu**:
+   - **Desktop (`lg:flex`)**: Language Switcher + Theme Toggle + Resume CTA button clearly presented in the header controls area.
+   - **Mobile Viewports (<1024px, including 360px)**: Language Switcher and Theme Toggle tucked neatly into a compact three-dot (`⋮`, `MoreVertical`) overflow menu.
+   - **Separation of Concerns**: Hamburger menu strictly contains section navigation links; three-dot overflow menu houses user preferences.
+   - **Usability & Accessibility**: Independent popover states, mutual close on alternating menu trigger, outside-click listener, Escape key dismissal, and ARIA attributes (`aria-expanded`, `aria-haspopup`, `aria-label`).
+
+### Verification Outcomes
+1. **Lint**: `npm run lint` -> **0 errors, 0 warnings** (exited code 0).
+2. **Production Build**: `npm run build` -> **18/18 static pages generated in 925ms** (exited code 0).
+3. **Backend Build**: `npm --prefix backend run build` -> **TypeScript compilation exited code 0**.
+4. **Live Probes**: Verified HTTP 200 on `/en` and `/bn`, checked anti-FOUC script injection, mobile popover elements, and responsive layout styling.
 
 ---
 

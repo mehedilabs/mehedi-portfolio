@@ -1,6 +1,10 @@
+@import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+
 @import "tailwindcss";
 
 @source "../**/*.{ts,tsx}";
+
+@variant dark (&:where(.dark, .dark *));
 
 :root {
   --background: #0a0d14;
@@ -22,22 +26,67 @@
   --ring: #10b981;
 }
 
-html {
+html.dark {
   color-scheme: dark;
+}
+
+html.light {
+  color-scheme: light;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #1e293b;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #10b981;
+}
+
+html {
   scroll-behavior: smooth;
 }
 
+/* Base English Font: Inter */
 body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hind Siliguri", "Noto Sans Bengali", sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow-x: hidden;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* Bangla typography enhancement */
+html.dark body {
+  background-color: #0a0d14;
+  color: #f1f5f9;
+}
+
+html.light body {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+/* Bangla Font & Typography: Hind Siliguri */
 [lang="bn"],
-.locale-bn {
-  font-family: "Hind Siliguri", "Noto Sans Bengali", "Inter", sans-serif;
+.locale-bn,
+.locale-bn body,
+.locale-bn h1,
+.locale-bn h2,
+.locale-bn h3,
+.locale-bn h4,
+.locale-bn h5,
+.locale-bn h6,
+.locale-bn p,
+.locale-bn span,
+.locale-bn a,
+.locale-bn button,
+.locale-bn input,
+.locale-bn textarea,
+.locale-bn select,
+.locale-bn div {
+  font-family: "Hind Siliguri", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   line-height: 1.75;
   letter-spacing: 0.01em;
 }
@@ -58,7 +107,7 @@ body {
 code,
 pre,
 .font-mono {
-  font-family: "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-family: "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace !important;
 }
 
 /* Terminal scanline subtle visual texture */
@@ -69,9 +118,19 @@ pre,
     linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
 }
 
+html.light .terminal-grid {
+  background-image: 
+    linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+}
+
 .terminal-dots {
   background-image: radial-gradient(rgba(16, 185, 129, 0.12) 1px, transparent 1px);
   background-size: 24px 24px;
+}
+
+html.light .terminal-dots {
+  background-image: radial-gradient(rgba(16, 185, 129, 0.16) 1px, transparent 1px);
 }
 
 /* Custom terminal scrollbars */
@@ -82,11 +141,193 @@ pre,
 ::-webkit-scrollbar-track {
   background: #0a0d14;
 }
+html.light ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
 ::-webkit-scrollbar-thumb {
   background: #1e293b;
   border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
+html.light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
 ::-webkit-scrollbar-thumb:hover {
   background: #334155;
+}
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ==============================================================================
+   Light Theme Adaptations for Core Components & Layout Surfaces
+   ============================================================================== */
+html.light header.border-b {
+  background-color: rgba(255, 255, 255, 0.88) !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+html.light .bg-\[\#0a0d14\] {
+  background-color: #f8fafc !important;
+}
+
+html.light .bg-\[\#0a0d14\]\/90 {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+}
+
+html.light .bg-\[\#0a0d14\]\/40 {
+  background-color: rgba(255, 255, 255, 0.6) !important;
+}
+
+html.light .bg-\[\#0c101a\],
+html.light .bg-\[\#0b0f19\],
+html.light .bg-\[\#0d121c\] {
+  background-color: #ffffff !important;
+}
+
+html.light .bg-\[\#070a0f\] {
+  background-color: #f1f5f9 !important;
+}
+
+html.light .bg-\[\#080b12\]\/50 {
+  background-color: #f8fafc !important;
+}
+
+html.light .bg-slate-900\/50,
+html.light .bg-slate-900\/60,
+html.light .bg-slate-900\/80,
+html.light .bg-slate-900\/90,
+html.light .bg-slate-900 {
+  background-color: #ffffff !important;
+}
+
+html.light .bg-slate-950 {
+  background-color: #f8fafc !important;
+}
+
+html.light .bg-slate-950\/40 {
+  background-color: rgba(241, 245, 249, 0.75) !important;
+}
+
+html.light .bg-slate-800,
+html.light .bg-slate-800\/80 {
+  background-color: #f1f5f9 !important;
+}
+
+html.light .border-slate-800,
+html.light .border-slate-800\/80,
+html.light .border-slate-900 {
+  border-color: #e2e8f0 !important;
+}
+
+html.light .border-slate-700,
+html.light .border-slate-700\/80,
+html.light .border-slate-700\/60,
+html.light .border-slate-700\/40 {
+  border-color: #cbd5e1 !important;
+}
+
+html.light .text-white,
+html.light .text-slate-100 {
+  color: #0f172a !important;
+}
+
+html.light .text-emerald-300,
+html.light .text-emerald-400 {
+  color: #059669 !important;
+}
+
+html.light .text-cyan-300,
+html.light .text-cyan-400 {
+  color: #0891b2 !important;
+}
+
+html.light .text-slate-200,
+html.light .text-slate-300 {
+  color: #1e293b !important;
+}
+
+html.light .text-slate-400 {
+  color: #475569 !important;
+}
+
+html.light .text-slate-500 {
+  color: #64748b !important;
+}
+
+html.light .text-slate-600 {
+  color: #94a3b8 !important;
+}
+
+/* Light Theme Inputs & Controls */
+html.light input,
+html.light textarea,
+html.light select {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Light Theme Badges & Buttons */
+html.light .bg-slate-800 {
+  background-color: #f1f5f9 !important;
+  color: #334155 !important;
+}
+
+html.light a.bg-slate-900 {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+html.light a.bg-slate-900:hover {
+  background-color: #f8fafc !important;
+}
+
+html.light button.border-emerald-500\/30 {
+  border-color: rgba(16, 185, 129, 0.4) !important;
+  background-color: #ecfdf5 !important;
+  color: #047857 !important;
+}
+
+html.light button.border-emerald-500\/30:hover {
+  background-color: #d1fae5 !important;
+}
+
+html.light .border-slate-800 {
+  border-color: #e2e8f0 !important;
+}
+
+/* Light Mode Terminal Banner */
+html.light .bg-emerald-950\/40,
+html.light .bg-emerald-950\/20 {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+}
+
+html.light .bg-cyan-950\/40,
+html.light .bg-cyan-950\/10 {
+  background-color: rgba(6, 182, 212, 0.1) !important;
+}
+
+html.light .bg-rose-950\/10 {
+  background-color: rgba(244, 63, 94, 0.08) !important;
+}
+
+/* Preserve dedicated terminal windows as sleek dark IDE consoles */
+.terminal-window,
+.terminal-console {
+  background-color: #0c111c !important;
+  color: #f1f5f9 !important;
+  border-color: #1e293b !important;
+}
+.terminal-window *,
+.terminal-console * {
+  color: inherit;
 }
