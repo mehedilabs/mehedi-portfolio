@@ -1,11 +1,13 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import {
   FolderGit2,
   ExternalLink,
   BookOpen,
   Sparkles,
+  ArrowRight,
 } from "lucide-react";
 import { GithubIcon } from "@/components/ui/Icons";
 import { Locale, ProjectItem } from "@/types";
@@ -41,18 +43,30 @@ export function ProjectsSection({ locale, dict }: ProjectsSectionProps) {
   return (
     <section id="projects" className="py-20 border-t border-slate-900 relative">
       <div className="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-8 xl:px-10">
-        {/* Section Heading */}
-        <div className="space-y-2 mb-10">
-          <div className="inline-flex items-center gap-2 font-mono text-xs text-emerald-400 font-semibold tracking-wider uppercase">
-            <span className="w-2 h-2 rounded bg-emerald-500" />
-            {dict.projects.sectionTag}
+        {/* Section Heading & See All Link */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 font-mono text-xs text-emerald-400 font-semibold tracking-wider uppercase">
+              <span className="w-2 h-2 rounded bg-emerald-500" />
+              {dict.projects.sectionTag}
+            </div>
+            <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-white">
+              {dict.projects.title}
+            </h2>
+            <p className="text-slate-400 text-sm sm:text-base lg:text-[17px] max-w-3xl leading-relaxed">
+              {dict.projects.subtitle}
+            </p>
           </div>
-          <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-white">
-            {dict.projects.title}
-          </h2>
-          <p className="text-slate-400 text-sm sm:text-base lg:text-[17px] max-w-3xl leading-relaxed">
-            {dict.projects.subtitle}
-          </p>
+
+          <Link href={`/${locale}/projects`} className="shrink-0">
+            <Button variant="terminal" size="sm" className="gap-2 font-mono text-xs group">
+              <span>{dict.projects.seeAll}</span>
+              <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-950/60 border border-emerald-400/30 text-emerald-300">
+                {PROJECTS_DATA.length}
+              </span>
+              <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+            </Button>
+          </Link>
         </div>
 
         {/* Filter Navigation */}
@@ -87,7 +101,7 @@ export function ProjectsSection({ locale, dict }: ProjectsSectionProps) {
                 <Card
                   key={project.id}
                   glow="emerald"
-                  className="bg-[#0b0f19] border-slate-800 flex flex-col justify-between"
+                  className="bg-[#0b0f19] border-slate-800 flex flex-col justify-between group/card"
                 >
                   <div>
                     {/* Terminal Window Header Bar */}
@@ -104,9 +118,11 @@ export function ProjectsSection({ locale, dict }: ProjectsSectionProps) {
                     </div>
 
                     <CardHeader className="p-6 sm:p-7 pb-3 space-y-2">
-                      <CardTitle className="text-lg sm:text-xl font-bold text-white hover:text-emerald-400 transition-colors">
-                        {projectContent.title}
-                      </CardTitle>
+                      <Link href={`/${locale}/projects/${projectContent.slug}`}>
+                        <CardTitle className="text-lg sm:text-xl font-bold text-white hover:text-emerald-400 transition-colors cursor-pointer">
+                          {projectContent.title}
+                        </CardTitle>
+                      </Link>
                       <p className="text-xs sm:text-sm font-mono text-emerald-400">
                         {projectContent.tagline}
                       </p>
@@ -153,13 +169,19 @@ export function ProjectsSection({ locale, dict }: ProjectsSectionProps) {
                   {/* Actions Footer */}
                   <CardFooter className="p-6 pt-4 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
+                      <Link href={`/${locale}/projects/${projectContent.slug}`}>
+                        <Button size="sm" variant="default" className="gap-1.5 text-xs">
+                          <span>{dict.projects.viewDetails}</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Button>
+                      </Link>
                       {project.liveUrl && (
                         <a
                           href={project.liveUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          <Button size="sm" variant="default" className="gap-1.5 text-xs">
+                          <Button size="sm" variant="outline" className="gap-1.5 text-xs text-slate-300 hover:text-white">
                             <ExternalLink className="w-3.5 h-3.5" />
                             <span>{dict.projects.viewLive}</span>
                           </Button>
@@ -182,12 +204,12 @@ export function ProjectsSection({ locale, dict }: ProjectsSectionProps) {
                     {projectContent.caseStudy && (
                       <Button
                         size="sm"
-                        variant="outline"
+                        variant="ghost"
                         onClick={() => setSelectedProject(project)}
-                        className="gap-1.5 text-xs text-slate-300 hover:text-white"
+                        className="gap-1.5 text-xs text-slate-400 hover:text-cyan-400"
                       >
                         <BookOpen className="w-3.5 h-3.5 text-cyan-400" />
-                        <span>{dict.projects.readCaseStudy}</span>
+                        <span>Quick Modal</span>
                       </Button>
                     )}
                   </CardFooter>
@@ -196,6 +218,24 @@ export function ProjectsSection({ locale, dict }: ProjectsSectionProps) {
             })}
           </div>
         )}
+
+        {/* Dedicated Projects Page Bottom CTA */}
+        <div className="mt-12 p-6 rounded-xl border border-slate-800 bg-[#0c101a] text-center space-y-3">
+          <p className="text-sm font-mono text-slate-400">
+            {locale === "bn"
+              ? "সকল সিস্টেম ও ইনফ্রাস্ট্রাকচার প্রজেক্টের সম্পূর্ণ বিবরণ দেখতে চান?"
+              : "Looking to explore all engineered systems, cloud tools, and open-source projects?"}
+          </p>
+          <Link href={`/${locale}/projects`}>
+            <Button variant="terminal" size="default" className="gap-2 text-xs sm:text-sm font-mono">
+              <span>{dict.projects.seeAll}</span>
+              <span className="text-[11px] px-2 py-0.5 rounded bg-emerald-950/60 border border-emerald-400/40 text-emerald-300 font-bold">
+                {PROJECTS_DATA.length} Systems
+              </span>
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+          </Link>
+        </div>
 
         {/* Case Study Modal */}
         <CaseStudyModal

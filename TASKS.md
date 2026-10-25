@@ -52,7 +52,14 @@ Legend:
 - [x] Implement centralized error handling middleware.
 - [x] Implement public portfolio routes (`GET /api/projects`, `GET /api/projects/:slug`, `POST /api/messages`) with graceful fallback mode.
 
-### 5. Verification & Git
+### 5. Enhanced Sections & Pages (Mihir Das & Abhishek Ganvir Standards)
+- [x] Dedicated Projects Archive page (`/[locale]/projects`) with category filters, project counts, breadcrumbs, and bottom CTA.
+- [x] Mihir Das standard project details page (`/[locale]/projects/[slug]`) with browser mockup window (`slug.mehedi.dev`), tech stack pills, architecture data flow pipeline, comparative challenge vs. solution cards, impact metrics, future roadmap, and prev/next pagination.
+- [x] Redesigned About section with profile identity card, verified metrics (6+ Years, 40+ Systems, 99.98% Uptime, B.Sc. CSE), core focus chips, narrative journey & academic cards, Rule 0 callout, and 4-column engineering principles grid.
+- [x] Redesigned Skills section eliminating fake percentage bars; organized into clean category tabs with recognizable SVG logos (React, Next.js, TypeScript, Node, Tailwind, Mongo, Docker, Postgres, Redis, Express) and production status tags.
+- [x] Video Showcase section with terminal window bar, duration tag, glowing play button, chapters timeline, and modal player.
+
+### 6. Verification & Git
 - [x] Run root Next.js ESLint (`npm run lint` -> 0 errors, 0 warnings).
 - [x] Run root Next.js production build (`npm run build` -> 18/18 static pages generated cleanly).
 - [x] Run backend TypeScript compilation (`npm --prefix backend run build` & `npm --prefix backend run typecheck` -> 0 errors).

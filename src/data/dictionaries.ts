@@ -43,6 +43,10 @@ export interface Dictionary {
     bioParagraph1: string;
     bioParagraph2: string;
     bioParagraph3: string;
+    journeyTitle: string;
+    journeyText: string;
+    educationTitle: string;
+    educationText: string;
     principlesTitle: string;
     principles: {
       title: string;
@@ -54,6 +58,8 @@ export interface Dictionary {
     title: string;
     subtitle: string;
     proficiencyLegend: string;
+    allCompetencies: string;
+    levelProduction: string;
     categories: {
       frontend: string;
       backend: string;
@@ -86,9 +92,15 @@ export interface Dictionary {
     filterCloud: string;
     viewLive: string;
     viewCode: string;
-    readCaseStudy: string;
-    caseStudyTag: string;
+    viewDetails: string;
+    seeAll: string;
+    backToProjects: string;
+    backToHome: string;
+    allProjectsTitle: string;
+    allProjectsSubtitle: string;
     keyHighlights: string;
+    keyFeatures: string;
+    futureRoadmap: string;
     emptyState: string;
   };
   caseStudy: {
@@ -99,6 +111,19 @@ export interface Dictionary {
     solution: string;
     architecture: string;
     results: string;
+    roadmapTitle: string;
+  };
+  videoShowcase: {
+    sectionTag: string;
+    title: string;
+    subtitle: string;
+    videoTitle: string;
+    videoDesc: string;
+    watchDemo: string;
+    closeDemo: string;
+    duration: string;
+    category: string;
+    placeholderNotice: string;
   };
   blog: {
     sectionTag: string;
@@ -220,6 +245,12 @@ export const dictionaries: Record<Locale, Dictionary> = {
         "My work bridges user experience and backend resilience. Whether designing distributed APIs with Express and MongoDB, engineering type-safe Next.js frontends, or tuning rendering performance, I focus on predictable maintainability and production robustness.",
       bioParagraph3:
         "I believe that great software starts with clean system boundaries, continuous testing, transparent observability, and thoughtful developer experience.",
+      journeyTitle: "Learning Journey & Technical Evolution",
+      journeyText:
+        "Starting with core systems programming and native web fundamentals, I progressed through component-driven frontends and resilient distributed backends. Over the years, I've led technical designs, engineered high-throughput REST APIs, and authored maintainable monorepos with strict TypeScript typing.",
+      educationTitle: "Academic Foundation",
+      educationText:
+        "Bachelor of Science in Computer Science & Engineering, grounding my practical development work in solid algorithms, distributed systems theory, and database management.",
       principlesTitle: "Engineering Philosophy",
       principles: [
         {
@@ -244,7 +275,9 @@ export const dictionaries: Record<Locale, Dictionary> = {
       sectionTag: "02. CORE_COMPETENCIES",
       title: "Technical Stack & Engineering Toolbox",
       subtitle: "A balanced toolkit cultivated through production challenges and real-world workloads.",
-      proficiencyLegend: "Proficiency Index (Production Experience)",
+      proficiencyLegend: "Production Toolbox & Verified Technologies",
+      allCompetencies: "All Technologies",
+      levelProduction: "Production Ready",
       categories: {
         frontend: "Frontend & UI Systems",
         backend: "Backend & Distributed APIs",
@@ -277,9 +310,15 @@ export const dictionaries: Record<Locale, Dictionary> = {
       filterCloud: "Cloud & DevOps",
       viewLive: "Live Demo",
       viewCode: "Source Code",
-      readCaseStudy: "Architecture Deep-Dive",
-      caseStudyTag: "Case Study Available",
+      viewDetails: "View Project Details",
+      seeAll: "See All Projects",
+      backToProjects: "Return to All Projects",
+      backToHome: "Return to Home",
+      allProjectsTitle: "All Projects & Engineering Systems",
+      allProjectsSubtitle: "A complete showcase of full-stack applications, microservices, cloud tools, and open-source systems.",
       keyHighlights: "Key Architecture Highlights:",
+      keyFeatures: "Core Architectural Capabilities:",
+      futureRoadmap: "Future Roadmap & Planned Enhancements:",
       emptyState: "No projects found matching the selected filter criteria.",
     },
     caseStudy: {
@@ -290,6 +329,19 @@ export const dictionaries: Record<Locale, Dictionary> = {
       solution: "Engineering Solution",
       architecture: "System Design & Data Flow",
       results: "Measurable Impact & Metrics",
+      roadmapTitle: "Future Architectural Roadmap",
+    },
+    videoShowcase: {
+      sectionTag: "04. SYSTEM_DEMO",
+      title: "Architecture Walkthrough & Development Solutions",
+      subtitle: "Deep-dive video walkthroughs exploring system design, code structure, and live deployment workflows.",
+      videoTitle: "Full-Stack System Architecture & Monorepo Walkthrough",
+      videoDesc: "A guided architectural walkthrough of the monorepo design, decoupled Express REST backend, bilingual Next.js routing, and containerized deployment.",
+      watchDemo: "Watch System Walkthrough",
+      closeDemo: "Close Video Player",
+      duration: "12:40",
+      category: "Full-Stack Systems Architecture",
+      placeholderNotice: "Architecture video recording in production. Video player and media player container configured for Phase 2 Cloudinary integration.",
     },
     blog: {
       sectionTag: "06. TECHNICAL_INSIGHTS",
@@ -409,6 +461,12 @@ export const dictionaries: Record<Locale, Dictionary> = {
         "আমার কাজের মূল ভিত্তি হলো চমৎকার ইউজার এক্সপেরিয়েন্স এবং ব্যাকএন্ডের মজবুত কাঠামোর সংযোগ স্থাপন করা। Express ও MongoDB দিয়ে মাইক্রোসার্ভিস ডিজাইন থেকে শুরু করে Next.js ফ্রন্টএন্ড অপটিমাইজেশন—সবকিছুতেই আমি কোডের স্বচ্ছতা ও নির্ভরযোগ্যতায় জোর দিই।",
       bioParagraph3:
         "আমি বিশ্বাস করি দীর্ঘমেয়াদী সফল সফটওয়্যার নির্ভর করে পরিষ্কার সিস্টেম বাউন্ডারি, স্বয়ংক্রিয় টেস্টিং এবং চমৎকার ডেভেলপার অভিজ্ঞতার ওপর।",
+      journeyTitle: "শেখার পথচলা ও প্রযুক্তিগত বিকাশ",
+      journeyText:
+        "সিস্টেম প্রোগ্রামিং এবং ওয়েব ফান্ডামেন্টাল দিয়ে শুরু করে আধুনিক কম্পোনেন্ট-ভিত্তিক ফ্রন্টএন্ড ও ডিস্ট্রিবিউটেড ব্যাকএন্ডে দক্ষতা অর্জন করেছি। বছরের পর বছর উচ্চ ক্ষমতাসম্পন্ন এপিআই ও টাইপ-সেফ আর্কিটেকচার পরিচালনায় অভিজ্ঞতা সঞ্চয় করেছি।",
+      educationTitle: "প্রাতিষ্ঠানিক ভিত্তি",
+      educationText:
+        "কম্পিউটার সায়েন্স অ্যান্ড ইঞ্জিনিয়ারিংয়ে বিএসসি (B.Sc. in CSE), যা আমার ব্যবহারিক দক্ষতাকে শক্তিশালী অ্যালগরিদম ও সিস্টেম ডিজাইনের তাত্ত্বিক ভিত্তি দান করেছে।",
       principlesTitle: "আমার ইঞ্জিনিয়ারিং দর্শন",
       principles: [
         {
@@ -433,7 +491,9 @@ export const dictionaries: Record<Locale, Dictionary> = {
       sectionTag: "০২. মূল দক্ষতা",
       title: "প্রযুক্তিগত দক্ষতা ও ইঞ্জিনিয়ারিং টুলবক্স",
       subtitle: "প্রোডাকশন পরিবেশের চ্যালেঞ্জ মোকাবেলায় গড়ে তোলা আধুনিক টুলসেট।",
-      proficiencyLegend: "দক্ষতার সূচক (প্রোডাকশন অভিজ্ঞতা)",
+      proficiencyLegend: "প্রোডাকশন টুলবক্স ও প্রমাণিত প্রযুক্তি",
+      allCompetencies: "সকল প্রযুক্তি",
+      levelProduction: "প্রোডাকশন উপযোগী",
       categories: {
         frontend: "ফ্রন্টএন্ড ও ইউআই সিস্টেম",
         backend: "ব্যাকএন্ড ও ডিস্ট্রিবিউটেড এপিআই",
@@ -466,9 +526,15 @@ export const dictionaries: Record<Locale, Dictionary> = {
       filterCloud: "ক্লাউড ও ডেভঅপ্স",
       viewLive: "লাইভ ডেমো",
       viewCode: "সোর্স কোড",
-      readCaseStudy: "আর্কিটেকচার কেস স্টাডি",
-      caseStudyTag: "কেস স্টাডি যুক্ত আছে",
+      viewDetails: "প্রজেক্টের বিস্তারিত দেখুন",
+      seeAll: "সকল প্রজেক্ট দেখুন",
+      backToProjects: "সকল প্রজেক্টের তালিকায় ফিরুন",
+      backToHome: "মূল পাতায় ফিরুন",
+      allProjectsTitle: "সকল প্রজেক্ট ও সিস্টেম আর্কিটেকচার",
+      allProjectsSubtitle: "ফুল-স্ট্যাক অ্যাপ্লিকেশন, মাইক্রোসার্ভিস, ক্লাউড টুলস এবং ওপেন সোর্স সিস্টেমের সম্পূর্ণ আর্কাইভ।",
       keyHighlights: "মূল আর্কিটেকচারাল বৈশিষ্ট্য:",
+      keyFeatures: "মূল আর্কিটেকচারাল সক্ষমতা:",
+      futureRoadmap: "ভবিষ্যত পরিকল্পনা ও সম্প্রসারণ:",
       emptyState: "এই ক্যাটাগরিতে কোনো প্রকল্প পাওয়া যায়নি।",
     },
     caseStudy: {
@@ -479,6 +545,19 @@ export const dictionaries: Record<Locale, Dictionary> = {
       solution: "ইঞ্জিনিয়ারিং সমাধান",
       architecture: "সিস্টেম ডিজাইন ও ডেটা ফ্লো",
       results: "পরিমাপযোগ্য ফলাফল ও মেট্রিক্স",
+      roadmapTitle: "ভবিষ্যৎ আর্কিটেকচারাল রোডম্যাপ",
+    },
+    videoShowcase: {
+      sectionTag: "০৪. সিস্টেম ডেমো",
+      title: "আর্কিটেকচার ওয়াকথ্রু ও ডেভেলপমেন্ট সল্যুশন",
+      subtitle: "সিস্টেম ডিজাইন, কোড স্ট্রাকচার এবং লাইভ ডেপ্লয়মেন্টের বিশদ ভিডিও ডেমো।",
+      videoTitle: "ফুল-স্ট্যাক সিস্টেম আর্কিটেকচার ও মনোরেপো ওয়াকথ্রু",
+      videoDesc: "মনোরেপো ডিজাইন, ডিকাপল্ড Express ব্যাকএন্ড, দ্বিভাষিক Next.js রাউটিং এবং ডকার ডেপ্লয়মেন্টের সম্পূর্ণ নির্দেশনা।",
+      watchDemo: "সিস্টেম ডেমো দেখুন",
+      closeDemo: "ভিডিও বন্ধ করুন",
+      duration: "১২:৪০",
+      category: "ফুল-স্ট্যাক সিস্টেম আর্কিটেকচার",
+      placeholderNotice: "আর্কিটেকচার ভিডিও তৈরির কাজ চলছে। ফেজ ২ ক্লাউডিনারি ইন্টিগ্রেশনের জন্য প্লেয়ার প্রস্তুত।",
     },
     blog: {
       sectionTag: "০৬. প্রযুক্তিগত অন্তর্দৃষ্টি",

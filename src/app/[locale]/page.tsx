@@ -8,6 +8,7 @@ import { SkillsSection } from "@/components/sections/SkillsSection";
 import { ExperienceSection } from "@/components/sections/ExperienceSection";
 import { EducationSection } from "@/components/sections/EducationSection";
 import { ProjectsSection } from "@/components/sections/ProjectsSection";
+import { VideoShowcaseSection } from "@/components/sections/VideoShowcaseSection";
 import { BlogSection } from "@/components/sections/BlogSection";
 import { ContactSection } from "@/components/sections/ContactSection";
 
@@ -37,6 +38,7 @@ export default async function LocalizedHomePage({
       <ExperienceSection locale={locale} dict={dict} />
       <EducationSection locale={locale} dict={dict} />
       <ProjectsSection locale={locale} dict={dict} />
+      <VideoShowcaseSection locale={locale} dict={dict} />
       <BlogSection locale={locale} dict={dict} />
       <ContactSection locale={locale} dict={dict} />
     </div>
