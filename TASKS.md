@@ -58,9 +58,10 @@ Legend:
 - [x] Unified 16:9 aspect-ratio `ProjectCard` component with screenshot area, domain bar, concise title/description, tech tags, and Details/Live Demo/Code actions.
 - [x] View All Projects page (`/[locale]/projects`) displaying all real projects in a consistent, compact responsive grid with back navigation.
 - [x] Individual project details pages (`/[locale]/projects/[slug]`): prominent 16:9 preview mockup, plain-English overview, key features with checkmarks, actual technology stack, and verified live/code links without unnecessary jargon.
-- [x] Redesigned About section with profile identity card, verified metrics (6+ Years, 40+ Systems, 99.98% Uptime, B.Sc. CSE), core focus chips, narrative journey & academic cards, Rule 0 callout, and 4-column engineering principles grid.
-- [x] Redesigned Skills section eliminating fake percentage bars; organized into clean category tabs with recognizable SVG logos (React, Next.js, TypeScript, Node, Tailwind, Mongo, Docker, Postgres, Redis, Express) and production status tags.
-- [x] Scroll-driven 3D MacBook video showcase section animating smoothly across initial (screen lid), intermediate (3D tilt lift), and final (foreground flat expanded) states with temporary local CC0 video asset.
+- [x] Streamlined Hero section removing all fake statistics and terminal blocks; focused on clean name, role, friendly intro, and direct links.
+- [x] Simplified About section with balanced 2-column layout (dedicated profile photo placeholder on one side, concise human introduction on the other).
+- [x] Simplified Skills section into 3 clean groups (Frontend, Backend & Database, Tools & Platforms) with recognizable SVG logos and zero fake percentages.
+- [x] Fixed Laptop Video Showcase: eliminated heading overlap, resolved screen bezel alignment, and corrected 3D Z-layering so the keyboard never covers the video.
 
 ### 6. Verification & Git
 - [x] Run root Next.js ESLint (`npm run lint` -> 0 errors, 0 warnings).
