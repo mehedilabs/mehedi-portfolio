@@ -224,7 +224,7 @@ export const PROJECTS_DATA: ProjectItem[] = [
   {
     id: "proj-4",
     category: "fullstack",
-    featured: false,
+    featured: true,
     order: 4,
     thumbnail: "/images/projects/telemetry-dash.png",
     techStack: ["Next.js", "TypeScript", "Tailwind CSS", "Chart.js", "Node.js"],
@@ -242,6 +242,21 @@ export const PROJECTS_DATA: ProjectItem[] = [
         "Customizable alert threshold notifications and log stream filtering",
       ],
       metrics: "Sub-second live streaming updates over secure WebSockets",
+      caseStudy: {
+        overview:
+          "Designed to provide instantaneous visibility into server CPU, memory, and network throughput with minimal client-side overhead.",
+        challenge:
+          "Traditional monitoring dashboards often consume excessive CPU resources or experience multi-second latency spikes when querying metrics during incidents.",
+        solution:
+          "Implemented lightweight WebSocket connections and optimized Canvas rendering to deliver fluid 60 FPS real-time telemetry updates.",
+        architecture:
+          "Next.js frontend with Canvas chart primitives connected to a Node.js WebSocket stream broadcasting live server health stats.",
+        results: [
+          "Sub-second latency on telemetry broadcast updates",
+          "Smooth 60 FPS charts with minimal CPU and memory consumption",
+          "Responsive layouts adapted for mobile and desktop screens",
+        ],
+      },
     },
     bn: {
       title: "রিয়েল-টাইম ক্লাউড টেলিমেট্রি ড্যাশবোর্ড",
@@ -255,6 +270,21 @@ export const PROJECTS_DATA: ProjectItem[] = [
         "কাস্টম অ্যালার্ট থ্রেশহোল্ড এবং রিয়েল-টাইম লগ ফিল্টারিং",
       ],
       metrics: "ওয়েবসকেটের মাধ্যমে সাব-সেকেন্ড লাইভ ডেটা আপডেট",
+      caseStudy: {
+        overview:
+          "সার্ভার সিপিইউ, মেমরি ও নেটওয়ার্ক থ্রুপুট তাৎক্ষণিকভাবে পর্যবেক্ষণের জন্য নির্মিত লাইটওয়েট টেলিমেট্রি সিস্টেম।",
+        challenge:
+          "প্রচলিত মনিটরিং টুলগুলো প্রায়শই বেশি রিসোর্স ব্যবহার করে এবং জরুরি মুহূর্তে তথ্য দেখাতে কয়েক সেকেন্ড বিলম্ব ঘটায়।",
+        solution:
+          "লাইটওয়েট ওয়েবসকেট সংযোগ এবং অপটিমাইজড ক্যানভাস রেন্ডারিংয়ের মাধ্যমে ৬০ FPS গতিতে তথ্য প্রদর্শনের ব্যবস্থা করা হয়েছে।",
+        architecture:
+          "Next.js ফ্রন্টএন্ড এবং ক্যানভাস চার্ট, যা লাইভ সার্ভার হেলথ ডেটা ব্রডকাস্ট করা Node.js ওয়েবসকেটের সাথে যুক্ত।",
+        results: [
+          "সাব-সেকেন্ড লেটেন্সিতে রিয়েল-টাইম ডেটা সম্প্রচার",
+          "কম রিসোর্স ব্যবহারে স্মুথ ৬০ FPS চার্ট পারফরম্যান্স",
+          "মোবাইল ও ডেস্কটপ সব ডিভাইসে সহজে মনিটরিংয়ের সুবিধা",
+        ],
+      },
     },
   },
 ];

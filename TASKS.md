@@ -52,9 +52,12 @@ Legend:
 - [x] Implement centralized error handling middleware.
 - [x] Implement public portfolio routes (`GET /api/projects`, `GET /api/projects/:slug`, `POST /api/messages`) with graceful fallback mode.
 
-### 5. Enhanced Sections & Pages (Mihir Das & Abhishek Ganvir Standards)
-- [x] Dedicated Projects Archive page (`/[locale]/projects`) with category filters, project counts, breadcrumbs, and bottom CTA.
-- [x] Mihir Das standard project details page (`/[locale]/projects/[slug]`) with browser mockup window (`slug.mehedi.dev`), tech stack pills, architecture data flow pipeline, comparative challenge vs. solution cards, impact metrics, future roadmap, and prev/next pagination.
+### 5. Simplified & Visual Projects Experience
+- [x] Homepage Projects section: exactly 4 featured project cards, 3 columns on desktop (4th card wraps naturally), simple "Featured Projects" heading, and "View All Projects" link.
+- [x] Removed category filter tabs, statistical counters, and dashboard-style clutter from homepage and archive.
+- [x] Unified 16:9 aspect-ratio `ProjectCard` component with screenshot area, domain bar, concise title/description, tech tags, and Details/Live Demo/Code actions.
+- [x] View All Projects page (`/[locale]/projects`) displaying all real projects in a consistent, compact responsive grid with back navigation.
+- [x] Individual project details pages (`/[locale]/projects/[slug]`): prominent 16:9 preview mockup, plain-English overview, key features with checkmarks, actual technology stack, and verified live/code links without unnecessary jargon.
 - [x] Redesigned About section with profile identity card, verified metrics (6+ Years, 40+ Systems, 99.98% Uptime, B.Sc. CSE), core focus chips, narrative journey & academic cards, Rule 0 callout, and 4-column engineering principles grid.
 - [x] Redesigned Skills section eliminating fake percentage bars; organized into clean category tabs with recognizable SVG logos (React, Next.js, TypeScript, Node, Tailwind, Mongo, Docker, Postgres, Redis, Express) and production status tags.
 - [x] Video Showcase section with terminal window bar, duration tag, glowing play button, chapters timeline, and modal player.

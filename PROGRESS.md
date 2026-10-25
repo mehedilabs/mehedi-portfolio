@@ -2,8 +2,48 @@
 
 ## Current Phase
 - **Phase**: Phase 1 — Project Foundation & Public Portfolio (Prompt 1 of 4)
-- **Status**: COMPLETED & VERIFIED (Milestone: Dedicated Projects Archive, Mihir Das Details, Modern Skills & Video Showcase)
-- **Current Task**: All public portfolio enhancements complete. Ready for Git push to `origin main` and transition to Phase 2 (Database, Authentication & Admin CMS).
+- **Status**: COMPLETED & VERIFIED (Milestone: Simplified, Visual, Professional Projects Experience)
+- **Current Task**: Projects experience simplified across Homepage, View All Projects, and Individual Project Details pages. Ready for Phase 2.
+
+---
+
+## Milestone: Simplified, Visual, Professional Projects Experience
+
+### Implemented Enhancements
+1. **Homepage Projects Section**:
+   - Displays exactly 4 featured project cards (`PROJECTS_DATA.filter(p => p.featured).slice(0, 4)`).
+   - Clean, simple heading "Featured Projects" (with bilingual support) and an intuitive "View All Projects" action link.
+   - Removed all unnecessary category counters, statistics ("All Systems", "Full-Stack Web", "APIs & Services", "Cloud & DevOps"), and confusing decorative tags.
+   - Clean responsive layout: 3 compact cards per row on desktop (4th card wraps naturally to the next row), 2 columns on tablet, and 1 column on mobile.
+   - Removed heavy case study quick modals from the homepage in favor of clean navigation to individual detail pages.
+
+2. **Unified 16:9 Visual `ProjectCard` Component**:
+   - Created `src/components/ui/ProjectCard.tsx` with a prominent 16:9 aspect ratio (`aspect-video`) screenshot/image area.
+   - Built a sleek terminal window header bar showing the live/demo domain and 3 colored window dots.
+   - Implemented real screenshot image rendering with automatic fallback to an elegant developer placeholder with category badge and icon.
+   - Compact content body: 1-line project title, concise 1–2 line description, 3–4 clean technology tags, and clear "Details", "Live Demo", and "Source Code" action links.
+   - Reused across both the Homepage and the View All Projects page for 100% visual consistency.
+
+3. **View All Projects Page (`/[locale]/projects`)**:
+   - Clean dedicated page displaying ALL available real projects in the same compact 3-column desktop grid.
+   - Removed cluttered category tabs, item counters, and complex dashboard decorations.
+   - Preserves breadcrumb navigation (`Home / Projects`), "Back to Home" button, and native browser Back button history.
+
+4. **Clean, Plain-English Project Details Pages (`/[locale]/projects/[slug]`)**:
+   - Consistent layout across all projects:
+     - Header with project name, concise tagline, category, and Live Demo/Source Code action buttons.
+     - Large, attractive 16:9 preview mockup window with real screenshot / placeholder canvas.
+     - Clear plain-English "Project Overview".
+     - "Key Features" presented as readable bullet points with checkmark icons.
+     - "Technology Stack" section showing verified tools and concise architecture description.
+     - "Challenge & Solution" comparative cards written without excessive technical jargon.
+     - Previous / Next project pagination links and "Back to Projects" return action.
+
+5. **Verification Outcomes**:
+   - `npm run lint`: **0 errors, 0 warnings** (exited code 0).
+   - `npm run build`: **20/20 static pages generated in 870ms** (exited code 0).
+   - `npm --prefix backend run build`: Backend TypeScript compiles cleanly (exited code 0).
+   - Verified both `/en` and `/bn` routes and all project detail pages (`/[locale]/projects/[slug]`).
 
 ---
 
