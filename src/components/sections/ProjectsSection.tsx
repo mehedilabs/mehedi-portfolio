@@ -19,7 +19,7 @@ export function ProjectsSection({ locale, dict }: ProjectsSectionProps) {
   const featuredProjects = PROJECTS_DATA.filter((p) => p.featured).slice(0, 4);
 
   return (
-    <section id="projects" className="py-16 sm:py-20 border-t border-slate-900 relative">
+    <section id="projects" className="py-16 sm:py-20 border-t border-slate-900 bg-[#050811] relative z-20">
       <div className="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* Simple Section Header with View All Projects link */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 sm:mb-10">

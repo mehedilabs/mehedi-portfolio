@@ -2,33 +2,30 @@
 
 ## Current Phase
 - **Phase**: Phase 1 — Project Foundation & Public Portfolio (Prompt 1 of 4)
-- **Status**: COMPLETED & VERIFIED (Milestone: Portfolio Simplification & Video Showcase Alignment Fix)
-- **Current Task**: Homepage clutter removed, About and Skills simplified, Video showcase layer stacking and alignment fixed.
+- **Status**: COMPLETED & VERIFIED (Milestone: Laptop Video Showcase 3 Bugs Fix)
+- **Current Task**: Fixed the 3 laptop video showcase bugs (screen bezel alignment, heading separation, seamless exit into BlogSection).
 
 ---
 
-## Milestone: Portfolio Simplification & Video Showcase Alignment Fix
+## Milestone: Laptop Video Showcase 3 Bugs Fix (Screen Fit, Heading Separation & Seamless Exit Transition)
 
 ### Implemented Fixes & Enhancements
-1. **Homepage Hero Section Cleaned Up**:
-   - Completely removed unverified statistics: "6+ Years Experience", "40+ Systems Production", "99.98% SLA Uptime Metric".
-   - Completely removed terminal-style block (`$mehedi --status --tech-stack --availability`, role/core/focus/status lines).
-   - Streamlined into a clean, friendly, welcoming hero containing: Name ("Mehedi Hasan"), Role ("Full-Stack Developer"), short introduction, primary project links, contact button, and social connect links.
-2. **Simplified About Section**:
-   - Implemented balanced 2-column layout on desktop and natural stacked layout on mobile.
-   - Added a dedicated, neutral profile photo placeholder with a modern silhouette avatar and badge (ready for easy Phase 2 replacement).
-   - Replaced heavy technical cards and principles grids with a concise, human narrative explaining background, primary technologies (React, Next.js, TypeScript, Node.js, Express, MongoDB), kinds of web applications built, and continuous learning mindset.
-3. **Simplified Skills Section**:
-   - Removed bloated category numbers and counts ("All Technologies — 22", etc.).
-   - Replaced with 3 simple, recognizable groups: **Frontend**, **Backend & Database**, and **Tools & Platforms**.
-   - Displayed actual technologies with official SVG logos and consistent icon sizing, spacing, and alignment without fake proficiency percentages.
-4. **Laptop Video Showcase Alignment & Layering Fixes**:
-   - **Fixed Problem A (Keyboard overlapping video)**: Elevated animated video to higher stacking order (`z-50`) with positive 3D Z translation (`translateZ` from 12px to 160px). The video stays strictly in front of the keyboard throughout all scroll states.
-   - **Fixed Problem B (Video fitting screen)**: Matched screen bezel dimensions and padding (`aspect-[16/10]`) so the video fits flush inside the laptop screen in State 1 with zero gaps.
-   - **Fixed Heading Overlap**: Positioned heading with generous top spacing above the laptop so it never collides with or covers the video in the initial resting state, and smoothly fades upward on scroll.
-5. **Verification Outcomes**:
+1. **Bug 1 Fixed — Heading & Section Overlap Eliminated**:
+   - Rescaled heading to clean, balanced proportions (`text-2xl sm:text-4xl md:text-5xl font-extrabold`) with generous vertical spacing (`mb-5 sm:mb-8`).
+   - Re-architected 3D laptop perspective geometry: laptop screen lid sits upright while keyboard chassis base tilts in perspective (`rotateX(55deg) origin-top`), dramatically reducing the vertical footprint from over 620px to ~420px.
+   - Ensured ample breathing room (~67px - 130px) between top navbar, heading, and laptop lid across desktop, tablet, and mobile, completely eliminating overlap.
+2. **Bug 2 Fixed — Video Fits Inside Laptop Screen Realistically**:
+   - Relocated animated video overlay to be anchored directly over the inner screen display well: `top-[22px] sm:top-[28px] left-[6px] sm:left-[8px] right-[6px] sm:right-[8px] bottom-[6px] sm:bottom-[8px]`.
+   - In State 1 (`progress = 0`), the video matches the inner screen bezel geometry with 0px offset, completely eliminating the black gap at the bottom of the screen.
+   - When lifting off, the video elevates in Z (`translateZ` from 0 to 140px), scales smoothly (`1.0` to `1.36`), tilts forward at mid-point (`rotateX` up to 16deg), and levels flat (`rotateX: 0deg`) in front of the keyboard.
+   - Behind the lifted video, the recessed matte screen well cleanly displays Mehedi Hasan's branding.
+3. **Bug 3 Fixed — Seamless Transition to Section Below (BlogSection)**:
+   - Moderated State 3 vertical positioning (`translateY: 34px`) so the scaled video stays comfortably centered within the viewport with over 160px of clearance from the bottom edge.
+   - Removed native video controls (`controls={isFinalState}`) that intercepted mouse wheel/touch scroll and covered the bottom; video loops smoothly with sleek custom audio toggle (`Volume2`/`VolumeX`).
+   - Updated `BlogSection` and `ProjectsSection` with solid, opaque backgrounds (`bg-[#080b12]` and `bg-[#050811]`) and explicit `z-20` stacking context so scrolling down flows seamlessly into the following content.
+4. **Verification Outcomes**:
    - `npm run lint`: **0 errors, 0 warnings** (clean code 0).
-   - `npm run build`: **20/20 static pages generated in 737ms** (clean code 0).
+   - `npm run build`: **20/20 static pages generated cleanly** (clean code 0).
    - `npm --prefix backend run build`: Backend TypeScript compiles cleanly (clean code 0).
 
 ---

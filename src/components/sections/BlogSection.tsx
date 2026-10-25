@@ -15,7 +15,7 @@ interface BlogSectionProps {
 
 export function BlogSection({ locale, dict }: BlogSectionProps) {
   return (
-    <section id="blog" className="py-20 border-t border-slate-900 bg-[#080b12]/50 relative">
+    <section id="blog" className="py-20 border-t border-slate-900 bg-[#080b12] relative z-20">
       <div className="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* Section Heading */}
         <div className="space-y-2 mb-10">

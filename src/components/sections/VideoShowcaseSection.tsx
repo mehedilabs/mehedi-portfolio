@@ -100,74 +100,79 @@ export function VideoShowcaseSection({
     }
   };
 
-  // Interpolated Animation Values based on the 3 reference states
-  // State 1 (progress = 0): Resting inside laptop screen bezel
-  // State 2 (progress = 0.5): Lifting forward in Z, scaling up, tilting in 3D perspective
-  // State 3 (progress = 1.0): Fully expanded, flat facing camera, positioned in front of keyboard
-  const maxScale = isMobile ? 1.15 : 1.58;
-  const midScale = isMobile ? 1.06 : 1.25;
-
-  const maxTranslateY = isMobile ? 60 : 125;
-  const midTranslateY = isMobile ? 25 : 50;
-
-  const maxTranslateZ = isMobile ? 80 : 160;
-  const midTranslateZ = isMobile ? 40 : 80;
-
-  let currentScale = 1;
-  let currentTranslateY = 0;
-  let currentTranslateZ = 12; // Initial Z elevation guarantees it is in front of the lid
-  let currentRotateX = -8;
-
-  if (progress <= 0.5) {
-    const localP = progress / 0.5;
-    currentScale = 1 + (midScale - 1) * localP;
-    currentTranslateY = midTranslateY * localP;
-    currentTranslateZ = 12 + (midTranslateZ - 12) * localP;
-    currentRotateX = -8 + 28 * localP; // -8deg -> +20deg (tilt forward)
-  } else {
-    const localP = (progress - 0.5) / 0.5;
-    currentScale = midScale + (maxScale - midScale) * localP;
-    currentTranslateY = midTranslateY + (maxTranslateY - midTranslateY) * localP;
-    currentTranslateZ = midTranslateZ + (maxTranslateZ - midTranslateZ) * localP;
-    currentRotateX = 20 - 20 * localP; // +20deg -> 0deg (flat)
+  // Timeline Mapping:
+  // Phase 1 (0.00 -> 0.08): Rest state — Video flush inside laptop screen, heading fully visible
+  // Phase 2 (0.08 -> 0.72): Lift & zoom state — Video lifts out of laptop, tilts, scales up, heading fades out
+  // Phase 3 (0.72 -> 0.88): Settled state — Video is flat facing user, centered in viewport
+  // Phase 4 (0.88 -> 1.00): Exit release — Smooth unpinning into BlogSection
+  let animProgress = 0;
+  if (progress > 0.08 && progress < 0.72) {
+    animProgress = (progress - 0.08) / (0.72 - 0.08);
+  } else if (progress >= 0.72) {
+    animProgress = 1;
   }
 
-  // Heading opacity & translation: fades out cleanly as user scrolls
-  const headingOpacity = Math.max(0, 1 - progress * 2.8);
-  const headingTranslateY = -progress * 100;
+  // Smooth cubic ease-in-out curve
+  const easeProgress = animProgress * animProgress * (3 - 2 * animProgress);
 
-  const isFinalState = progress > 0.85;
+  // Interpolated animation values:
+  // Scale
+  const maxScale = isMobile ? 1.15 : 1.36;
+  const currentScale = 1 + (maxScale - 1) * easeProgress;
+
+  // 3D Z elevation (lifts out of the screen lid towards the camera)
+  const maxTranslateZ = isMobile ? 70 : 140;
+  const currentTranslateZ = maxTranslateZ * easeProgress;
+
+  // Gentle vertical positioning (keeps video comfortably centered in viewport)
+  const maxTranslateY = isMobile ? 18 : 34;
+  const currentTranslateY = maxTranslateY * easeProgress;
+
+  // 3D forward tilt in intermediate state (peels forward at mid-point, levels flat at final)
+  const tiltMax = isMobile ? 10 : 16;
+  const currentRotateX = Math.sin(easeProgress * Math.PI) * tiltMax;
+
+  // Dynamic box-shadow that deepens as the video elevates in Z
+  const shadowSpread = 15 + 40 * easeProgress;
+  const shadowBlur = 25 + 50 * easeProgress;
+  const shadowAlpha = 0.5 + 0.45 * easeProgress;
+  const glowAlpha = 0.25 * easeProgress;
+  const dynamicShadow = `0 ${shadowSpread}px ${shadowBlur}px rgba(0, 0, 0, ${shadowAlpha}), 0 0 35px rgba(16, 185, 129, ${glowAlpha})`;
+
+  // Heading opacity & translation: fades out cleanly as the video lifts off
+  const headingOpacity = Math.max(0, 1 - progress * 3.2);
+  const headingTranslateY = -progress * 40;
 
   return (
     <section
       id="showcase"
       ref={containerRef}
-      className="relative h-[220vh] sm:h-[260vh] bg-[#050811] text-white"
+      className="relative h-[240vh] sm:h-[260vh] bg-[#050811] text-white z-10"
     >
       {/* Sticky Fullscreen Presentation Stage */}
-      <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center overflow-hidden px-4">
+      <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center overflow-hidden px-4 select-none">
         {/* Subtle Background Ambience */}
         <div className="absolute inset-0 terminal-grid opacity-20 pointer-events-none" />
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[280px] bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none" />
 
-        {/* Section Heading: Placed with generous spacing above laptop so it NEVER overlaps in State 1 */}
+        {/* Section Heading: Comfortably spaced above laptop with clear margin to prevent any overlap */}
         <div
-          className="text-center z-10 space-y-1 sm:space-y-2 mb-6 sm:mb-10 pointer-events-none transition-transform duration-75"
+          className="text-center z-10 space-y-1 sm:space-y-1.5 mb-5 sm:mb-8 pointer-events-none transition-transform duration-75"
           style={{
             opacity: headingOpacity,
             transform: `translate3d(0, ${headingTranslateY}px, 0)`,
           }}
         >
-          <div className="inline-flex items-center gap-2 font-mono text-[11px] sm:text-xs text-emerald-400 font-semibold tracking-wider uppercase mb-1">
+          <div className="inline-flex items-center gap-2 font-mono text-[11px] sm:text-xs text-emerald-400 font-semibold tracking-wider uppercase mb-0.5">
             <span className="w-2 h-2 rounded bg-emerald-500" />
             <span>{dict.videoShowcase.sectionTag}</span>
           </div>
 
-          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
+          <h2 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">
             <span className="block text-emerald-400 drop-shadow-[0_0_25px_rgba(16,185,129,0.35)]">
               {locale === "bn" ? "সিস্টেম আর্কিটেকচার" : "Full-Stack"}
             </span>
-            <span className="block text-white mt-0.5 sm:mt-1">
+            <span className="block text-white mt-0.5">
               {locale === "bn" ? "ডেভেলপমেন্ট সল্যুশনস" : "Development Solutions"}
             </span>
           </h2>
@@ -175,74 +180,53 @@ export function VideoShowcaseSection({
 
         {/* 3D Laptop Perspective Stage */}
         <div
-          className="relative flex flex-col items-center justify-center"
+          className="relative flex flex-col items-center"
           style={{
             perspective: "1200px",
             transformStyle: "preserve-3d",
           }}
         >
-          {/* Layer 1: Laptop Body (Lid Backing + Base Keyboard Chassis) — Lower Stacking Order */}
+          {/* 1. The Screen Lid (Outer chassis with top camera notch and inner recessed well) */}
           <div
-            className="relative flex flex-col items-center z-10 pointer-events-none select-none transition-transform duration-75"
+            className="relative w-[300px] sm:w-[430px] md:w-[530px] aspect-[16/10] rounded-t-xl sm:rounded-t-2xl bg-[#090a10] border-2 border-[#1c1d29] shadow-2xl p-1.5 sm:p-2 pb-1.5 sm:pb-2 flex flex-col justify-between"
             style={{
-              transform: "rotateX(20deg)",
+              transform: "rotateX(0deg)",
               transformStyle: "preserve-3d",
             }}
           >
-            {/* Laptop Lid Screen Backing (Frame where video initially lives) */}
-            <div className="relative w-[306px] sm:w-[474px] md:w-[594px] aspect-[16/10] rounded-t-2xl bg-[#090a0f] border-2 border-[#1c1d27] p-2 sm:p-2.5 pb-2 flex flex-col justify-between shadow-2xl">
-              {/* Top Bezel with Camera dot & Branding */}
-              <div className="flex items-center justify-between px-2 py-0.5 text-[10px] font-mono text-slate-500">
-                <span className="opacity-0">sys</span>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#202230]" />
-                  <span className="text-[10px] text-slate-500 uppercase tracking-widest font-mono">
-                    Mehedi Hasan
-                  </span>
-                </div>
-                <span className="opacity-0">sys</span>
-              </div>
-
-              {/* Inside Screen Well (Recessed Surface revealed when video lifts forward) */}
-              <div className="w-full flex-1 rounded-lg bg-black border border-[#1b1c26] relative overflow-hidden flex items-center justify-center">
-                <div className="absolute inset-0 terminal-grid opacity-15 pointer-events-none" />
-                <span className="text-[11px] font-mono text-slate-600">
-                  ~/media/showcase.mp4
+            {/* Top Bezel: Camera Dot & Status Branding */}
+            <div className="h-4 sm:h-5 flex items-center justify-between px-2 text-[9px] sm:text-[10px] font-mono text-slate-500 select-none">
+              <span className="opacity-0 w-3">sys</span>
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#1b1c28] border border-slate-700/60" />
+                <span className="text-[9px] sm:text-[10px] text-slate-500 uppercase tracking-widest font-mono">
+                  Mehedi Hasan
                 </span>
               </div>
+              <span className="opacity-0 w-3">sys</span>
             </div>
 
-            {/* Laptop Keyboard Chassis Base (Physical keyboard deck) */}
-            <div className="w-[326px] sm:w-[504px] md:w-[634px] h-[145px] sm:h-[205px] md:h-[250px] rounded-b-2xl sm:rounded-b-[24px] bg-gradient-to-b from-[#14151c] via-[#0f1016] to-[#0a0b10] border border-[#222432] p-2 sm:p-3 shadow-[0_25px_50px_rgba(0,0,0,0.9)] flex flex-col justify-between relative z-10">
-              {/* Display Hinge Cutout */}
-              <div className="w-24 sm:w-36 h-1.5 sm:h-2 rounded-b-md bg-[#08080c] mx-auto mb-1 border-b border-[#1f202b]" />
-
-              {/* Recessed Keyboard Well */}
-              <div className="w-full flex-1 rounded-xl bg-[#06070a] border border-[#1a1b24] p-1.5 sm:p-2 shadow-inner">
-                <MacbookKeyboard />
+            {/* Inner Screen Display Well (Recessed Screen Surface revealed when video lifts forward) */}
+            <div className="w-full flex-1 rounded-md sm:rounded-lg bg-black border border-[#171824] relative overflow-hidden flex flex-col items-center justify-center select-none">
+              <div className="absolute inset-0 terminal-grid opacity-15 pointer-events-none" />
+              <div className="w-6 h-6 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mb-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
               </div>
-
-              {/* Trackpad Area */}
-              <div className="w-24 sm:w-36 md:w-44 h-9 sm:h-14 md:h-16 rounded-lg bg-[#0c0d13] border border-[#20212d] mx-auto mt-1.5 shadow-inner" />
-
-              {/* Front Lip Opening Notch */}
-              <div className="w-12 sm:w-16 h-1 rounded-full bg-[#1c1d29] mx-auto mt-1" />
+              <span className="text-[11px] font-mono text-slate-300 font-medium">Mehedi Hasan</span>
+              <span className="text-[9px] font-mono text-slate-500">~/media/showcase.mp4</span>
             </div>
-          </div>
 
-          {/* Layer 2: EXACTLY ONE ANIMATED VIDEO ELEMENT (Higher Z & translateZ — NEVER covered by keyboard!) */}
-          <div
-            className="absolute top-0 z-50 flex items-center justify-center pointer-events-auto w-[302px] sm:w-[470px] md:w-[590px] aspect-[16/10]"
-            style={{
-              transform: `translate3d(0, ${currentTranslateY}px, ${currentTranslateZ}px) scale(${currentScale}) rotateX(${currentRotateX}deg)`,
-              transformStyle: "preserve-3d",
-              transition: "box-shadow 0.2s ease",
-              boxShadow: isFinalState
-                ? "0 35px 80px -15px rgba(0, 0, 0, 0.95), 0 0 35px rgba(16, 185, 129, 0.25)"
-                : "0 10px 30px -10px rgba(0, 0, 0, 0.8)",
-            }}
-          >
-            <div className="relative w-full h-full rounded-xl sm:rounded-2xl overflow-hidden border border-slate-700/80 bg-black group shadow-2xl">
+            {/* 2. THE ANIMATED VIDEO OVERLAY (Anchored directly over the Inner Screen Well) */}
+            {/* In State 1 (progress = 0), this fits flush with 0 gap inside the screen lid bezels */}
+            <div
+              className="absolute top-[22px] sm:top-[28px] left-[6px] sm:left-[8px] right-[6px] sm:right-[8px] bottom-[6px] sm:bottom-[8px] z-30 pointer-events-auto rounded-md sm:rounded-lg overflow-hidden border border-slate-700/60 bg-black group"
+              style={{
+                transform: `translate3d(0, ${currentTranslateY}px, ${currentTranslateZ}px) scale(${currentScale}) rotateX(${currentRotateX}deg)`,
+                transformStyle: "preserve-3d",
+                transformOrigin: "center center",
+                boxShadow: dynamicShadow,
+              }}
+            >
               <video
                 ref={videoRef}
                 src="/videos/demo-showcase.mp4"
@@ -250,7 +234,6 @@ export function VideoShowcaseSection({
                 muted={isMuted}
                 autoPlay
                 loop
-                controls={isFinalState}
                 className="w-full h-full object-cover"
               />
 
@@ -259,25 +242,49 @@ export function VideoShowcaseSection({
                 type="button"
                 onClick={toggleMute}
                 aria-label={isMuted ? "Unmute audio" : "Mute audio"}
-                className="absolute top-3 right-3 z-50 p-2 rounded-full bg-slate-900/80 hover:bg-slate-800 text-white border border-slate-700/70 backdrop-blur-md transition-all shadow-lg hover:scale-105"
+                className="absolute top-2.5 right-2.5 z-40 p-1.5 sm:p-2 rounded-full bg-slate-900/80 hover:bg-slate-800 text-white border border-slate-700/70 backdrop-blur-md transition-all shadow-lg hover:scale-105"
               >
                 {isMuted ? (
-                  <VolumeX className="w-4 h-4 text-slate-300" />
+                  <VolumeX className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-300" />
                 ) : (
-                  <Volume2 className="w-4 h-4 text-emerald-400" />
+                  <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400" />
                 )}
               </button>
 
               {/* Status Badge in Initial State */}
-              {!isFinalState && (
-                <div className="absolute bottom-3 left-3 z-40 pointer-events-none opacity-80 group-hover:opacity-100 transition-opacity">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-950/80 border border-slate-800 text-emerald-300 text-[10px] font-mono backdrop-blur-sm">
-                    <Sparkles className="w-3 h-3 text-emerald-400" />
-                    <span>Demo Walkthrough</span>
-                  </span>
-                </div>
-              )}
+              <div
+                className="absolute bottom-2.5 left-2.5 z-30 pointer-events-none transition-opacity duration-300"
+                style={{ opacity: Math.max(0, 1 - easeProgress * 1.5) }}
+              >
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md bg-slate-950/80 border border-slate-800 text-emerald-300 text-[9px] sm:text-[10px] font-mono backdrop-blur-sm">
+                  <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-emerald-400" />
+                  <span>Demo Walkthrough</span>
+                </span>
+              </div>
             </div>
+          </div>
+
+          {/* 3. Laptop Keyboard Chassis Base (Physical keyboard deck in 3D perspective) */}
+          <div
+            className="w-[320px] sm:w-[460px] md:w-[570px] h-[110px] sm:h-[150px] md:h-[180px] rounded-b-xl sm:rounded-b-2xl bg-gradient-to-b from-[#14151f] via-[#0f1016] to-[#0a0b10] border border-[#222434] p-1.5 sm:p-2.5 shadow-[0_20px_40px_rgba(0,0,0,0.85)] flex flex-col justify-between relative z-10 pointer-events-none"
+            style={{
+              transform: "rotateX(55deg)",
+              transformOrigin: "top center",
+            }}
+          >
+            {/* Display Hinge Cutout */}
+            <div className="w-20 sm:w-32 h-1 sm:h-1.5 rounded-b bg-[#08080c] mx-auto mb-0.5 border-b border-[#20212d]" />
+
+            {/* Recessed Keyboard Well */}
+            <div className="w-full flex-1 rounded-lg bg-[#06070a] border border-[#1a1b26] p-1 sm:p-1.5 shadow-inner overflow-hidden">
+              <MacbookKeyboard />
+            </div>
+
+            {/* Trackpad Area */}
+            <div className="w-20 sm:w-32 md:w-40 h-6 sm:h-9 md:h-11 rounded-md bg-[#0c0d14] border border-[#20212f] mx-auto mt-1 shadow-inner" />
+
+            {/* Front Lip Opening Notch */}
+            <div className="w-10 sm:w-14 h-0.5 rounded-full bg-[#1c1d2a] mx-auto mt-0.5" />
           </div>
         </div>
       </div>
