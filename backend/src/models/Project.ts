@@ -31,6 +31,7 @@ const ProjectSchema = new Schema<IProject & Document>(
       index: true,
     },
     featured: { type: Boolean, default: false, index: true },
+    isPublished: { type: Boolean, default: true, index: true },
     order: { type: Number, default: 0, index: true },
     thumbnail: { type: String, required: true },
     techStack: [{ type: String, required: true }],

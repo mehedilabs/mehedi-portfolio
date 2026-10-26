@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { ISession } from "../types/index.js";
 
-export interface ISessionDocument extends ISession, Document {}
+export interface ISessionDocument extends Omit<ISession, "_id">, Document {}
 
 const SessionSchema = new Schema<ISessionDocument>(
   {

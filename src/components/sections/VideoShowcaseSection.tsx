@@ -6,9 +6,30 @@ import { Locale } from "@/types";
 import { Dictionary } from "@/data/dictionaries";
 import { MacbookKeyboard } from "@/components/ui/MacbookKeyboard";
 
+export interface VideoShowcaseConfig {
+  videoSourceType?: "google-drive" | "native-url";
+  googleDriveSharingUrl?: string;
+  googleDriveFileId?: string;
+  videoUrl?: string;
+  posterUrl?: string;
+  en?: {
+    badge?: string;
+    headingHighlight?: string;
+    headingNormal?: string;
+    subheading?: string;
+  };
+  bn?: {
+    badge?: string;
+    headingHighlight?: string;
+    headingNormal?: string;
+    subheading?: string;
+  };
+}
+
 interface VideoShowcaseSectionProps {
   locale?: Locale;
   dict: Dictionary;
+  config?: VideoShowcaseConfig;
 }
 
 const subscribeReducedMotion = (callback: () => void) => {
@@ -65,7 +86,12 @@ function formatTime(seconds: number): string {
 export function VideoShowcaseSection({
   locale,
   dict,
+  config,
 }: VideoShowcaseSectionProps) {
+  const isGoogleDrive =
+    config?.videoSourceType === "google-drive" && Boolean(config?.googleDriveFileId);
+  const videoSrc = config?.videoUrl || "/videos/demo-showcase.mp4";
+
   const containerRef = React.useRef<HTMLDivElement>(null);
   const videoRef = React.useRef<HTMLVideoElement>(null);
   const rafRef = React.useRef<number | null>(null);
@@ -308,20 +334,31 @@ export function VideoShowcaseSection({
         >
           <div className="inline-flex items-center gap-2 font-mono text-[11px] sm:text-xs text-emerald-400 font-semibold tracking-wider uppercase mb-0.5">
             <span className="w-2 h-2 rounded bg-emerald-500" />
-            <span>{dict.videoShowcase.sectionTag}</span>
+            <span>
+              {config?.[locale === "bn" ? "bn" : "en"]?.badge ||
+                dict.videoShowcase.sectionTag}
+            </span>
           </div>
 
           <h2 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">
             <span className="block text-emerald-400 drop-shadow-[0_0_25px_rgba(16,185,129,0.35)]">
-              {locale === "bn" ? "সিস্টেম আর্কিটেকচার" : "Full-Stack"}
+              {config?.[locale === "bn" ? "bn" : "en"]?.headingHighlight ||
+                (locale === "bn" ? "সিস্টেম আর্কিটেকচার" : "Full-Stack")}
             </span>
 
             <span className="block text-white mt-0.5">
-              {locale === "bn"
-                ? "ডেভেলপমেন্ট সল্যুশনস"
-                : "Development Solutions"}
+              {config?.[locale === "bn" ? "bn" : "en"]?.headingNormal ||
+                (locale === "bn"
+                  ? "ডেভেলপমেন্ট সল্যুশনস"
+                  : "Development Solutions")}
             </span>
           </h2>
+
+          {config?.[locale === "bn" ? "bn" : "en"]?.subheading && (
+            <p className="text-xs sm:text-sm text-slate-400 font-mono mt-2">
+              {config[locale === "bn" ? "bn" : "en"]?.subheading}
+            </p>
+          )}
         </div>
 
         <div
@@ -377,15 +414,25 @@ export function VideoShowcaseSection({
                 boxShadow: dynamicShadow,
               }}
             >
-              <video
-                ref={videoRef}
-                src="/videos/demo-showcase.mp4"
-                playsInline
-                muted={isMuted}
-                autoPlay
-                loop
-                preload="metadata"
-                onTimeUpdate={handleTimeUpdate}
+              {isGoogleDrive ? (
+                <iframe
+                  src={`https://drive.google.com/file/d/${config?.googleDriveFileId}/preview`}
+                  title="Showcase Video"
+                  className="w-full h-full border-0"
+                  allow="autoplay; encrypted-media"
+                  allowFullScreen
+                />
+              ) : (
+                <>
+                  <video
+                    ref={videoRef}
+                    src={videoSrc}
+                    playsInline
+                    muted={isMuted}
+                    autoPlay
+                    loop
+                    preload="metadata"
+                    onTimeUpdate={handleTimeUpdate}
                 onLoadedMetadata={handleLoadedMetadata}
                 onDurationChange={handleDurationChange}
                 onPlay={handlePlay}
@@ -481,7 +528,9 @@ export function VideoShowcaseSection({
                   </div>
                 </div>
               </div>
-            </div>
+            </>
+          )}
+        </div>
           </div>
 
           <div

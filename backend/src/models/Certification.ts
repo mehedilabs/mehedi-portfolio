@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { ICertification } from "../types/index.js";
 
-export interface ICertificationDocument extends ICertification, Document {}
+export interface ICertificationDocument extends Omit<ICertification, "_id">, Document {}
 
 const CertificationSchema = new Schema<ICertificationDocument>(
   {

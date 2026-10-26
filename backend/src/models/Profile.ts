@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { IProfile } from "../types/index.js";
 
-export interface IProfileDocument extends IProfile, Document {}
+export interface IProfileDocument extends Omit<IProfile, "_id">, Document {}
 
 const ProfileSchema = new Schema<IProfileDocument>(
   {
@@ -36,6 +36,11 @@ const ProfileSchema = new Schema<IProfileDocument>(
     resumeUrl: {
       type: String,
       default: "/documents/resume-mehedi-hasan.pdf",
+    },
+    availabilityText: {
+      type: String,
+      default: "Available for Senior Roles & Architecture Consulting",
+      trim: true,
     },
     socialLinks: {
       github: { type: String, default: "https://github.com/mehedilabs" },

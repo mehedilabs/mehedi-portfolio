@@ -1,3 +1,17 @@
+import type {
+  ProjectItem,
+  SkillItem,
+  ExperienceItem,
+  EducationItem,
+  CertificationItem,
+  BlogPostItem,
+  AssistantQAPair,
+  ContactMessageItem,
+  MediaAssetItem,
+  ProfileData,
+  SiteSettingsData,
+} from "@/types";
+
 /**
  * Centralized typed API client for Mehedi Portfolio frontend
  * Connects Next.js application to Express REST API with full credentials support.
@@ -14,6 +28,10 @@ export interface ApiResponse<T = unknown> {
   data?: T;
   token?: string;
   user?: AuthUser;
+  count?: number;
+  isPublished?: boolean;
+  isRead?: boolean;
+  isArchived?: boolean;
 }
 
 export interface AuthUser {
@@ -23,6 +41,49 @@ export interface AuthUser {
   role: "owner" | "admin" | "demo";
   lastLogin?: string;
   createdAt?: string;
+}
+
+export interface SectionConfigItem {
+  id: string;
+  label: string;
+  enabled: boolean;
+  order: number;
+}
+
+export interface VideoShowcaseData {
+  videoSourceType: "google-drive" | "native-url";
+  googleDriveSharingUrl?: string;
+  googleDriveFileId?: string;
+  videoUrl: string;
+  posterUrl?: string;
+  aspectRatio: string;
+  autoPlay: boolean;
+  loop: boolean;
+  muted: boolean;
+  en: {
+    badge: string;
+    headingHighlight: string;
+    headingNormal: string;
+    subheading?: string;
+  };
+  bn: {
+    badge: string;
+    headingHighlight: string;
+    headingNormal: string;
+    subheading?: string;
+  };
+}
+
+export interface PublicSiteSettings {
+  siteName: string;
+  brandTagline: string;
+  sections: SectionConfigItem[];
+  activeSections: Record<string, boolean>;
+  videoShowcase: VideoShowcaseData;
+  resumeUrl: string;
+  avatarUrl: string;
+  aboutPhotoUrl: string;
+  availabilityText?: string;
 }
 
 export class ApiError extends Error {
@@ -51,11 +112,14 @@ export async function apiRequest<T = unknown>(
   const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
   const url = `${API_BASE_URL}${cleanEndpoint}`;
 
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-    ...options.headers,
-  };
+  const isFormData = options.body instanceof FormData;
+  const headers: HeadersInit = isFormData
+    ? { ...options.headers }
+    : {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        ...options.headers,
+      };
 
   try {
     const response = await fetch(url, {
@@ -64,17 +128,42 @@ export async function apiRequest<T = unknown>(
       credentials: "include", // Transmit HTTP-only authentication cookies
     });
 
-    const isJson = response.headers
-      .get("content-type")
-      ?.includes("application/json");
-    const data = isJson ? await response.json() : null;
+    const contentType = response.headers.get("content-type") || "";
+    const isJson = contentType.includes("application/json");
+
+    let data: unknown = null;
+    if (response.status !== 204) {
+      const rawText = await response.text();
+      if (rawText && rawText.trim().length > 0) {
+        if (isJson) {
+          try {
+            data = JSON.parse(rawText);
+          } catch {
+            data = { message: rawText };
+          }
+        } else {
+          data = { message: rawText };
+        }
+      }
+    }
 
     if (!response.ok) {
+      const parsedData =
+        typeof data === "object" && data !== null
+          ? (data as Record<string, unknown>)
+          : {};
       const errorMessage =
-        data?.error ||
-        data?.message ||
+        (typeof parsedData.error === "string" && parsedData.error) ||
+        (typeof parsedData.message === "string" && parsedData.message) ||
         `Request failed with status ${response.status}`;
-      throw new ApiError(errorMessage, response.status, data?.issues);
+      const issues = Array.isArray(parsedData.issues)
+        ? (parsedData.issues as Array<{ field: string; message: string }>)
+        : undefined;
+      throw new ApiError(errorMessage, response.status, issues);
+    }
+
+    if (data === null || data === undefined) {
+      return { success: true } as unknown as T;
     }
 
     return data as T;
@@ -90,7 +179,7 @@ export async function apiRequest<T = unknown>(
 }
 
 // ------------------------------------------------------------------------------
-// Authentication & Account API
+// Authentication API
 // ------------------------------------------------------------------------------
 export const authApi = {
   login: async (email: string, password: string): Promise<ApiResponse> => {
@@ -143,7 +232,7 @@ export const authApi = {
 };
 
 // ------------------------------------------------------------------------------
-// Admin API (Protected)
+// Admin CMS & Management API
 // ------------------------------------------------------------------------------
 export const adminApi = {
   getOverview: async (): Promise<{
@@ -154,6 +243,7 @@ export const adminApi = {
       posts: number;
       unreadMessages: number;
       auditLogs: number;
+      mediaAssets: number;
     };
   }> => {
     return apiRequest("/admin/overview");
@@ -165,37 +255,308 @@ export const adminApi = {
     return apiRequest(`/admin/audit-logs?limit=${limit}`);
   },
 
-  getSettings: async (): Promise<{ success: boolean; data: unknown }> => {
+  // Section Visibility & Order (Critical Requirement)
+  getSections: async (): Promise<{ success: boolean; data: SectionConfigItem[] }> => {
+    return apiRequest("/admin/sections");
+  },
+
+  updateSections: async (
+    sections: SectionConfigItem[]
+  ): Promise<ApiResponse<SectionConfigItem[]>> => {
+    return apiRequest<ApiResponse<SectionConfigItem[]>>("/admin/sections", {
+      method: "PUT",
+      body: JSON.stringify({ sections }),
+    });
+  },
+
+  // Video Showcase (Google Drive Link Management)
+  getVideoShowcase: async (): Promise<{ success: boolean; data: VideoShowcaseData }> => {
+    return apiRequest("/admin/video-showcase");
+  },
+
+  updateVideoShowcase: async (
+    data: Partial<VideoShowcaseData>
+  ): Promise<ApiResponse<VideoShowcaseData>> => {
+    return apiRequest<ApiResponse<VideoShowcaseData>>("/admin/video-showcase", {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+  },
+
+  removeShowcaseVideo: async (): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>("/admin/video-showcase/video", {
+      method: "DELETE",
+    });
+  },
+
+  // Profile & Resume
+  getProfile: async (): Promise<{ success: boolean; data: ProfileData }> => {
+    return apiRequest("/admin/profile");
+  },
+
+  updateProfile: async (profile: Record<string, unknown>): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>("/admin/profile", {
+      method: "PUT",
+      body: JSON.stringify(profile),
+    });
+  },
+
+  // Settings
+  getSettings: async (): Promise<{ success: boolean; data: SiteSettingsData }> => {
     return apiRequest("/admin/settings");
   },
 
-  updateSettings: async (
-    settings: Record<string, unknown>
-  ): Promise<ApiResponse> => {
+  updateSettings: async (settings: Record<string, unknown>): Promise<ApiResponse> => {
     return apiRequest<ApiResponse>("/admin/settings", {
       method: "PUT",
       body: JSON.stringify(settings),
     });
   },
 
-  getProfile: async (): Promise<{ success: boolean; data: unknown }> => {
-    return apiRequest("/admin/profile");
+  // Projects CRUD
+  getProjects: async <T = ProjectItem>(): Promise<{ success: boolean; count: number; data: T[] }> => {
+    return apiRequest("/admin/projects");
   },
 
-  updateProfile: async (
-    profile: Record<string, unknown>
-  ): Promise<ApiResponse> => {
-    return apiRequest<ApiResponse>("/admin/profile", {
+  createProject: async (project: Record<string, unknown>): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>("/admin/projects", {
+      method: "POST",
+      body: JSON.stringify(project),
+    });
+  },
+
+  updateProject: async (id: string, project: Record<string, unknown>): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>(`/admin/projects/${id}`, {
       method: "PUT",
-      body: JSON.stringify(profile),
+      body: JSON.stringify(project),
+    });
+  },
+
+  deleteProject: async (id: string): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>(`/admin/projects/${id}`, {
+      method: "DELETE",
+    });
+  },
+
+  toggleProjectPublish: async (id: string): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>(`/admin/projects/${id}/toggle-publish`, {
+      method: "PATCH",
+    });
+  },
+
+  // Skills CRUD
+  getSkills: async <T = SkillItem>(): Promise<{ success: boolean; count: number; data: T[] }> => {
+    return apiRequest("/admin/skills");
+  },
+
+  createSkill: async (skill: Record<string, unknown>): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>("/admin/skills", {
+      method: "POST",
+      body: JSON.stringify(skill),
+    });
+  },
+
+  updateSkill: async (id: string, skill: Record<string, unknown>): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>(`/admin/skills/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(skill),
+    });
+  },
+
+  deleteSkill: async (id: string): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>(`/admin/skills/${id}`, {
+      method: "DELETE",
+    });
+  },
+
+  // Career: Experience, Education, Certifications
+  getExperience: async <T = ExperienceItem>(): Promise<{ success: boolean; data: T[] }> => {
+    return apiRequest("/admin/experience");
+  },
+
+  createExperience: async (exp: Record<string, unknown>): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>("/admin/experience", {
+      method: "POST",
+      body: JSON.stringify(exp),
+    });
+  },
+
+  deleteExperience: async (id: string): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>(`/admin/experience/${id}`, {
+      method: "DELETE",
+    });
+  },
+
+  getEducation: async <T = EducationItem>(): Promise<{ success: boolean; data: T[] }> => {
+    return apiRequest("/admin/education");
+  },
+
+  createEducation: async (edu: Record<string, unknown>): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>("/admin/education", {
+      method: "POST",
+      body: JSON.stringify(edu),
+    });
+  },
+
+  deleteEducation: async (id: string): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>(`/admin/education/${id}`, {
+      method: "DELETE",
+    });
+  },
+
+  getCertifications: async <T = CertificationItem>(): Promise<{ success: boolean; data: T[] }> => {
+    return apiRequest("/admin/certifications");
+  },
+
+  createCertification: async (cert: Record<string, unknown>): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>("/admin/certifications", {
+      method: "POST",
+      body: JSON.stringify(cert),
+    });
+  },
+
+  deleteCertification: async (id: string): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>(`/admin/certifications/${id}`, {
+      method: "DELETE",
+    });
+  },
+
+  // Blog CRUD
+  getBlogPosts: async <T = BlogPostItem>(): Promise<{ success: boolean; count: number; data: T[] }> => {
+    return apiRequest("/admin/blog");
+  },
+
+  createBlogPost: async (post: Record<string, unknown>): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>("/admin/blog", {
+      method: "POST",
+      body: JSON.stringify(post),
+    });
+  },
+
+  updateBlogPost: async (id: string, post: Record<string, unknown>): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>(`/admin/blog/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(post),
+    });
+  },
+
+  deleteBlogPost: async (id: string): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>(`/admin/blog/${id}`, {
+      method: "DELETE",
+    });
+  },
+
+  // Contact Messages
+  getMessages: async <T = ContactMessageItem>(params?: {
+    isRead?: boolean;
+    isArchived?: boolean;
+    search?: string;
+  }): Promise<{ success: boolean; count: number; data: T[] }> => {
+    const q = new URLSearchParams();
+    if (params?.isRead !== undefined) q.set("isRead", String(params.isRead));
+    if (params?.isArchived !== undefined) q.set("isArchived", String(params.isArchived));
+    if (params?.search) q.set("search", params.search);
+    return apiRequest(`/admin/messages?${q.toString()}`);
+  },
+
+  toggleMessageRead: async (id: string): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>(`/admin/messages/${id}/read`, {
+      method: "PATCH",
+    });
+  },
+
+  toggleMessageArchived: async (id: string): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>(`/admin/messages/${id}/archive`, {
+      method: "PATCH",
+    });
+  },
+
+  deleteMessage: async (id: string): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>(`/admin/messages/${id}`, {
+      method: "DELETE",
+    });
+  },
+
+  // Assistant Q&A
+  getAssistantQA: async <T = AssistantQAPair>(): Promise<{ success: boolean; count: number; data: T[] }> => {
+    return apiRequest("/admin/assistant-qa");
+  },
+
+  createAssistantQA: async (qa: Record<string, unknown>): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>("/admin/assistant-qa", {
+      method: "POST",
+      body: JSON.stringify(qa),
+    });
+  },
+
+  deleteAssistantQA: async (id: string): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>(`/admin/assistant-qa/${id}`, {
+      method: "DELETE",
+    });
+  },
+
+  // Media Library & Direct PC Uploads
+  getMedia: async <T = MediaAssetItem>(params?: {
+    category?: string;
+    search?: string;
+  }): Promise<{ success: boolean; count: number; data: T[] }> => {
+    const q = new URLSearchParams();
+    if (params?.category) q.set("category", params.category);
+    if (params?.search) q.set("search", params.search);
+    return apiRequest(`/media?${q.toString()}`);
+  },
+
+  uploadMedia: async (
+    file: File,
+    category: "avatar" | "project" | "blog" | "video" | "document" | "other" = "other"
+  ): Promise<ApiResponse<{ url: string; filename: string; category: string }>> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("category", category);
+    return apiRequest<ApiResponse<{ url: string; filename: string; category: string }>>(
+      "/media/upload",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+  },
+
+  uploadResumePdf: async (
+    file: File
+  ): Promise<ApiResponse<{ url: string; filename: string }>> => {
+    const formData = new FormData();
+    formData.append("resume", file);
+    return apiRequest<ApiResponse<{ url: string; filename: string }>>(
+      "/media/upload-resume",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+  },
+
+  removeResumePdf: async (): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>("/media/resume", {
+      method: "DELETE",
+    });
+  },
+
+  deleteMedia: async (id: string): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>(`/media/${id}`, {
+      method: "DELETE",
     });
   },
 };
 
 // ------------------------------------------------------------------------------
-// Public Portfolio API
+// Public API
 // ------------------------------------------------------------------------------
 export const publicApi = {
+  getPublicSettings: async (): Promise<{ success: boolean; data: PublicSiteSettings }> => {
+    return apiRequest("/public-settings");
+  },
+
   getHealth: async (): Promise<{
     status: string;
     uptimeSeconds: number;
@@ -206,6 +567,19 @@ export const publicApi = {
 
   getReadiness: async (): Promise<unknown> => {
     return apiRequest("/ready");
+  },
+
+  getProjects: async (category?: string): Promise<{ success: boolean; data: ProjectItem[] }> => {
+    const q = category ? `?category=${category}` : "";
+    return apiRequest(`/projects${q}`);
+  },
+
+  getProjectBySlug: async (slug: string): Promise<{ success: boolean; data: ProjectItem }> => {
+    return apiRequest(`/projects/${slug}`);
+  },
+
+  getAssistantQA: async (): Promise<{ success: boolean; data: AssistantQAPair[] }> => {
+    return apiRequest("/assistant-qa");
   },
 
   sendMessage: async (data: {

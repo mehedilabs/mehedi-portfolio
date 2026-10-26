@@ -7,6 +7,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { FloatingAssistant } from "@/components/assistant/FloatingAssistant";
 import { Locale } from "@/types";
+import { publicApi, PublicSiteSettings } from "@/lib/api-client";
 
 export function generateStaticParams() {
   return [{ locale: "en" }, { locale: "bn" }];
@@ -70,6 +71,18 @@ export default async function LocalizedLayout({
   const locale = rawLocale as Locale;
   const dict = dictionaries[locale];
 
+  let settings: PublicSiteSettings | null = null;
+  try {
+    const res = await publicApi.getPublicSettings();
+    if (res.success && res.data) {
+      settings = res.data;
+    }
+  } catch {
+    // API is offline or unavailable during static generation - fallback gracefully
+  }
+
+  const showAssistant = settings?.activeSections?.assistant !== false;
+
   return (
     <div className={`min-h-screen flex flex-col ${locale === "bn" ? "locale-bn" : ""}`}>
       {/* Top Banner Notice: Architecture Placeholder Marker */}
@@ -78,10 +91,15 @@ export default async function LocalizedLayout({
         {dict.common.placeholderNotice}
       </div>
 
-      <Navbar locale={locale} dict={dict} />
+      <Navbar
+        locale={locale}
+        dict={dict}
+        activeSections={settings?.activeSections}
+        resumeUrl={settings?.resumeUrl}
+      />
       <main className="flex-1 w-full">{children}</main>
       <Footer dict={dict} />
-      <FloatingAssistant locale={locale} dict={dict} />
+      {showAssistant && <FloatingAssistant locale={locale} dict={dict} />}
     </div>
   );
 }

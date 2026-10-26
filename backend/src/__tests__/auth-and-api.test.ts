@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { hashPassword } from "../models/User.js";
+import { parseGoogleDriveUrl } from "../utils/googleDrive.js";
+import { checkDemoRestriction } from "../controllers/adminController.js";
 import {
   loginSchema,
   changePasswordSchema,
@@ -173,6 +175,58 @@ async function runTests() {
       message: "Short",
     });
     assert.equal(messageTooShort.success, false);
+  });
+
+  // 9. Google Drive URL Parser: All Standard Sharing Formats
+  await test("Google Drive parser extracts file ID and generates correct embed preview URL", () => {
+    const testFileId = "1aBcDeFgHiJkLmNoPqRsTuVwXyZ123456";
+
+    // Format 1: /file/d/ID/view?usp=sharing
+    const res1 = parseGoogleDriveUrl(`https://drive.google.com/file/d/${testFileId}/view?usp=sharing`);
+    assert.equal(res1.isValid, true);
+    assert.equal(res1.fileId, testFileId);
+    assert.equal(res1.previewUrl, `https://drive.google.com/file/d/${testFileId}/preview`);
+
+    // Format 2: ?id=ID
+    const res2 = parseGoogleDriveUrl(`https://drive.google.com/open?id=${testFileId}`);
+    assert.equal(res2.isValid, true);
+    assert.equal(res2.fileId, testFileId);
+
+    // Format 3: Bare ID
+    const res3 = parseGoogleDriveUrl(testFileId);
+    assert.equal(res3.isValid, true);
+    assert.equal(res3.fileId, testFileId);
+
+    // Invalid format
+    const resInvalid = parseGoogleDriveUrl("https://other-website.com/video.mp4");
+    assert.equal(resInvalid.isValid, false);
+    assert.ok(resInvalid.error);
+  });
+
+  // 10. Demo Account Restriction Helper
+  await test("Demo restriction helper rejects mutations with 403 Forbidden", () => {
+    let statusReturned = 0;
+    let jsonReturned: Record<string, unknown> = {};
+
+    const mockRes = {
+      status(code: number) {
+        statusReturned = code;
+        return this;
+      },
+      json(data: Record<string, unknown>) {
+        jsonReturned = data;
+        return this;
+      },
+    } as any;
+
+    const mockReq = {
+      user: { role: "demo" },
+    } as any;
+
+    const isRestricted = checkDemoRestriction(mockReq, mockRes);
+    assert.equal(isRestricted, true);
+    assert.equal(statusReturned, 403);
+    assert.equal(jsonReturned.success, false);
   });
 
   console.log(`\nTest Results: ${passed} passed, ${failed} failed.\n`);

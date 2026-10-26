@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { IMediaAsset } from "../types/index.js";
 
-export interface IMediaAssetDocument extends IMediaAsset, Document {}
+export interface IMediaAssetDocument extends Omit<IMediaAsset, "_id">, Document {}
 
 const MediaAssetSchema = new Schema<IMediaAssetDocument>(
   {

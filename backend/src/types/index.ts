@@ -19,8 +19,10 @@ export interface ILocalizedProjectContent {
 }
 
 export interface IProject {
+  _id?: string;
   category: "fullstack" | "backend" | "cloud" | "frontend";
   featured: boolean;
+  isPublished: boolean;
   order: number;
   thumbnail: string;
   techStack: string[];
@@ -42,6 +44,7 @@ export interface ILocalizedBlogContent {
 }
 
 export interface IBlogPost {
+  _id?: string;
   slug: string;
   publishedAt: Date;
   readTime: string;
@@ -55,6 +58,7 @@ export interface IBlogPost {
 }
 
 export interface ISkill {
+  _id?: string;
   category: "frontend" | "backend" | "database" | "cloud" | "tools";
   name: string;
   level: number; // 0 - 100
@@ -66,6 +70,7 @@ export interface ISkill {
 }
 
 export interface IExperience {
+  _id?: string;
   period: string;
   current: boolean;
   techStack: string[];
@@ -91,6 +96,7 @@ export interface IExperience {
 }
 
 export interface IEducation {
+  _id?: string;
   period: string;
   order: number;
   en: {
@@ -112,6 +118,7 @@ export interface IEducation {
 }
 
 export interface ICertification {
+  _id?: string;
   name: string;
   issuer: string;
   issueDate: string;
@@ -130,6 +137,7 @@ export interface ICertification {
 }
 
 export interface IMessage {
+  _id?: string;
   name: string;
   email: string;
   subject: string;
@@ -144,6 +152,7 @@ export interface IMessage {
 }
 
 export interface IAssistantQA {
+  _id?: string;
   category: "experience" | "skills" | "freelance" | "contact" | "architecture";
   order: number;
   isActive: boolean;
@@ -182,6 +191,7 @@ export interface ISession {
 }
 
 export interface IProfile {
+  _id?: string;
   name: string;
   email: string;
   phone?: string;
@@ -189,6 +199,7 @@ export interface IProfile {
   avatarUrl?: string;
   aboutPhotoUrl?: string;
   resumeUrl?: string;
+  availabilityText?: string;
   socialLinks: {
     github?: string;
     linkedin?: string;
@@ -211,6 +222,9 @@ export interface IProfile {
 }
 
 export interface IVideoShowcaseSettings {
+  videoSourceType: "google-drive" | "native-url";
+  googleDriveSharingUrl?: string;
+  googleDriveFileId?: string;
   videoUrl: string;
   posterUrl?: string;
   aspectRatio: string;
@@ -231,22 +245,20 @@ export interface IVideoShowcaseSettings {
   };
 }
 
+export interface ISectionItem {
+  id: string; // 'hero' | 'about' | 'skills' | 'videoShowcase' | 'experience' | 'education' | 'projects' | 'blog' | 'contact' | 'assistant'
+  label: string;
+  enabled: boolean;
+  order: number;
+}
+
 export interface ISiteSettings {
+  _id?: string;
   siteName: string;
   brandTagline: string;
   maintenanceMode: boolean;
-  activeSections: {
-    hero: boolean;
-    about: boolean;
-    skills: boolean;
-    videoShowcase: boolean;
-    projects: boolean;
-    experience: boolean;
-    education: boolean;
-    blog: boolean;
-    contact: boolean;
-    assistant: boolean;
-  };
+  sections: ISectionItem[];
+  activeSections: Record<string, boolean>;
   videoShowcase: IVideoShowcaseSettings;
   seo: {
     defaultTitle: string;
@@ -258,6 +270,7 @@ export interface ISiteSettings {
 }
 
 export interface IMediaAsset {
+  _id?: string;
   filename: string;
   publicId?: string;
   url: string;
@@ -275,6 +288,7 @@ export interface IMediaAsset {
 }
 
 export interface IPage {
+  _id?: string;
   slug: string;
   isPublished: boolean;
   en: {
@@ -294,6 +308,7 @@ export interface IPage {
 }
 
 export interface IAuditLog {
+  _id?: string;
   action: string;
   resource: string;
   resourceId?: string;

@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.11.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -22,6 +23,7 @@
     "jsonwebtoken": "^9.0.3",
     "mehedi-portfolio": "file:..",
     "mongoose": "^8.9.5",
+    "multer": "^2.5.0",
     "zod": "^4.6.7"
   },
   "devDependencies": {
@@ -30,6 +32,7 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.3.0",
     "@types/node": "^22.10.7",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3"

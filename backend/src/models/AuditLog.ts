@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { IAuditLog } from "../types/index.js";
 
-export interface IAuditLogDocument extends IAuditLog, Document {}
+export interface IAuditLogDocument extends Omit<IAuditLog, "_id">, Document {}
 
 const AuditLogSchema = new Schema<IAuditLogDocument>(
   {

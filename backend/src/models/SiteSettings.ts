@@ -1,7 +1,30 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { ISiteSettings } from "../types/index.js";
 
-export interface ISiteSettingsDocument extends ISiteSettings, Document {}
+export interface ISiteSettingsDocument extends Omit<ISiteSettings, "_id">, Document {}
+
+const DEFAULT_SECTIONS = [
+  { id: "hero", label: "Hero & Introduction", enabled: true, order: 1 },
+  { id: "about", label: "About & Philosophy", enabled: true, order: 2 },
+  { id: "skills", label: "Skills & Technologies", enabled: true, order: 3 },
+  { id: "videoShowcase", label: "Video Showcase (Laptop Demo)", enabled: true, order: 4 },
+  { id: "experience", label: "Professional Experience", enabled: true, order: 5 },
+  { id: "education", label: "Education & Coursework", enabled: true, order: 6 },
+  { id: "projects", label: "Featured Projects & Case Studies", enabled: true, order: 7 },
+  { id: "blog", label: "Engineering Articles & Blog", enabled: true, order: 8 },
+  { id: "contact", label: "Contact & Inquiries", enabled: true, order: 9 },
+  { id: "assistant", label: "Interactive Chat Assistant", enabled: true, order: 10 },
+];
+
+const SectionItemSchema = new Schema(
+  {
+    id: { type: String, required: true },
+    label: { type: String, required: true },
+    enabled: { type: Boolean, default: true },
+    order: { type: Number, required: true },
+  },
+  { _id: false }
+);
 
 const SiteSettingsSchema = new Schema<ISiteSettingsDocument>(
   {
@@ -19,19 +42,40 @@ const SiteSettingsSchema = new Schema<ISiteSettingsDocument>(
       type: Boolean,
       default: false,
     },
+    sections: {
+      type: [SectionItemSchema],
+      default: DEFAULT_SECTIONS,
+    },
     activeSections: {
-      hero: { type: Boolean, default: true },
-      about: { type: Boolean, default: true },
-      skills: { type: Boolean, default: true },
-      videoShowcase: { type: Boolean, default: true },
-      projects: { type: Boolean, default: true },
-      experience: { type: Boolean, default: true },
-      education: { type: Boolean, default: true },
-      blog: { type: Boolean, default: true },
-      contact: { type: Boolean, default: true },
-      assistant: { type: Boolean, default: true },
+      type: Map,
+      of: Boolean,
+      default: {
+        hero: true,
+        about: true,
+        skills: true,
+        videoShowcase: true,
+        projects: true,
+        experience: true,
+        education: true,
+        blog: true,
+        contact: true,
+        assistant: true,
+      },
     },
     videoShowcase: {
+      videoSourceType: {
+        type: String,
+        enum: ["google-drive", "native-url"],
+        default: "native-url",
+      },
+      googleDriveSharingUrl: {
+        type: String,
+        default: "",
+      },
+      googleDriveFileId: {
+        type: String,
+        default: "",
+      },
       videoUrl: {
         type: String,
         default: "/videos/demo-showcase.mp4",

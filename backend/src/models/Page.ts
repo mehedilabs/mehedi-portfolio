@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { IPage } from "../types/index.js";
 
-export interface IPageDocument extends IPage, Document {}
+export interface IPageDocument extends Omit<IPage, "_id">, Document {}
 
 const PageSchema = new Schema<IPageDocument>(
   {

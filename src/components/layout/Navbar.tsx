@@ -22,9 +22,11 @@ import { cn } from "@/lib/utils";
 interface NavbarProps {
   locale: Locale;
   dict: Dictionary;
+  activeSections?: Record<string, boolean>;
+  resumeUrl?: string;
 }
 
-export function Navbar({ locale, dict }: NavbarProps) {
+export function Navbar({ locale, dict, activeSections, resumeUrl }: NavbarProps) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [isOverflowOpen, setIsOverflowOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
@@ -72,14 +74,20 @@ export function Navbar({ locale, dict }: NavbarProps) {
     };
   }, [isOverflowOpen, isOpen]);
 
-  const navLinks = [
-    { href: `#about`, label: dict.nav.about },
-    { href: `#skills`, label: dict.nav.skills },
-    { href: `#experience`, label: dict.nav.experience },
-    { href: `#projects`, label: dict.nav.projects },
-    { href: `#blog`, label: dict.nav.blog },
-    { href: `#contact`, label: dict.nav.contact },
+  const allNavLinks = [
+    { id: "about", href: `#about`, label: dict.nav.about },
+    { id: "skills", href: `#skills`, label: dict.nav.skills },
+    { id: "projects", href: `#projects`, label: dict.nav.projects },
+    { id: "experience", href: `#experience`, label: dict.nav.experience },
+    { id: "blog", href: `#blog`, label: dict.nav.blog },
+    { id: "contact", href: `#contact`, label: dict.nav.contact },
   ];
+
+  const navLinks = activeSections
+    ? allNavLinks.filter((link) => activeSections[link.id] !== false)
+    : allNavLinks;
+
+  const targetResumeUrl = resumeUrl || "/documents/resume-mehedi-hasan.pdf";
 
   return (
     <header
@@ -124,7 +132,11 @@ export function Navbar({ locale, dict }: NavbarProps) {
           <div className="hidden lg:flex items-center gap-2.5">
             <LanguageSwitcher currentLocale={locale} />
             <ThemeToggle />
-            <a href="#contact">
+            <a
+              href={targetResumeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Button variant="terminal" size="sm" className="gap-1.5 text-xs">
                 <FileText className="h-3.5 w-3.5" />
                 <span>{dict.nav.resume}</span>
@@ -224,7 +236,9 @@ export function Navbar({ locale, dict }: NavbarProps) {
             ))}
             <div className="pt-2 border-t border-slate-800 flex justify-between items-center">
               <a
-                href="#contact"
+                href={targetResumeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() => setIsOpen(false)}
                 className="w-full"
               >

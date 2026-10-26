@@ -1,4 +1,5 @@
 import express, { Request, Response } from "express";
+import path from "node:path";
 import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
@@ -7,6 +8,7 @@ import { connectDatabase, closeDatabase, isDatabaseConnected } from "./config/db
 import healthRoutes from "./routes/health.js";
 import authRoutes from "./routes/auth.js";
 import adminRoutes from "./routes/admin.js";
+import mediaRoutes from "./routes/media.js";
 import portfolioRoutes from "./routes/portfolio.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { apiLimiter } from "./middleware/rateLimiter.js";
@@ -19,7 +21,7 @@ const PORT = env.PORT || 5000;
 // Security & Parsing Middleware
 app.use(
   helmet({
-    contentSecurityPolicy: env.NODE_ENV === "production",
+    contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false,
   })
 );
@@ -34,8 +36,11 @@ app.use(
 );
 
 app.use(cookieParser());
-app.use(express.json({ limit: "2mb" }));
-app.use(express.urlencoded({ extended: true, limit: "2mb" }));
+app.use(express.json({ limit: "20mb" }));
+app.use(express.urlencoded({ extended: true, limit: "20mb" }));
+
+// Static direct media uploads
+app.use("/uploads", express.static(path.resolve(process.cwd(), "uploads")));
 
 // General API Rate Limiting for all /api endpoints
 app.use("/api", apiLimiter);
@@ -44,6 +49,7 @@ app.use("/api", apiLimiter);
 app.use("/api", healthRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/media", mediaRoutes);
 app.use("/api", portfolioRoutes);
 
 // Root informational endpoint
