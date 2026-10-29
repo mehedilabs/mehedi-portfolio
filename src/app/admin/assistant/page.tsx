@@ -43,7 +43,7 @@ export default function AdminAssistantPage() {
   const loadQA = React.useCallback(async () => {
     setLoading(true);
     try {
-      const res = await adminApi.getAssistantQA();
+      const res = await adminApi.getAssistantQA<AssistantQA>();
       if (res.success) {
         setQaList(res.data || []);
       }
@@ -59,7 +59,7 @@ export default function AdminAssistantPage() {
 
     const fetchQA = async () => {
       try {
-        const res = await adminApi.getAssistantQA();
+        const res = await adminApi.getAssistantQA<AssistantQA>();
 
         if (active && res.success) {
           setQaList(res.data || []);

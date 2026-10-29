@@ -2,13 +2,16 @@ import * as React from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { ArrowLeft, Home, Mail } from "lucide-react";
+import { ArrowLeft, Home, Mail, Code2 } from "lucide-react";
 import { isValidLocale, DEFAULT_LOCALE } from "@/lib/i18n";
 import { dictionaries } from "@/data/dictionaries";
-import { PROJECTS_DATA } from "@/data/portfolio-data";
-import { Locale } from "@/types";
+import { Locale, ProjectItem } from "@/types";
+import { publicApi } from "@/lib/api-client";
 import { Button } from "@/components/ui/Button";
 import { ProjectsArchiveGrid } from "@/components/sections/ProjectsArchiveGrid";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export function generateStaticParams() {
   return [{ locale: "en" }, { locale: "bn" }];
@@ -60,6 +63,16 @@ export default async function ProjectsArchivePage({
   const locale = rawLocale as Locale;
   const dict = dictionaries[locale];
 
+  let projects: ProjectItem[] = [];
+  try {
+    const res = await publicApi.getProjects();
+    if (res.success && Array.isArray(res.data)) {
+      projects = res.data;
+    }
+  } catch {
+    projects = [];
+  }
+
   return (
     <div className="py-10 sm:py-14 md:py-18">
       <div className="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-8 xl:px-10 space-y-8 sm:space-y-10">
@@ -100,12 +113,28 @@ export default async function ProjectsArchivePage({
           </p>
         </div>
 
-        {/* Grid of ALL real projects */}
-        <ProjectsArchiveGrid
-          projects={PROJECTS_DATA}
-          locale={locale}
-          dict={dict}
-        />
+        {/* Grid of real CMS projects or Coming Soon empty state */}
+        {projects.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-slate-800 bg-[#0b0f19]/60 p-16 text-center font-mono">
+            <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto mb-3">
+              <Code2 className="w-6 h-6" />
+            </div>
+            <h3 className="text-base font-bold text-slate-200">
+              {locale === "bn" ? "প্রজেক্ট শীঘ্রই আসছে" : "Projects Coming Soon"}
+            </h3>
+            <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">
+              {locale === "bn"
+                ? "সিএমএস-এর মাধ্যমে নতুন প্রজেক্ট এবং কেস স্টাডি শীঘ্রই যুক্ত করা হবে।"
+                : "Real-world engineering projects and architectural case studies are currently being curated and published via the CMS."}
+            </p>
+          </div>
+        ) : (
+          <ProjectsArchiveGrid
+            projects={projects}
+            locale={locale}
+            dict={dict}
+          />
+        )}
 
         {/* Simple Bottom Return / Contact Action */}
         <div className="pt-8 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-4">

@@ -16,20 +16,12 @@ import {
 import { GithubIcon } from "@/components/ui/Icons";
 import { isValidLocale, DEFAULT_LOCALE } from "@/lib/i18n";
 import { dictionaries } from "@/data/dictionaries";
-import { PROJECTS_DATA } from "@/data/portfolio-data";
-import { Locale } from "@/types";
+import { Locale, ProjectItem } from "@/types";
+import { publicApi } from "@/lib/api-client";
 import { Button } from "@/components/ui/Button";
 
-export function generateStaticParams() {
-  const params: { locale: string; slug: string }[] = [];
-  for (const locale of ["en", "bn"]) {
-    for (const project of PROJECTS_DATA) {
-      const slug = locale === "bn" ? project.bn.slug : project.en.slug;
-      params.push({ locale, slug });
-    }
-  }
-  return params;
-}
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function generateMetadata({
   params,
@@ -39,9 +31,15 @@ export async function generateMetadata({
   const { locale: rawLocale, slug } = await params;
   const locale: Locale = isValidLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
 
-  const project = PROJECTS_DATA.find(
-    (p) => p.en.slug === slug || p.bn.slug === slug
-  );
+  let project: ProjectItem | null = null;
+  try {
+    const res = await publicApi.getProjectBySlug(slug);
+    if (res.success && res.data) {
+      project = res.data;
+    }
+  } catch {
+    project = null;
+  }
 
   if (!project) return { title: "Project Not Found" };
 
@@ -81,22 +79,40 @@ export default async function ProjectDetailPage({
   const locale = rawLocale as Locale;
   const dict = dictionaries[locale];
 
-  const projectIndex = PROJECTS_DATA.findIndex(
-    (p) => p.en.slug === slug || p.bn.slug === slug
-  );
+  let project: ProjectItem | null = null;
+  let allProjects: ProjectItem[] = [];
 
-  if (projectIndex === -1) {
+  try {
+    const [projectRes, listRes] = await Promise.all([
+      publicApi.getProjectBySlug(slug),
+      publicApi.getProjects(),
+    ]);
+
+    if (projectRes.success && projectRes.data) {
+      project = projectRes.data;
+    }
+    if (listRes.success && Array.isArray(listRes.data)) {
+      allProjects = listRes.data;
+    }
+  } catch {
+    project = null;
+  }
+
+  if (!project) {
     notFound();
   }
 
-  const project = PROJECTS_DATA[projectIndex];
   const content = locale === "bn" ? project.bn : project.en;
   const study = content.caseStudy;
 
-  const prevProject = projectIndex > 0 ? PROJECTS_DATA[projectIndex - 1] : null;
+  const projectIndex = allProjects.findIndex(
+    (p) => p.en.slug === slug || p.bn.slug === slug || p.id === project?._id || p._id === project?._id
+  );
+
+  const prevProject = projectIndex > 0 ? allProjects[projectIndex - 1] : null;
   const nextProject =
-    projectIndex < PROJECTS_DATA.length - 1
-      ? PROJECTS_DATA[projectIndex + 1]
+    projectIndex !== -1 && projectIndex < allProjects.length - 1
+      ? allProjects[projectIndex + 1]
       : null;
 
   const displayUrl = project.liveUrl
@@ -149,9 +165,11 @@ export default async function ProjectDetailPage({
             {content.title}
           </h1>
 
-          <p className="text-base sm:text-lg text-slate-300 max-w-3xl leading-relaxed">
-            {content.tagline}
-          </p>
+          {content.tagline && (
+            <p className="text-base sm:text-lg text-slate-300 max-w-3xl leading-relaxed">
+              {content.tagline}
+            </p>
+          )}
 
           {/* Action Links */}
           <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -214,12 +232,14 @@ export default async function ProjectDetailPage({
                   <h3 className="text-lg sm:text-2xl font-bold text-white font-mono">
                     {content.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-400 font-mono">
-                    {content.tagline}
-                  </p>
+                  {content.tagline && (
+                    <p className="text-xs sm:text-sm text-slate-400 font-mono">
+                      {content.tagline}
+                    </p>
+                  )}
                 </div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-slate-900/90 border border-slate-800 text-slate-400 text-xs font-mono">
-                  <span>Screenshot Preview</span>
+                  <span>Project Preview</span>
                 </div>
               </div>
             )}
@@ -239,52 +259,56 @@ export default async function ProjectDetailPage({
         </section>
 
         {/* Content Section: Key Features */}
-        <section className="space-y-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-white font-mono flex items-center gap-2.5">
-            <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-            <span>{dict.projects.keyFeatures}</span>
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {content.highlights.map((highlight, idx) => (
-              <div
-                key={idx}
-                className="rounded-xl border border-slate-800 bg-[#0c111a] p-5 flex items-start gap-3.5"
-              >
-                <span className="text-emerald-400 font-bold text-base leading-none mt-1">✓</span>
-                <p className="text-sm sm:text-base text-slate-200 leading-relaxed font-sans">
-                  {highlight}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Content Section: Technology Stack */}
-        <section className="space-y-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-white font-mono flex items-center gap-2.5">
-            <Code2 className="w-5 h-5 text-cyan-400" />
-            <span>{locale === "bn" ? "ব্যবহৃত প্রযুক্তি" : "Technology Stack"}</span>
-          </h2>
-          <div className="rounded-xl border border-slate-800 bg-[#0c101a] p-6 space-y-4">
-            <div className="flex flex-wrap gap-2">
-              {project.techStack.map((tech) => (
-                <span
-                  key={tech}
-                  className="px-3 py-1 rounded-md text-xs sm:text-sm font-mono bg-slate-900 border border-slate-800 text-slate-200"
+        {content.highlights && content.highlights.length > 0 && (
+          <section className="space-y-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-white font-mono flex items-center gap-2.5">
+              <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+              <span>{dict.projects.keyFeatures}</span>
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {content.highlights.map((highlight, idx) => (
+                <div
+                  key={idx}
+                  className="rounded-xl border border-slate-800 bg-[#0c111a] p-5 flex items-start gap-3.5"
                 >
-                  {tech}
-                </span>
+                  <span className="text-emerald-400 font-bold text-base leading-none mt-1">✓</span>
+                  <p className="text-sm sm:text-base text-slate-200 leading-relaxed font-sans">
+                    {highlight}
+                  </p>
+                </div>
               ))}
             </div>
-            {study?.architecture && (
-              <p className="text-xs sm:text-sm text-slate-400 pt-2 border-t border-slate-800/80 leading-relaxed font-sans">
-                {study.architecture}
-              </p>
-            )}
-          </div>
-        </section>
+          </section>
+        )}
 
-        {/* Optional Clean Challenge & Solution (Plain-English) */}
+        {/* Content Section: Technology Stack */}
+        {project.techStack && project.techStack.length > 0 && (
+          <section className="space-y-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-white font-mono flex items-center gap-2.5">
+              <Code2 className="w-5 h-5 text-cyan-400" />
+              <span>{locale === "bn" ? "ব্যবহৃত প্রযুক্তি" : "Technology Stack"}</span>
+            </h2>
+            <div className="rounded-xl border border-slate-800 bg-[#0c101a] p-6 space-y-4">
+              <div className="flex flex-wrap gap-2">
+                {project.techStack.map((tech) => (
+                  <span
+                    key={tech}
+                    className="px-3 py-1 rounded-md text-xs sm:text-sm font-mono bg-slate-900 border border-slate-800 text-slate-200"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+              {study?.architecture && (
+                <p className="text-xs sm:text-sm text-slate-400 pt-2 border-t border-slate-800/80 leading-relaxed font-sans">
+                  {study.architecture}
+                </p>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* Optional Clean Challenge & Solution */}
         {study && study.challenge && study.solution && (
           <section className="space-y-4">
             <h2 className="text-xl sm:text-2xl font-bold text-white font-mono flex items-center gap-2.5">

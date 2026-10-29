@@ -2,9 +2,9 @@
 
 import * as React from "react";
 import { X, Send, Terminal, Bot, User } from "lucide-react";
-import { Locale } from "@/types";
+import { Locale, AssistantQAPair } from "@/types";
 import { Dictionary } from "@/data/dictionaries";
-import { ASSISTANT_QA_DATA } from "@/data/portfolio-data";
+import { publicApi } from "@/lib/api-client";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
@@ -35,6 +35,25 @@ export function FloatingAssistant({ locale, dict }: FloatingAssistantProps) {
     },
   ]);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
+  const [qaList, setQaList] = React.useState<AssistantQAPair[]>([]);
+
+  // Fetch real CMS-managed Q&A from backend API
+  React.useEffect(() => {
+    let isMounted = true;
+    publicApi
+      .getAssistantQA()
+      .then((res) => {
+        if (isMounted && res.success && Array.isArray(res.data)) {
+          setQaList(res.data);
+        }
+      })
+      .catch(() => {
+        // Fallback gracefully without breaking public UI
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Auto-scroll to bottom of chat
   React.useEffect(() => {
@@ -45,11 +64,17 @@ export function FloatingAssistant({ locale, dict }: FloatingAssistantProps) {
 
   // Handle preset question selection
   const handleAskQuestion = (qaId: string) => {
-    const qa = ASSISTANT_QA_DATA.find((item) => item.id === qaId);
+    const qa = qaList.find((item) => (item._id || item.id) === qaId);
     if (!qa) return;
 
-    const questionText = locale === "bn" ? qa.bn.question : qa.en.question;
-    const answerText = locale === "bn" ? qa.bn.answer : qa.en.answer;
+    const questionText =
+      (locale === "bn" ? qa.bn?.question : qa.en?.question) ||
+      qa.en?.question ||
+      "";
+    const answerText =
+      (locale === "bn" ? qa.bn?.answer : qa.en?.answer) ||
+      qa.en?.answer ||
+      "";
 
     const uId = `usr-${messageCounter.current++}`;
     const userMsg: ChatMessage = {
@@ -91,14 +116,14 @@ export function FloatingAssistant({ locale, dict }: FloatingAssistantProps) {
 
     setMessages((prev) => [...prev, userMsg]);
 
-    // Match query against predefined corpus
+    // Match query against predefined CMS corpus
     setTimeout(() => {
       const query = userText.toLowerCase();
-      const matchedQA = ASSISTANT_QA_DATA.find((item) => {
-        const qEn = item.en.question.toLowerCase();
-        const aEn = item.en.answer.toLowerCase();
-        const qBn = item.bn.question.toLowerCase();
-        const aBn = item.bn.answer.toLowerCase();
+      const matchedQA = qaList.find((item) => {
+        const qEn = (item.en?.question || "").toLowerCase();
+        const aEn = (item.en?.answer || "").toLowerCase();
+        const qBn = (item.bn?.question || "").toLowerCase();
+        const aBn = (item.bn?.answer || "").toLowerCase();
         return (
           qEn.includes(query) ||
           aEn.includes(query) ||
@@ -114,9 +139,9 @@ export function FloatingAssistant({ locale, dict }: FloatingAssistantProps) {
           : "Thank you for asking! For detailed discussions or specific opportunities, feel free to use the contact form below or reach Mehedi directly at mehedi.hasan.bd.dev@gmail.com.";
 
       const botReply = matchedQA
-        ? locale === "bn"
-          ? matchedQA.bn.answer
-          : matchedQA.en.answer
+        ? (locale === "bn" ? matchedQA.bn?.answer : matchedQA.en?.answer) ||
+          matchedQA.en?.answer ||
+          fallbackText
         : fallbackText;
 
       const bId = `bot-${messageCounter.current++}`;
@@ -231,26 +256,38 @@ export function FloatingAssistant({ locale, dict }: FloatingAssistantProps) {
           </div>
 
           {/* Quick Predefined Questions */}
-          <div className="p-2.5 bg-slate-900/50 border-t border-slate-800/80 space-y-1.5">
-            <p className="text-[10px] font-mono uppercase text-slate-500 tracking-wider">
-              {dict.assistant.quickPromptsLabel}
-            </p>
-            <div className="flex flex-wrap gap-1 max-h-24 overflow-y-auto">
-              {ASSISTANT_QA_DATA.map((qa) => {
-                const label = locale === "bn" ? qa.bn.question : qa.en.question;
-                return (
-                  <button
-                    key={qa.id}
-                    type="button"
-                    onClick={() => handleAskQuestion(qa.id)}
-                    className="text-left text-[11px] font-mono px-2 py-1 rounded bg-slate-950 border border-slate-800 text-slate-300 hover:text-emerald-400 hover:border-emerald-500/30 transition-colors"
-                  >
-                    › {label}
-                  </button>
-                );
-              })}
+          {qaList.length > 0 ? (
+            <div className="p-2.5 bg-slate-900/50 border-t border-slate-800/80 space-y-1.5">
+              <p className="text-[10px] font-mono uppercase text-slate-500 tracking-wider">
+                {dict.assistant.quickPromptsLabel}
+              </p>
+              <div className="flex flex-wrap gap-1 max-h-24 overflow-y-auto">
+                {qaList.map((qa) => {
+                  const key = qa._id || qa.id;
+                  const label =
+                    (locale === "bn" ? qa.bn?.question : qa.en?.question) ||
+                    qa.en?.question ||
+                    "";
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => handleAskQuestion(key)}
+                      className="text-left text-[11px] font-mono px-2 py-1 rounded bg-slate-950 border border-slate-800 text-slate-300 hover:text-emerald-400 hover:border-emerald-500/30 transition-colors"
+                    >
+                      › {label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="p-2.5 bg-slate-900/40 border-t border-slate-800/80 text-[11px] font-mono text-slate-500 text-center">
+              {locale === "bn"
+                ? "কোনো সংরক্ষিত প্রশ্নোত্তর সক্রিয় নেই। সরাসরি বার্তা পাঠাতে পারেন।"
+                : "No preset questions configured. Feel free to type your question below!"}
+            </div>
+          )}
 
           {/* Input Bar */}
           <form

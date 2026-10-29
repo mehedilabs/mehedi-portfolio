@@ -9,6 +9,9 @@ import { FloatingAssistant } from "@/components/assistant/FloatingAssistant";
 import { Locale } from "@/types";
 import { publicApi, PublicSiteSettings } from "@/lib/api-client";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export function generateStaticParams() {
   return [{ locale: "en" }, { locale: "bn" }];
 }
@@ -85,12 +88,6 @@ export default async function LocalizedLayout({
 
   return (
     <div className={`min-h-screen flex flex-col ${locale === "bn" ? "locale-bn" : ""}`}>
-      {/* Top Banner Notice: Architecture Placeholder Marker */}
-      <div className="w-full bg-slate-900/90 border-b border-emerald-500/20 px-3 py-1 text-center font-mono text-[11px] text-slate-400">
-        <span className="text-emerald-400 font-semibold">[PROD-READY ARCHITECTURE]</span>{" "}
-        {dict.common.placeholderNotice}
-      </div>
-
       <Navbar
         locale={locale}
         dict={dict}

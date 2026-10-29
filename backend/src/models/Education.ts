@@ -5,8 +5,8 @@ const LocalizedEduSchema = new Schema(
   {
     degree: { type: String, required: true },
     institution: { type: String, required: true },
-    location: { type: String, required: true },
-    description: { type: String, required: true },
+    location: { type: String, default: "" },
+    description: { type: String, default: "" },
     courses: [{ type: String }],
   },
   { _id: false }

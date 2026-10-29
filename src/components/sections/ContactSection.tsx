@@ -12,6 +12,7 @@ import { GithubIcon, LinkedinIcon } from "@/components/ui/Icons";
 import { Locale } from "@/types";
 import { Dictionary } from "@/data/dictionaries";
 import { CONTACT_INFO } from "@/data/portfolio-data";
+import { PublicProfileData } from "@/lib/api-client";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
@@ -20,9 +21,10 @@ import { Card, CardContent } from "@/components/ui/Card";
 interface ContactSectionProps {
   locale?: Locale;
   dict: Dictionary;
+  profile?: PublicProfileData | null;
 }
 
-export function ContactSection({ dict }: ContactSectionProps) {
+export function ContactSection({ dict, profile }: ContactSectionProps) {
   const [formData, setFormData] = React.useState({
     name: "",
     email: "",
@@ -104,7 +106,7 @@ export function ContactSection({ dict }: ContactSectionProps) {
                 </span>
               </div>
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-                {dict.contact.availabilityNote}
+                {profile?.availabilityText || dict.contact.availabilityNote}
               </p>
             </div>
 
@@ -116,7 +118,7 @@ export function ContactSection({ dict }: ContactSectionProps) {
 
               {/* Email */}
               <a
-                href={`mailto:${CONTACT_INFO.email}`}
+                href={`mailto:${profile?.email || CONTACT_INFO.email}`}
                 className="flex items-center gap-3 p-3.5 rounded-lg border border-slate-800 bg-slate-900/60 text-slate-300 hover:text-white hover:border-slate-700 transition-colors group"
               >
                 <div className="p-2 rounded bg-slate-800 text-emerald-400 group-hover:bg-emerald-950/50 transition-colors">
@@ -124,13 +126,13 @@ export function ContactSection({ dict }: ContactSectionProps) {
                 </div>
                 <div>
                   <p className="text-[10px] sm:text-xs text-slate-500 uppercase">{dict.contact.emailTitle}</p>
-                  <p className="text-xs sm:text-sm font-mono text-slate-200 mt-0.5">{CONTACT_INFO.email}</p>
+                  <p className="text-xs sm:text-sm font-mono text-slate-200 mt-0.5">{profile?.email || CONTACT_INFO.email}</p>
                 </div>
               </a>
 
               {/* GitHub */}
               <a
-                href={CONTACT_INFO.github}
+                href={profile?.socialLinks?.github || CONTACT_INFO.github}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 p-3.5 rounded-lg border border-slate-800 bg-slate-900/60 text-slate-300 hover:text-white hover:border-slate-700 transition-colors group"
@@ -140,13 +142,17 @@ export function ContactSection({ dict }: ContactSectionProps) {
                 </div>
                 <div>
                   <p className="text-[10px] sm:text-xs text-slate-500 uppercase">{dict.contact.githubTitle}</p>
-                  <p className="text-xs sm:text-sm font-mono text-slate-200 mt-0.5">github.com/mehedilabs</p>
+                  <p className="text-xs sm:text-sm font-mono text-slate-200 mt-0.5">
+                    {profile?.socialLinks?.github
+                      ? profile.socialLinks.github.replace(/^https?:\/\//, "")
+                      : "github.com/mehedilabs"}
+                  </p>
                 </div>
               </a>
 
               {/* LinkedIn */}
               <a
-                href={CONTACT_INFO.linkedin}
+                href={profile?.socialLinks?.linkedin || CONTACT_INFO.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 p-3.5 rounded-lg border border-slate-800 bg-slate-900/60 text-slate-300 hover:text-white hover:border-slate-700 transition-colors group"
@@ -156,7 +162,11 @@ export function ContactSection({ dict }: ContactSectionProps) {
                 </div>
                 <div>
                   <p className="text-[10px] sm:text-xs text-slate-500 uppercase">{dict.contact.linkedinTitle}</p>
-                  <p className="text-xs sm:text-sm font-mono text-slate-200 mt-0.5">linkedin.com/in/mehedihasan-dev</p>
+                  <p className="text-xs sm:text-sm font-mono text-slate-200 mt-0.5">
+                    {profile?.socialLinks?.linkedin
+                      ? profile.socialLinks.linkedin.replace(/^https?:\/\//, "")
+                      : "linkedin.com/in/mehedihasan-dev"}
+                  </p>
                 </div>
               </a>
 
@@ -167,7 +177,7 @@ export function ContactSection({ dict }: ContactSectionProps) {
                 </div>
                 <div>
                   <p className="text-[10px] sm:text-xs text-slate-500 uppercase">{dict.contact.locationTitle}</p>
-                  <p className="text-xs sm:text-sm font-mono text-slate-200 mt-0.5">{CONTACT_INFO.location}</p>
+                  <p className="text-xs sm:text-sm font-mono text-slate-200 mt-0.5">{profile?.location || CONTACT_INFO.location}</p>
                 </div>
               </div>
             </div>

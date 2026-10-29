@@ -11,7 +11,7 @@ export const CONTACT_INFO = {
   email: "contact.mehedi.dev@gmail.com", // clearly identified professional placeholder
   github: "https://github.com/mehedilabs",
   linkedin: "https://linkedin.com/in/mehedihasan-dev",
-  twitter: "https://twitter.com/mehedi_dev",
+  twitter: "https://twitter.com/mehedilabs",
   location: "Dhaka, Bangladesh (UTC+6)",
   availability: "Available for Full-Time Roles & Consulting",
 };

@@ -11,6 +11,7 @@ import {
   User,
   Video,
   Briefcase,
+  GraduationCap,
   Code2,
   FileText,
   MessageSquare,
@@ -21,6 +22,7 @@ import {
   Menu,
   X,
   ExternalLink,
+  Loader2,
 } from "lucide-react";
 import { authApi } from "@/lib/api-client";
 
@@ -37,7 +39,9 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Profile & Resume", href: "/admin/profile", icon: User },
   { label: "Video Showcase", href: "/admin/video", icon: Video },
   { label: "Projects & Cases", href: "/admin/projects", icon: Briefcase },
-  { label: "Skills & Career", href: "/admin/skills", icon: Code2 },
+  { label: "Experience CMS", href: "/admin/experience", icon: Briefcase },
+  { label: "Academics & Certs", href: "/admin/education", icon: GraduationCap },
+  { label: "Skills & Stack", href: "/admin/skills", icon: Code2 },
   { label: "Blog CMS", href: "/admin/blog", icon: FileText },
   { label: "Contact Inbox", href: "/admin/messages", icon: MessageSquare },
   { label: "Assistant Q&A", href: "/admin/assistant", icon: HelpCircle },
@@ -56,16 +60,41 @@ export default function AdminLayout({
   const [userRole, setUserRole] = React.useState<string>("owner");
 
   const isLoginPage = pathname === "/admin/login";
+  const [authChecked, setAuthChecked] = React.useState(isLoginPage);
 
   React.useEffect(() => {
     if (!isLoginPage) {
-      authApi.getMe().then((res) => {
-        if (res.success && res.user) {
-          setUserRole(res.user.role);
-        }
-      }).catch(() => {});
+      let isMounted = true;
+      const redirectToLogin = () => {
+        const redirectUrl =
+          pathname && pathname !== "/admin" && pathname !== "/admin/login"
+            ? `/admin/login?redirect=${encodeURIComponent(pathname)}`
+            : "/admin/login";
+        router.push(redirectUrl);
+      };
+
+      authApi
+        .getMe()
+        .then((res) => {
+          if (!isMounted) return;
+          if (res.success && res.user) {
+            setUserRole(res.user.role);
+            setAuthChecked(true);
+          } else {
+            redirectToLogin();
+          }
+        })
+        .catch(() => {
+          if (isMounted) {
+            redirectToLogin();
+          }
+        });
+
+      return () => {
+        isMounted = false;
+      };
     }
-  }, [isLoginPage]);
+  }, [isLoginPage, pathname, router]);
 
   const handleLogout = async () => {
     try {
@@ -73,6 +102,15 @@ export default function AdminLayout({
     } catch {}
     router.push("/admin/login");
   };
+
+  if (!authChecked && !isLoginPage) {
+    return (
+      <div className="min-h-screen bg-[#070a13] text-slate-100 flex flex-col items-center justify-center p-4 font-mono text-xs gap-3">
+        <Loader2 className="w-6 h-6 animate-spin text-emerald-400" />
+        <span className="text-slate-400">Verifying administrator session...</span>
+      </div>
+    );
+  }
 
   if (isLoginPage) {
     return (

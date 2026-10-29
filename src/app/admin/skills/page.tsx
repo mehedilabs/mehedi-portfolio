@@ -77,10 +77,10 @@ export default function AdminSkillsCareerPage() {
     setLoading(true);
     try {
       const [skillsRes, expRes, eduRes, certRes] = await Promise.all([
-        adminApi.getSkills(),
-        adminApi.getExperience(),
-        adminApi.getEducation(),
-        adminApi.getCertifications(),
+        adminApi.getSkills<Skill>(),
+        adminApi.getExperience<Experience>(),
+        adminApi.getEducation<Education>(),
+        adminApi.getCertifications<Certification>(),
       ]);
 
       if (skillsRes.success) setSkills(skillsRes.data || []);
@@ -100,10 +100,10 @@ export default function AdminSkillsCareerPage() {
     const fetchData = async () => {
       try {
         const [skillsRes, expRes, eduRes, certRes] = await Promise.all([
-          adminApi.getSkills(),
-          adminApi.getExperience(),
-          adminApi.getEducation(),
-          adminApi.getCertifications(),
+          adminApi.getSkills<Skill>(),
+          adminApi.getExperience<Experience>(),
+          adminApi.getEducation<Education>(),
+          adminApi.getCertifications<Certification>(),
         ]);
 
         if (!isMounted) return;

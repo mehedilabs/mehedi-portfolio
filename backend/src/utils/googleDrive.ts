@@ -2,10 +2,16 @@
  * Google Drive Sharing URL Parser & Validator
  * Supports extraction of Google Drive file ID from all standard sharing formats:
  * - https://drive.google.com/file/d/FILE_ID/view?usp=sharing
- * - https://drive.google.com/file/d/FILE_ID/view
+ * - https://drive.google.com/file/d/FILE_ID/view?usp=drive_link
+ * - https://drive.google.com/file/u/0/d/FILE_ID/view
+ * - https://drive.google.com/file/u/1/d/FILE_ID/view
+ * - https://drive.google.com/file/d/FILE_ID/preview
+ * - https://drive.google.com/file/d/FILE_ID/edit
  * - https://drive.google.com/open?id=FILE_ID
  * - https://drive.google.com/uc?id=FILE_ID
- * - Bare ID: FILE_ID
+ * - https://docs.google.com/.../d/FILE_ID/...
+ * - <iframe ... src="...FILE_ID..."></iframe> embed codes
+ * - Bare ID: FILE_ID (20-50 alphanumeric characters with - and _)
  */
 
 export interface GoogleDriveParseResult {
@@ -24,12 +30,18 @@ export function parseGoogleDriveUrl(inputUrl: string): GoogleDriveParseResult {
     };
   }
 
-  const trimmed = inputUrl.trim();
+  let trimmed = inputUrl.trim();
 
-  // Pattern 1: /file/d/([a-zA-Z0-9_-]+)
-  const fileDMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-  if (fileDMatch && fileDMatch[1]) {
-    const fileId = fileDMatch[1];
+  // If user pasted an iframe embed code, extract the src URL
+  const iframeMatch = trimmed.match(/src=["']([^"']+)["']/i);
+  if (iframeMatch && iframeMatch[1]) {
+    trimmed = iframeMatch[1].trim();
+  }
+
+  // Pattern 1: /d/([a-zA-Z0-9_-]{20,50}) (matches /file/d/ID, /file/u/0/d/ID, /document/d/ID, etc.)
+  const dMatch = trimmed.match(/\/d\/([a-zA-Z0-9_-]{20,50})/);
+  if (dMatch && dMatch[1]) {
+    const fileId = dMatch[1];
     return {
       isValid: true,
       fileId,
@@ -38,8 +50,8 @@ export function parseGoogleDriveUrl(inputUrl: string): GoogleDriveParseResult {
     };
   }
 
-  // Pattern 2: id=([a-zA-Z0-9_-]+)
-  const idParamMatch = trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  // Pattern 2: [?&]id=([a-zA-Z0-9_-]{20,50}) (matches /open?id=ID, /uc?id=ID, etc.)
+  const idParamMatch = trimmed.match(/[?&]id=([a-zA-Z0-9_-]{20,50})/);
   if (idParamMatch && idParamMatch[1]) {
     const fileId = idParamMatch[1];
     return {
@@ -50,7 +62,7 @@ export function parseGoogleDriveUrl(inputUrl: string): GoogleDriveParseResult {
     };
   }
 
-  // Pattern 3: Bare File ID (standard 25 to 45 chars alphanumeric with - and _)
+  // Pattern 3: Bare File ID (standard 20 to 50 chars alphanumeric with - and _)
   if (/^[a-zA-Z0-9_-]{20,50}$/.test(trimmed)) {
     return {
       isValid: true,
@@ -63,7 +75,6 @@ export function parseGoogleDriveUrl(inputUrl: string): GoogleDriveParseResult {
   return {
     isValid: false,
     error:
-      "Invalid Google Drive sharing URL. Please ensure it follows the format 'https://drive.google.com/file/d/.../view?usp=sharing' with general access set to 'Anyone with the link'.",
+      "Invalid Google Drive URL. Please paste a valid sharing link (e.g. 'https://drive.google.com/file/d/.../view?usp=sharing') with General Access set to 'Anyone with the link'.",
   };
 }
-

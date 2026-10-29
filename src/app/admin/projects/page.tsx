@@ -105,11 +105,12 @@ export default function AdminProjectsPage() {
   // Search & filter
   const [searchTerm, setSearchTerm] = React.useState("");
   const [categoryFilter, setCategoryFilter] = React.useState("all");
+  const [dialogError, setDialogError] = React.useState<string | null>(null);
 
   const loadProjects = React.useCallback(async () => {
     setLoading(true);
     try {
-      const res = await adminApi.getProjects();
+      const res = await adminApi.getProjects<ProjectItem>();
       if (res.success) {
         setProjects(res.data || []);
       }
@@ -125,7 +126,7 @@ export default function AdminProjectsPage() {
 
     const fetchProjects = async () => {
       try {
-        const res = await adminApi.getProjects();
+        const res = await adminApi.getProjects<ProjectItem>();
 
         if (active && res.success) {
           setProjects(res.data || []);
@@ -153,6 +154,7 @@ export default function AdminProjectsPage() {
     setIsEditing(false);
     setIsDialogOpen(true);
     setError(null);
+    setDialogError(null);
   };
 
   const handleOpenEdit = (project: ProjectItem) => {
@@ -184,16 +186,36 @@ export default function AdminProjectsPage() {
     setIsEditing(true);
     setIsDialogOpen(true);
     setError(null);
+    setDialogError(null);
   };
 
   const handleSaveSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setActionLoading(true);
     setError(null);
+    setDialogError(null);
     setSuccess(null);
+
+    const enSlug =
+      formData.en.slug.trim() ||
+      formData.en.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
 
     const payload = {
       ...formData,
+      en: {
+        ...formData.en,
+        slug: enSlug,
+      },
+      bn: {
+        title: formData.bn.title.trim() || formData.en.title.trim(),
+        slug: formData.bn.slug.trim() || enSlug,
+        tagline: formData.bn.tagline.trim() || formData.en.tagline.trim(),
+        description:
+          formData.bn.description.trim() || formData.en.description.trim(),
+      },
       techStack: formData.techStack
         .split(",")
         .map((s) => s.trim())
@@ -216,8 +238,10 @@ export default function AdminProjectsPage() {
       loadProjects();
     } catch (err) {
       if (err instanceof ApiError) {
+        setDialogError(err.message);
         setError(err.message);
       } else {
+        setDialogError("Failed to save project.");
         setError("Failed to save project.");
       }
     } finally {
@@ -536,6 +560,13 @@ export default function AdminProjectsPage() {
               </button>
             </div>
 
+            {dialogError && (
+              <div className="flex items-start gap-2.5 p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                <span>{dialogError}</span>
+              </div>
+            )}
+
             <form
               onSubmit={handleSaveSubmit}
               className="space-y-4 text-xs font-mono"
@@ -638,6 +669,21 @@ export default function AdminProjectsPage() {
                   />
                 </div>
                 <div>
+                  <label className="block text-slate-400 mb-0.5">Tagline / Subtitle</label>
+                  <input
+                    type="text"
+                    value={formData.en.tagline}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        en: { ...formData.en, tagline: e.target.value },
+                      })
+                    }
+                    placeholder="Short architectural summary..."
+                    className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded text-white"
+                  />
+                </div>
+                <div>
                   <label className="block text-slate-400 mb-0.5">Slug</label>
                   <input
                     type="text"
@@ -694,6 +740,21 @@ export default function AdminProjectsPage() {
                         },
                       })
                     }
+                    className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded text-white font-serif"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 mb-0.5">ট্যাগলাইন / সংক্ষিপ্ত পরিচিতি</label>
+                  <input
+                    type="text"
+                    value={formData.bn.tagline}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        bn: { ...formData.bn, tagline: e.target.value },
+                      })
+                    }
+                    placeholder="প্রজেক্টের সংক্ষিপ্ত পরিচিতি..."
                     className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded text-white font-serif"
                   />
                 </div>

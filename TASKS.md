@@ -117,15 +117,140 @@ Legend:
 
 ---
 
-## Phase 3: Blog CMS, Dynamic Assistant & Contact Inquiries (Prompt 3 — Upcoming)
-- [ ] Rich Markdown / MDX blog authoring with preview and syntax highlighting.
-- [ ] Predefined Q&A assistant with database-driven Q&A pairs and category browsing.
-- [ ] Working contact form with database storage and email notification triggers.
-- [ ] Admin message inbox with unread counts, status tags, and reply actions.
+## Phase 3: CMS Modules, Video Integration & Content Hardening (Prompt 3) — COMPLETED
+
+### 1. Robust JSON Parsing & Safe Media Fallbacks
+- [x] Fix `Unexpected end of JSON input` in `src/lib/api-client.ts` with safe empty response handling (HTTP 204, empty strings, non-JSON text errors).
+- [x] Resolve broken image paths (`distributed-cms.png`, `telemetry-dash.png`, `cloud-api-gateway.png`) with clean, graceful SVG fallback architecture.
+- [x] Eliminate circular junction at `backend/node_modules/mehedi-portfolio` permanently by removing `mehedi-portfolio: file:..` from `backend/package.json`.
+
+### 2. Video Showcase Integration
+- [x] Responsive Google Drive iframe player integration (`src/components/sections/VideoShowcaseSection.tsx`) with automatic embed URL conversion (`backend/src/utils/googleDrive.ts`).
+- [x] Dual-mode video controls: native HTML5 playback controls with seek bar, duration readout, and mute/volume for direct video sources; clean embed player for Google Drive.
+- [x] Complete Admin Video Management portal (`/admin/video`) controlling headline, description, source type, and URL.
+
+### 3. Dynamic Section Management
+- [x] Dynamic section visibility system (`/admin/sections`): toggling sections immediately updates homepage rendering without empty gaps.
+- [x] Synchronized navigation bar links (hidden sections are dynamically omitted from desktop navbar and mobile menus).
+- [x] Section ordering and metadata persisted to database with fallback to default layout.
+
+### 4. Full Admin CMS Modules
+- [x] Projects CMS (`/admin/projects`): Add, edit, reorder, delete, and feature projects with localized content.
+- [x] Skills CMS (`/admin/skills`): Manage domain categories and proficiency badges.
+- [x] Blog CMS (`/admin/blog`): Author and publish bilingual markdown articles.
+- [x] Messages Inbox (`/admin/messages`): View, filter, mark read, and archive inquiries.
+- [x] Assistant Training CMS (`/admin/assistant`): Train predefined Q&A pairs for the floating chat assistant.
+- [x] Media Manager (`/admin/media`): Upload, preview, and organize Cloudinary & local assets.
 
 ---
 
-## Phase 4: Production Polish, SEO, Performance & Deployment (Prompt 4 — Upcoming)
-- [ ] Dynamic sitemap.xml and robots.txt generation for all localized routes.
-- [ ] Open Graph & Twitter dynamic preview cards.
-- [ ] Production build optimization, caching strategies, and deployment documentation.
+## Phase 4: Full Integration, Security, Testing & Deployment (Prompt 4) — COMPLETED
+
+### 1. Admin Authentication Hardening
+- [x] Implement dual authentication transmission: `Authorization: Bearer <token>` in `localStorage` + `credentials: "include"` for HTTP-only cookies in `src/lib/api-client.ts`.
+- [x] Global Admin Route Guard in `src/app/admin/layout.tsx` checking `authApi.getMe()` and redirecting unauthenticated users to `/admin/login` with loading spinner.
+- [x] Add discreet footer shield link leading to `/admin`.
+- [x] Remove all `any` types and add generic type parameters across all `adminApi` fetch calls.
+
+### 2. Search Engine Optimization & Crawlers
+- [x] Author dynamic `src/app/robots.ts` disallowing `/admin/`, `/api/`, `/_next/` and referencing `sitemap.xml`.
+- [x] Author dynamic `src/app/sitemap.ts` covering `/en`, `/bn`, `/en/projects`, `/bn/projects`, localized project detail pages, and localized blog articles with alternate language links.
+
+### 3. Environment & Deployment Documentation
+- [x] Comprehensive, production-grade `README.md` authoring:
+  - Architecture overview and monorepo structure.
+  - Step-by-step local development setup.
+  - Frontend (`.env.local`) and Backend (`backend/.env`) variable tables.
+  - Vercel and Render/Railway production deployment guidelines.
+  - Security guidelines (zero secrets in repo, CORS, JWT revocation).
+- [x] Sanitized `.env.example` and `backend/.env.example` templates.
+- [x] Verified gitignore rules (`git check-ignore backend/.env .env.local` confirming zero secret exposure).
+
+### 4. Automated Testing & Production Builds
+- [x] Frontend ESLint: `npm run lint` (0 errors, 0 warnings).
+- [x] Backend TypeScript Typecheck: `npm --prefix backend run typecheck` (0 errors).
+- [x] Backend Unit/Integration Tests: `npm --prefix backend test` (10/10 tests passed).
+- [x] Backend Production Build: `npm --prefix backend run build` (0 errors).
+- [x] Frontend Production Build: `npm run build` (34/34 static & SSG routes generated cleanly).
+
+
+---
+
+## Phase 5: CMS Integration, Dynamic Sectioning, Theme Polish & Resume — COMPLETED
+
+### 1. End-to-End CMS to Public Website Pipeline
+- [x] Eliminate stale SSG caching: configure `export const dynamic = "force-dynamic"` and `export const revalidate = 0` on public pages so Admin CMS updates appear immediately without code redeployments.
+- [x] Configure server-side API requests with `cache: "no-store"` in `src/lib/api-client.ts`.
+- [x] Synchronize profile schema in MongoDB with `avatarAlt`, `aboutPhotoAlt`, and bilingual `greeting`, `summary`, and `aboutTitle`.
+- [x] Return complete bilingual `profile` object in `GET /api/public-settings`.
+- [x] Implement public endpoints `GET /api/blog` and `GET /api/blog/:slug` with fallback data.
+
+### 2. Complete Home & About Section Content Management
+- [x] Home Page Admin controls (`/admin/profile` -> Hero Tab): direct PC upload for avatar image, live preview, remove/replace controls, accessibility alt text, and bilingual greeting/summary/title fields.
+- [x] About Section Admin controls (`/admin/profile` -> About Tab): direct PC upload for workspace image, live preview, remove/replace controls, accessibility alt text, and bilingual headline/bio paragraphs editor.
+- [x] Public rendering: `HeroSection` and `AboutSection` consume live profile data with graceful fallbacks.
+
+### 3. Dynamic Sequential Section Numbering & Laptop Video
+- [x] Implement dynamic continuous section numbering (`01.`, `02.`, etc., and Bengali `০১.`, `০২.`, etc.) in `src/app/[locale]/page.tsx` for all active sections.
+- [x] Ensure toggling or reordering sections leaves zero gaps, zero broken numbers, and zero unwanted whitespace.
+- [x] Video Showcase: connected to MongoDB settings with laptop shell, animations, seeking/volume controls, and robust fallback for missing/broken video sources.
+
+### 4. Theme Polish & SVG High-Contrast Fixes
+- [x] Scope light-mode `.text-white` rule to `:not(svg):not(svg *).text-white` in `src/app/globals.css` to prevent corrupting SVG logos.
+- [x] Ensure high-contrast fills for `NextjsLogo`, `ExpressLogo`, and `NodeLogo` in `src/components/ui/Icons.tsx` across both light and dark themes.
+- [x] Remove Globe icon next to language selector in `LanguageSwitcher.tsx` and Navbar popover.
+- [x] Light theme adaptive styling for Hero image card.
+
+### 5. Resume Management
+- [x] Admin PDF upload, preview, download, and remove actions in `/admin/profile` -> Resume Tab.
+- [x] Public Navbar and Hero section render "View Resume" (in browser) and "Download Resume" buttons.
+- [x] Gracefully hide resume buttons when no resume URL is configured.
+
+---
+
+## Phase 6: Continuation Task — CMS Completion, Admin Security, Navigation & Branding — COMPLETED
+
+### 1. Remove Remaining Hardcoded Content & Connect to CMS
+- [x] `03. CAREER_TRAJECTORY`: Added `GET /api/experience` public API, built dedicated Admin Experience CMS at `/admin/experience` (full CRUD, bilingual fields, active role toggle, tech stack), updated `ExperienceSection.tsx` with dynamic CMS data or bilingual "Coming Soon" empty state.
+- [x] `04. ACADEMICS_AND_CERTS`: Added `GET /api/education` and `GET /api/certifications` public APIs, added `updateEducation` & `updateCertification` controllers/PUT routes, built dedicated Admin Academics CMS at `/admin/education` (full CRUD), updated `EducationSection.tsx` with dynamic CMS degrees/certs or bilingual empty state.
+- [x] `Contact & Social`: Connected `ContactSection.tsx` to CMS Profile data (`profile?.email`, `profile?.socialLinks?.github`, `profile?.socialLinks?.linkedin`, `profile?.location`, `profile?.availabilityText`), passed profile to ContactSection in `src/app/[locale]/page.tsx`.
+- [x] Critical restriction honored: Skills page (`SkillsSection.tsx`) preserved 100% untouched.
+
+### 2. Secure Admin Panel and Fix Footer Admin Link
+- [x] Clicking footer Admin link navigates directly to `/admin/login`, requiring authentication before entering the panel.
+- [x] Protected admin routes redirect unauthenticated users to `/admin/login?redirect=...`.
+- [x] Removed automatic bounce away from login page so visiting `/admin/login` always renders the login form.
+- [x] Post-login redirect navigates users to their intended destination page.
+- [x] Backend independently validates JWT token, session `tokenVersion`, and returns 401 for unauthenticated/expired requests.
+
+### 3. Remove Production Placeholder Banner
+- [x] Removed top `[PROD-READY ARCHITECTURE]` notice banner from `src/app/[locale]/layout.tsx`.
+- [x] Verified zero residual banner markup across all public routes.
+
+### 4. Fix Navigation from Project Detail Pages & Nested Routes
+- [x] Section navigation links in `Navbar` (desktop & mobile drawer) and `Footer` detect current route via `usePathname`.
+- [x] When viewing project detail pages or nested routes, clicking About, Skills, Projects, Experience, Blog, or Contact navigates to `/${locale}#${id}`.
+- [x] Added hash scroll listener in `Navbar` to ensure smooth scrolling after route transition.
+- [x] Added `scroll-padding-top: 5rem;` in `src/app/globals.css` so section titles are never hidden behind the sticky navbar.
+
+### 5. Replace Default Next.js Browser Favicon
+- [x] Removed default Next.js `src/app/favicon.ico`.
+- [x] Created custom developer SVG brand mark icon at `src/app/icon.svg` and `public/icon.svg` featuring dark terminal rounded base, emerald/cyan gradient border, and glowing `<M/>` code monogram.
+- [x] Configured icon metadata in `src/app/layout.tsx` for cross-browser and bilingual route support.
+
+### 6. Make Assistant Content Admin-Managed
+- [x] Public `FloatingAssistant.tsx` dynamically loads live Q&A pairs from `publicApi.getAssistantQA()`.
+- [x] Clicking any predefined question displays its saved bilingual answer.
+- [x] Free-form queries match against saved CMS Q&A corpus with bilingual fallback.
+- [x] Shows graceful empty state when no predefined questions are active in the database.
+- [x] Full management in Admin `/admin/assistant` verified working.
+
+### 7. Verification & Safety Audits
+- [x] `npm --prefix backend run typecheck` (0 errors).
+- [x] `npm --prefix backend test` (10/10 tests passed).
+- [x] `npm run lint` (0 errors, 0 warnings).
+- [x] `npx tsc --noEmit` (0 errors).
+- [x] `npm run build` (26/26 routes compiled cleanly).
+- [x] End-to-end integration test suite passed (auth, session, CRUD, public API).
+- [x] `git diff --check` passed.
+- [x] No secrets in Git; no database reset performed.

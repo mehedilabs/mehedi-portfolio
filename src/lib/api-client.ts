@@ -74,6 +74,43 @@ export interface VideoShowcaseData {
   };
 }
 
+export interface PublicProfileData {
+  name: string;
+  email: string;
+  phone?: string;
+  location: string;
+  avatarUrl: string;
+  avatarAlt?: string;
+  aboutPhotoUrl: string;
+  aboutPhotoAlt?: string;
+  resumeUrl: string;
+  availabilityText?: string;
+  socialLinks: {
+    github?: string;
+    linkedin?: string;
+    twitter?: string;
+    youtube?: string;
+  };
+  en: {
+    title: string;
+    greeting?: string;
+    bio: string;
+    summary?: string;
+    aboutTitle?: string;
+    aboutHeadline: string;
+    aboutParagraphs: string[];
+  };
+  bn: {
+    title: string;
+    greeting?: string;
+    bio: string;
+    summary?: string;
+    aboutTitle?: string;
+    aboutHeadline: string;
+    aboutParagraphs: string[];
+  };
+}
+
 export interface PublicSiteSettings {
   siteName: string;
   brandTagline: string;
@@ -82,8 +119,11 @@ export interface PublicSiteSettings {
   videoShowcase: VideoShowcaseData;
   resumeUrl: string;
   avatarUrl: string;
+  avatarAlt?: string;
   aboutPhotoUrl: string;
+  aboutPhotoAlt?: string;
   availabilityText?: string;
+  profile?: PublicProfileData | null;
 }
 
 export class ApiError extends Error {
@@ -102,6 +142,35 @@ export class ApiError extends Error {
   }
 }
 
+const TOKEN_STORAGE_KEY = "mehedi_admin_bearer_token";
+
+export function getStoredToken(): string | null {
+  if (typeof window !== "undefined") {
+    try {
+      return localStorage.getItem(TOKEN_STORAGE_KEY);
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+export function setStoredToken(token: string): void {
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.setItem(TOKEN_STORAGE_KEY, token);
+    } catch {}
+  }
+}
+
+export function clearStoredToken(): void {
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.removeItem(TOKEN_STORAGE_KEY);
+    } catch {}
+  }
+}
+
 /**
  * Generic fetch wrapper with automatic credentials and JSON handling
  */
@@ -112,18 +181,30 @@ export async function apiRequest<T = unknown>(
   const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
   const url = `${API_BASE_URL}${cleanEndpoint}`;
 
-  const isFormData = options.body instanceof FormData;
+  // When running on Next.js server runtime, default to no-store to avoid stale ISR data caches
+  const fetchOptions: RequestInit = { ...options };
+  if (typeof window === "undefined" && !fetchOptions.cache) {
+    fetchOptions.cache = "no-store";
+  }
+
+  const isFormData = fetchOptions.body instanceof FormData;
+  const storedToken = getStoredToken();
+  const authHeader: Record<string, string> = storedToken
+    ? { Authorization: `Bearer ${storedToken}` }
+    : {};
+
   const headers: HeadersInit = isFormData
-    ? { ...options.headers }
+    ? { ...authHeader, ...fetchOptions.headers }
     : {
         "Content-Type": "application/json",
         Accept: "application/json",
-        ...options.headers,
+        ...authHeader,
+        ...fetchOptions.headers,
       };
 
   try {
     const response = await fetch(url, {
-      ...options,
+      ...fetchOptions,
       headers,
       credentials: "include", // Transmit HTTP-only authentication cookies
     });
@@ -183,16 +264,24 @@ export async function apiRequest<T = unknown>(
 // ------------------------------------------------------------------------------
 export const authApi = {
   login: async (email: string, password: string): Promise<ApiResponse> => {
-    return apiRequest<ApiResponse>("/auth/login", {
+    const res = await apiRequest<ApiResponse>("/auth/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
+    if (res.token) {
+      setStoredToken(res.token);
+    }
+    return res;
   },
 
   logout: async (): Promise<ApiResponse> => {
-    return apiRequest<ApiResponse>("/auth/logout", {
-      method: "POST",
-    });
+    try {
+      return await apiRequest<ApiResponse>("/auth/logout", {
+        method: "POST",
+      });
+    } finally {
+      clearStoredToken();
+    }
   },
 
   getMe: async (): Promise<{ success: boolean; user: AuthUser }> => {
@@ -203,20 +292,28 @@ export const authApi = {
     currentPassword: string,
     newPassword: string
   ): Promise<ApiResponse> => {
-    return apiRequest<ApiResponse>("/auth/change-password", {
+    const res = await apiRequest<ApiResponse>("/auth/change-password", {
       method: "POST",
       body: JSON.stringify({ currentPassword, newPassword }),
     });
+    if (res.token) {
+      setStoredToken(res.token);
+    }
+    return res;
   },
 
   changeEmail: async (
     password: string,
     newEmail: string
   ): Promise<ApiResponse> => {
-    return apiRequest<ApiResponse>("/auth/change-email", {
+    const res = await apiRequest<ApiResponse>("/auth/change-email", {
       method: "POST",
       body: JSON.stringify({ password, newEmail }),
     });
+    if (res.token) {
+      setStoredToken(res.token);
+    }
+    return res;
   },
 
   setupInitialAdmin: async (
@@ -224,10 +321,14 @@ export const authApi = {
     email: string,
     password: string
   ): Promise<ApiResponse> => {
-    return apiRequest<ApiResponse>("/auth/setup-initial-admin", {
+    const res = await apiRequest<ApiResponse>("/auth/setup-initial-admin", {
       method: "POST",
       body: JSON.stringify({ name, email, password }),
     });
+    if (res.token) {
+      setStoredToken(res.token);
+    }
+    return res;
   },
 };
 
@@ -381,6 +482,13 @@ export const adminApi = {
     });
   },
 
+  updateExperience: async (id: string, exp: Record<string, unknown>): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>(`/admin/experience/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(exp),
+    });
+  },
+
   deleteExperience: async (id: string): Promise<ApiResponse> => {
     return apiRequest<ApiResponse>(`/admin/experience/${id}`, {
       method: "DELETE",
@@ -398,6 +506,13 @@ export const adminApi = {
     });
   },
 
+  updateEducation: async (id: string, edu: Record<string, unknown>): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>(`/admin/education/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(edu),
+    });
+  },
+
   deleteEducation: async (id: string): Promise<ApiResponse> => {
     return apiRequest<ApiResponse>(`/admin/education/${id}`, {
       method: "DELETE",
@@ -411,6 +526,13 @@ export const adminApi = {
   createCertification: async (cert: Record<string, unknown>): Promise<ApiResponse> => {
     return apiRequest<ApiResponse>("/admin/certifications", {
       method: "POST",
+      body: JSON.stringify(cert),
+    });
+  },
+
+  updateCertification: async (id: string, cert: Record<string, unknown>): Promise<ApiResponse> => {
+    return apiRequest<ApiResponse>(`/admin/certifications/${id}`, {
+      method: "PUT",
       body: JSON.stringify(cert),
     });
   },
@@ -578,8 +700,28 @@ export const publicApi = {
     return apiRequest(`/projects/${slug}`);
   },
 
+  getBlogPosts: async (): Promise<{ success: boolean; data: BlogPostItem[] }> => {
+    return apiRequest("/blog");
+  },
+
+  getBlogPostBySlug: async (slug: string): Promise<{ success: boolean; data: BlogPostItem }> => {
+    return apiRequest(`/blog/${slug}`);
+  },
+
   getAssistantQA: async (): Promise<{ success: boolean; data: AssistantQAPair[] }> => {
     return apiRequest("/assistant-qa");
+  },
+
+  getExperience: async (): Promise<{ success: boolean; data: ExperienceItem[] }> => {
+    return apiRequest("/experience");
+  },
+
+  getEducation: async (): Promise<{ success: boolean; data: EducationItem[] }> => {
+    return apiRequest("/education");
+  },
+
+  getCertifications: async (): Promise<{ success: boolean; data: CertificationItem[] }> => {
+    return apiRequest("/certifications");
   },
 
   sendMessage: async (data: {

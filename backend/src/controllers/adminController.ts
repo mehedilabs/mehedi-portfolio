@@ -198,10 +198,10 @@ export async function updateVideoShowcaseSettings(
       settings = new SiteSettingsModel();
     }
 
-    let googleDriveFileId = settings.videoShowcase.googleDriveFileId || "";
+    let googleDriveFileId = "";
 
-    // Validate Google Drive link if selected or provided
-    if (googleDriveSharingUrl && (videoSourceType === "google-drive" || googleDriveSharingUrl.trim().length > 0)) {
+    // Validate Google Drive link if provided
+    if (googleDriveSharingUrl && googleDriveSharingUrl.trim().length > 0) {
       const parsed = parseGoogleDriveUrl(googleDriveSharingUrl);
       if (!parsed.isValid) {
         res.status(400).json({
@@ -213,12 +213,16 @@ export async function updateVideoShowcaseSettings(
       googleDriveFileId = parsed.fileId || "";
     }
 
+    const determinedSourceType = googleDriveFileId
+      ? "google-drive"
+      : (videoSourceType === "google-drive" ? "google-drive" : "native-url");
+
     settings.videoShowcase = {
-      videoSourceType: videoSourceType || (googleDriveSharingUrl ? "google-drive" : "native-url"),
+      videoSourceType: determinedSourceType,
       googleDriveSharingUrl: googleDriveSharingUrl || "",
       googleDriveFileId,
-      videoUrl: videoUrl || settings.videoShowcase.videoUrl || "/videos/demo-showcase.mp4",
-      posterUrl: posterUrl !== undefined ? posterUrl : settings.videoShowcase.posterUrl,
+      videoUrl: determinedSourceType === "google-drive" ? "" : (videoUrl || ""),
+      posterUrl: posterUrl !== undefined ? posterUrl : settings.videoShowcase?.posterUrl || "",
       aspectRatio: aspectRatio || "16:10",
       autoPlay: autoPlay !== undefined ? autoPlay : true,
       loop: loop !== undefined ? loop : true,
@@ -274,7 +278,7 @@ export async function removeShowcaseVideo(
       settings.videoShowcase.googleDriveSharingUrl = "";
       settings.videoShowcase.googleDriveFileId = "";
       settings.videoShowcase.videoSourceType = "native-url";
-      settings.videoShowcase.videoUrl = "/videos/demo-showcase.mp4";
+      settings.videoShowcase.videoUrl = "";
       await settings.save();
     }
 
@@ -288,7 +292,7 @@ export async function removeShowcaseVideo(
 
     res.status(200).json({
       success: true,
-      message: "Google Drive video removed. Fallback demo player restored.",
+      message: "Video removed successfully.",
     });
   } catch (error) {
     next(error);
@@ -319,7 +323,45 @@ export async function createProject(
   try {
     if (checkDemoRestriction(req, res)) return;
 
-    const project = await ProjectModel.create(req.body);
+    const body = { ...req.body };
+
+    if (!body.en || !body.en.title || !body.en.description) {
+      res.status(400).json({
+        success: false,
+        error: "English project title and description are required.",
+      });
+      return;
+    }
+
+    if (!body.en.slug) {
+      body.en.slug = body.en.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    }
+
+    if (!body.bn) {
+      body.bn = {
+        title: body.en.title,
+        slug: body.en.slug,
+        tagline: body.en.tagline || "",
+        description: body.en.description,
+      };
+    } else {
+      if (!body.bn.title) body.bn.title = body.en.title;
+      if (!body.bn.slug) body.bn.slug = body.en.slug;
+      if (!body.bn.description) body.bn.description = body.en.description;
+      if (body.bn.tagline === undefined) body.bn.tagline = body.en.tagline || "";
+    }
+
+    if (typeof body.techStack === "string") {
+      body.techStack = body.techStack.split(",").map((s: string) => s.trim()).filter(Boolean);
+    } else if (!Array.isArray(body.techStack)) {
+      body.techStack = [];
+    }
+
+    if (body.isPublished === undefined) {
+      body.isPublished = true;
+    }
+
+    const project = await ProjectModel.create(body);
 
     await AuditLogModel.create({
       action: "PROJECT_CREATED",
@@ -344,7 +386,19 @@ export async function updateProject(
   try {
     if (checkDemoRestriction(req, res)) return;
 
-    const project = await ProjectModel.findByIdAndUpdate(req.params.id, req.body, {
+    const body = { ...req.body };
+    if (typeof body.techStack === "string") {
+      body.techStack = body.techStack.split(",").map((s: string) => s.trim()).filter(Boolean);
+    }
+
+    if (body.en && !body.en.slug && body.en.title) {
+      body.en.slug = body.en.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    }
+    if (body.bn && !body.bn.slug && body.en?.slug) {
+      body.bn.slug = body.en.slug;
+    }
+
+    const project = await ProjectModel.findByIdAndUpdate(req.params.id, body, {
       new: true,
       runValidators: true,
     });
@@ -555,6 +609,16 @@ export async function createEducation(req: AuthenticatedRequest, res: Response, 
   }
 }
 
+export async function updateEducation(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  try {
+    if (checkDemoRestriction(req, res)) return;
+    const item = await EducationModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.status(200).json({ success: true, data: item });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function deleteEducation(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
   try {
     if (checkDemoRestriction(req, res)) return;
@@ -580,6 +644,16 @@ export async function createCertification(req: AuthenticatedRequest, res: Respon
     if (checkDemoRestriction(req, res)) return;
     const item = await CertificationModel.create(req.body);
     res.status(201).json({ success: true, data: item });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function updateCertification(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  try {
+    if (checkDemoRestriction(req, res)) return;
+    const item = await CertificationModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.status(200).json({ success: true, data: item });
   } catch (error) {
     next(error);
   }
@@ -781,7 +855,61 @@ export async function updateProfile(req: AuthenticatedRequest, res: Response, ne
     if (!profile) {
       profile = new ProfileModel(req.body);
     } else {
-      Object.assign(profile, req.body);
+      if (req.body.name !== undefined && req.body.name !== "") profile.name = req.body.name;
+      if (req.body.email !== undefined && req.body.email !== "") profile.email = req.body.email;
+      if (req.body.phone !== undefined) profile.phone = req.body.phone;
+      if (req.body.location !== undefined) profile.location = req.body.location;
+
+      // Safe partial image updates: preserve existing photo if incoming is empty/whitespace
+      if (req.body.avatarUrl !== undefined && req.body.avatarUrl.trim() !== "") {
+        profile.avatarUrl = req.body.avatarUrl;
+      }
+      if (req.body.avatarAlt !== undefined) profile.avatarAlt = req.body.avatarAlt;
+
+      if (req.body.aboutPhotoUrl !== undefined && req.body.aboutPhotoUrl.trim() !== "") {
+        profile.aboutPhotoUrl = req.body.aboutPhotoUrl;
+      }
+      if (req.body.aboutPhotoAlt !== undefined) profile.aboutPhotoAlt = req.body.aboutPhotoAlt;
+
+      if (req.body.resumeUrl !== undefined) profile.resumeUrl = req.body.resumeUrl;
+      if (req.body.availabilityText !== undefined) profile.availabilityText = req.body.availabilityText;
+
+      // Safe partial update for social links
+      if (req.body.socialLinks && typeof req.body.socialLinks === "object") {
+        if (!profile.socialLinks) profile.socialLinks = {};
+        if (req.body.socialLinks.github !== undefined) profile.socialLinks.github = req.body.socialLinks.github;
+        if (req.body.socialLinks.linkedin !== undefined) profile.socialLinks.linkedin = req.body.socialLinks.linkedin;
+        if (req.body.socialLinks.twitter !== undefined) profile.socialLinks.twitter = req.body.socialLinks.twitter;
+        if (req.body.socialLinks.youtube !== undefined) profile.socialLinks.youtube = req.body.socialLinks.youtube;
+      }
+
+      // Safe partial update for English localized sub-document
+      if (req.body.en && typeof req.body.en === "object") {
+        if (!profile.en) profile.en = {};
+        if (req.body.en.title !== undefined) profile.en.title = req.body.en.title;
+        if (req.body.en.greeting !== undefined) profile.en.greeting = req.body.en.greeting;
+        if (req.body.en.bio !== undefined) profile.en.bio = req.body.en.bio;
+        if (req.body.en.summary !== undefined) profile.en.summary = req.body.en.summary;
+        if (req.body.en.aboutTitle !== undefined) profile.en.aboutTitle = req.body.en.aboutTitle;
+        if (req.body.en.aboutHeadline !== undefined) profile.en.aboutHeadline = req.body.en.aboutHeadline;
+        if (req.body.en.aboutParagraphs !== undefined && Array.isArray(req.body.en.aboutParagraphs)) {
+          profile.en.aboutParagraphs = req.body.en.aboutParagraphs;
+        }
+      }
+
+      // Safe partial update for Bangla localized sub-document
+      if (req.body.bn && typeof req.body.bn === "object") {
+        if (!profile.bn) profile.bn = {};
+        if (req.body.bn.title !== undefined) profile.bn.title = req.body.bn.title;
+        if (req.body.bn.greeting !== undefined) profile.bn.greeting = req.body.bn.greeting;
+        if (req.body.bn.bio !== undefined) profile.bn.bio = req.body.bn.bio;
+        if (req.body.bn.summary !== undefined) profile.bn.summary = req.body.bn.summary;
+        if (req.body.bn.aboutTitle !== undefined) profile.bn.aboutTitle = req.body.bn.aboutTitle;
+        if (req.body.bn.aboutHeadline !== undefined) profile.bn.aboutHeadline = req.body.bn.aboutHeadline;
+        if (req.body.bn.aboutParagraphs !== undefined && Array.isArray(req.body.bn.aboutParagraphs)) {
+          profile.bn.aboutParagraphs = req.body.bn.aboutParagraphs;
+        }
+      }
     }
     await profile.save();
 

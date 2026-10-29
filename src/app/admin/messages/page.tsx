@@ -47,7 +47,7 @@ export default function AdminMessagesPage() {
       if (filter === "archived") params.isArchived = true;
       if (search) params.search = search;
 
-      const res = await adminApi.getMessages(params);
+      const res = await adminApi.getMessages<ContactMessage>(params);
       if (res.success) {
         setMessages(res.data || []);
       }
@@ -69,7 +69,7 @@ export default function AdminMessagesPage() {
         if (filter === "archived") params.isArchived = true;
         if (search) params.search = search;
 
-        const res = await adminApi.getMessages(params);
+        const res = await adminApi.getMessages<ContactMessage>(params);
 
         if (active && res.success) {
           setMessages(res.data || []);

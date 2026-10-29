@@ -18,7 +18,7 @@ export default function AdminVideoShowcasePage() {
     videoSourceType: "native-url",
     googleDriveSharingUrl: "",
     googleDriveFileId: "",
-    videoUrl: "/videos/demo-showcase.mp4",
+    videoUrl: "",
     posterUrl: "",
     aspectRatio: "16:10",
     autoPlay: true,
@@ -109,7 +109,7 @@ export default function AdminVideoShowcasePage() {
           videoSourceType: "native-url",
           googleDriveSharingUrl: "",
           googleDriveFileId: "",
-          videoUrl: "/videos/demo-showcase.mp4",
+          videoUrl: "",
         }));
         setSuccess("Google Drive video reference removed. Fallback demo player restored.");
       }
@@ -352,12 +352,20 @@ export default function AdminVideoShowcasePage() {
                   className="w-full h-full border-0"
                   title="Google Drive Showcase Video Preview"
                 />
-              ) : (
+              ) : data.videoUrl ? (
                 <video
-                  src={data.videoUrl || "/videos/demo-showcase.mp4"}
+                  src={data.videoUrl}
                   controls
                   className="w-full h-full object-cover"
                 />
+              ) : (
+                <div className="flex flex-col items-center justify-center p-6 text-center text-slate-500 font-mono text-xs space-y-2">
+                  <Video className="w-8 h-8 text-slate-600" />
+                  <span>No video source configured.</span>
+                  <span className="text-[10px] text-slate-600">
+                    Paste a Google Drive link or enter a video URL on the left.
+                  </span>
+                </div>
               )}
             </div>
 

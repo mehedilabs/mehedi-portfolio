@@ -26,9 +26,11 @@ import {
   deleteExperience,
   getEducation,
   createEducation,
+  updateEducation,
   deleteEducation,
   getCertifications,
   createCertification,
+  updateCertification,
   deleteCertification,
   getBlogPosts,
   createBlogPost,
@@ -92,10 +94,12 @@ router.delete("/experience/:id", deleteExperience);
 
 router.get("/education", getEducation);
 router.post("/education", createEducation);
+router.put("/education/:id", updateEducation);
 router.delete("/education/:id", deleteEducation);
 
 router.get("/certifications", getCertifications);
 router.post("/certifications", createCertification);
+router.put("/certifications/:id", updateCertification);
 router.delete("/certifications/:id", deleteCertification);
 
 // Blog

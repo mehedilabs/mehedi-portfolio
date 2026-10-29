@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Volume2, Volume1, VolumeX, Play, Pause } from "lucide-react";
+import { Volume2, Volume1, VolumeX, Play, Pause, Video } from "lucide-react";
 import { Locale } from "@/types";
 import { Dictionary } from "@/data/dictionaries";
 import { MacbookKeyboard } from "@/components/ui/MacbookKeyboard";
@@ -90,7 +90,12 @@ export function VideoShowcaseSection({
 }: VideoShowcaseSectionProps) {
   const isGoogleDrive =
     config?.videoSourceType === "google-drive" && Boolean(config?.googleDriveFileId);
-  const videoSrc = config?.videoUrl || "/videos/demo-showcase.mp4";
+  const isNative =
+    config?.videoSourceType === "native-url" &&
+    Boolean(config?.videoUrl) &&
+    config.videoUrl !== "/videos/demo-showcase.mp4";
+  const [sourceError, setSourceError] = React.useState(false);
+  const videoSrc = isNative ? config?.videoUrl || "" : "";
 
   const containerRef = React.useRef<HTMLDivElement>(null);
   const videoRef = React.useRef<HTMLVideoElement>(null);
@@ -422,7 +427,7 @@ export function VideoShowcaseSection({
                   allow="autoplay; encrypted-media"
                   allowFullScreen
                 />
-              ) : (
+              ) : isNative && !sourceError ? (
                 <>
                   <video
                     ref={videoRef}
@@ -432,6 +437,7 @@ export function VideoShowcaseSection({
                     autoPlay
                     loop
                     preload="metadata"
+                    onError={() => setSourceError(true)}
                     onTimeUpdate={handleTimeUpdate}
                 onLoadedMetadata={handleLoadedMetadata}
                 onDurationChange={handleDurationChange}
@@ -529,6 +535,23 @@ export function VideoShowcaseSection({
                 </div>
               </div>
             </>
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center select-none bg-gradient-to-b from-[#090d16] to-[#04060c]">
+              <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mb-3 text-emerald-400">
+                <Video className="w-5 h-5 animate-pulse" />
+              </div>
+              <h3 className="font-mono text-xs sm:text-sm font-bold text-slate-200">
+                {locale === "bn" ? "সিস্টেম ডেমো ভিডিও শীঘ্রই আসছে" : "Demo Video Coming Soon"}
+              </h3>
+              <p className="font-mono text-[10px] sm:text-xs text-slate-500 mt-1 max-w-xs">
+                {locale === "bn"
+                  ? "অ্যাডমিন প্যানেল থেকে গুগল ড্রাইভ বা সরাসরি ভিডিও যুক্ত করা হলে এখানে প্রদর্শিত হবে।"
+                  : "An interactive video walkthrough will be published here via the Admin CMS."}
+              </p>
+              <div className="mt-3 px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-[9px] font-mono text-emerald-400/80">
+                status: waiting_for_video
+              </div>
+            </div>
           )}
         </div>
           </div>

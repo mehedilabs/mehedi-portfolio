@@ -3,20 +3,13 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { isValidLocale, DEFAULT_LOCALE } from "@/lib/i18n";
 import { dictionaries } from "@/data/dictionaries";
-import { BLOG_POSTS_DATA } from "@/data/portfolio-data";
-import { Locale } from "@/types";
+import { Locale, BlogPostItem } from "@/types";
+import { publicApi } from "@/lib/api-client";
 import { Badge } from "@/components/ui/Badge";
-import { ArrowLeft, Calendar, Clock, Terminal } from "lucide-react";
+import { ArrowLeft, Calendar, Clock } from "lucide-react";
 
-export function generateStaticParams() {
-  const params: { locale: string; slug: string }[] = [];
-  for (const locale of ["en", "bn"]) {
-    for (const post of BLOG_POSTS_DATA) {
-      params.push({ locale, slug: post.slug });
-    }
-  }
-  return params;
-}
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function generateMetadata({
   params,
@@ -26,7 +19,16 @@ export async function generateMetadata({
   const { locale: rawLocale, slug } = await params;
   const locale: Locale = isValidLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
 
-  const post = BLOG_POSTS_DATA.find((p) => p.slug === slug);
+  let post: BlogPostItem | null = null;
+  try {
+    const res = await publicApi.getBlogPostBySlug(slug);
+    if (res.success && res.data) {
+      post = res.data;
+    }
+  } catch {
+    post = null;
+  }
+
   if (!post) return { title: "Article Not Found" };
 
   const content = locale === "bn" ? post.bn : post.en;
@@ -59,7 +61,16 @@ export default async function BlogPostDetailPage({
   const locale = rawLocale as Locale;
   const dict = dictionaries[locale];
 
-  const post = BLOG_POSTS_DATA.find((p) => p.slug === slug);
+  let post: BlogPostItem | null = null;
+  try {
+    const res = await publicApi.getBlogPostBySlug(slug);
+    if (res.success && res.data) {
+      post = res.data;
+    }
+  } catch {
+    post = null;
+  }
+
   if (!post) {
     notFound();
   }
@@ -80,47 +91,46 @@ export default async function BlogPostDetailPage({
       {/* Article Header */}
       <div className="space-y-4 border-b border-slate-800 pb-8">
         <div className="flex items-center gap-3 text-xs font-mono text-slate-400">
-          <span className="flex items-center gap-1">
-            <Calendar className="w-3.5 h-3.5 text-slate-500" />
-            {post.publishedAt}
-          </span>
-          <span>•</span>
-          <span className="flex items-center gap-1 text-emerald-400">
-            <Clock className="w-3.5 h-3.5" />
-            {post.readTime} {dict.blog.readTime}
-          </span>
+          {post.publishedAt && (
+            <span className="flex items-center gap-1">
+              <Calendar className="w-3.5 h-3.5 text-slate-500" />
+              {post.publishedAt}
+            </span>
+          )}
+          {post.publishedAt && post.readTime && <span>•</span>}
+          {post.readTime && (
+            <span className="flex items-center gap-1 text-emerald-400">
+              <Clock className="w-3.5 h-3.5" />
+              {post.readTime} {dict.blog.readTime}
+            </span>
+          )}
         </div>
 
         <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
           {content.title}
         </h1>
 
-        <div className="flex flex-wrap gap-1.5 pt-2">
-          {post.tags.map((tag) => (
-            <Badge key={tag} variant="outline" className="text-xs font-mono">
-              #{tag}
-            </Badge>
-          ))}
-        </div>
+        {post.tags && post.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 pt-2">
+            {post.tags.map((tag) => (
+              <Badge key={tag} variant="outline" className="text-xs font-mono">
+                #{tag}
+              </Badge>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Article Body */}
-      <div className="space-y-6 text-slate-300 leading-[1.75] text-base sm:text-[17px]">
-        <p className="text-lg sm:text-xl text-slate-200 font-medium leading-relaxed bg-[#0c101a] p-6 rounded-xl border border-slate-800">
+      {/* Article Content */}
+      <div className="prose prose-invert max-w-none text-slate-300 font-sans leading-relaxed text-base sm:text-lg space-y-6">
+        <p className="text-xl font-medium text-slate-200 leading-relaxed border-l-2 border-emerald-500 pl-4 italic">
           {content.excerpt}
         </p>
 
-        <p className="leading-[1.75]">{content.content}</p>
-
-        {/* Phase 3 MDX CMS Notice */}
-        <div className="mt-12 rounded-lg border border-slate-800 bg-slate-900/60 p-4 font-mono text-xs text-slate-400 flex items-center gap-3">
-          <Terminal className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>
-            Database-backed Markdown/MDX publishing system integration scheduled for Phase 3.
-          </span>
+        <div className="whitespace-pre-line text-slate-300">
+          {content.content}
         </div>
       </div>
     </article>
   );
 }
-

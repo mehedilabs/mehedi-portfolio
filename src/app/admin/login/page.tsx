@@ -1,41 +1,21 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
-import { Lock, Mail, KeyRound, AlertCircle, CheckCircle2, Loader2, User, Eye, EyeOff } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Lock, Mail, KeyRound, AlertCircle, CheckCircle2, Loader2, Eye, EyeOff } from "lucide-react";
 import { authApi, ApiError } from "@/lib/api-client";
 
-export default function AdminLoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [mode, setMode] = React.useState<"login" | "initial-setup">("login");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [name, setName] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
 
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [success, setSuccess] = React.useState<string | null>(null);
-
-  // Check if user is already logged in
-  React.useEffect(() => {
-    let isMounted = true;
-    authApi
-      .getMe()
-      .then((res) => {
-        if (isMounted && res.success && res.user) {
-          router.push("/admin/settings");
-        }
-      })
-      .catch(() => {
-        // Not authenticated, stay on login page
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,22 +24,19 @@ export default function AdminLoginPage() {
     setIsLoading(true);
 
     try {
-      if (mode === "login") {
-        const res = await authApi.login(email, password);
-        if (res.success) {
-          setSuccess("Authentication verified. Redirecting to account settings...");
-          setTimeout(() => {
-            router.push("/admin/settings");
-          }, 800);
-        }
-      } else {
-        const res = await authApi.setupInitialAdmin(name, email, password);
-        if (res.success) {
-          setSuccess("Owner account initialized successfully! Redirecting...");
-          setTimeout(() => {
-            router.push("/admin/settings");
-          }, 800);
-        }
+      const res = await authApi.login(email, password);
+      if (res.success) {
+        setSuccess("Authentication verified. Redirecting to admin portal...");
+        const redirectParam = searchParams.get("redirect");
+        const destination =
+          redirectParam &&
+          redirectParam.startsWith("/admin") &&
+          redirectParam !== "/admin/login"
+            ? redirectParam
+            : "/admin";
+        setTimeout(() => {
+          router.push(destination);
+        }, 600);
       }
     } catch (err) {
       if (err instanceof ApiError) {
@@ -87,7 +64,7 @@ export default function AdminLoginPage() {
             <span className="w-3 h-3 rounded-full bg-amber-500/80 inline-block" />
             <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block" />
             <span className="ml-2 font-mono text-xs text-slate-400">
-              {mode === "login" ? "$ auth --owner-login" : "$ auth --initial-setup"}
+              $ auth --owner-login
             </span>
           </div>
           <span className="font-mono text-[11px] text-emerald-400/90 font-medium">
@@ -102,12 +79,10 @@ export default function AdminLoginPage() {
               <Lock className="w-6 h-6" />
             </div>
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white font-mono">
-              {mode === "login" ? "Owner Authentication" : "Initialize Owner Account"}
+              Owner Authentication
             </h1>
             <p className="text-xs sm:text-sm text-slate-400">
-              {mode === "login"
-                ? "Sign in to manage portfolio content, security & account settings."
-                : "One-time initial setup to configure the portfolio administrator account."}
+              Sign in to manage portfolio content, security & account settings.
             </p>
           </div>
 
@@ -127,27 +102,6 @@ export default function AdminLoginPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {mode === "initial-setup" && (
-              <div className="space-y-1.5">
-                <label className="block text-xs font-mono font-medium text-slate-300">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
-                    <User className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="text"
-                    required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Mehedi Hasan"
-                    className="w-full pl-9 pr-3 py-2 bg-slate-900/90 border border-slate-700/80 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors"
-                  />
-                </div>
-              </div>
-            )}
-
             <div className="space-y-1.5">
               <label className="block text-xs font-mono font-medium text-slate-300">
                 Email Address
@@ -182,7 +136,7 @@ export default function AdminLoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  autoComplete={mode === "login" ? "current-password" : "new-password"}
+                  autoComplete="current-password"
                   className="w-full pl-9 pr-10 py-2 bg-slate-900/90 border border-slate-700/80 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors"
                 />
                 <button
@@ -207,41 +161,32 @@ export default function AdminLoginPage() {
                   <span>Verifying Credentials...</span>
                 </>
               ) : (
-                <span>{mode === "login" ? "Authenticate & Sign In" : "Initialize Account"}</span>
+                <span>Authenticate & Sign In</span>
               )}
             </button>
           </form>
 
-          {/* Mode Switcher Toggle */}
           <div className="pt-2 border-t border-slate-800 text-center">
-            {mode === "login" ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setMode("initial-setup");
-                  setError(null);
-                  setSuccess(null);
-                }}
-                className="text-xs font-mono text-slate-400 hover:text-emerald-400 transition-colors underline-offset-4 hover:underline"
-              >
-                First time? Setup Initial Owner Account &rarr;
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  setMode("login");
-                  setError(null);
-                  setSuccess(null);
-                }}
-                className="text-xs font-mono text-slate-400 hover:text-emerald-400 transition-colors underline-offset-4 hover:underline"
-              >
-                &larr; Back to Owner Login
-              </button>
-            )}
+            <span className="text-[11px] font-mono text-slate-500">
+              Protected portfolio administrator area.
+            </span>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="w-full max-w-md my-auto flex items-center justify-center p-8 text-slate-400 font-mono text-xs">
+          <Loader2 className="w-6 h-6 animate-spin text-emerald-400" />
+        </div>
+      }
+    >
+      <LoginForm />
+    </React.Suspense>
   );
 }

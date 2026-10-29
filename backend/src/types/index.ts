@@ -197,7 +197,9 @@ export interface IProfile {
   phone?: string;
   location: string;
   avatarUrl?: string;
+  avatarAlt?: string;
   aboutPhotoUrl?: string;
+  aboutPhotoAlt?: string;
   resumeUrl?: string;
   availabilityText?: string;
   socialLinks: {
@@ -208,13 +210,19 @@ export interface IProfile {
   };
   en: {
     title: string;
+    greeting?: string;
     bio: string;
+    summary?: string;
+    aboutTitle?: string;
     aboutHeadline: string;
     aboutParagraphs: string[];
   };
   bn: {
     title: string;
+    greeting?: string;
     bio: string;
+    summary?: string;
+    aboutTitle?: string;
     aboutHeadline: string;
     aboutParagraphs: string[];
   };

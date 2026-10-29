@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Globe } from "lucide-react";
 import { Locale } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -50,9 +49,6 @@ export function LanguageSwitcher({
       role="group"
       aria-label="Language Switcher"
     >
-      <div className="flex items-center px-1.5 text-slate-500">
-        <Globe className="h-3.5 w-3.5" />
-      </div>
       <button
         type="button"
         onClick={() => switchLanguage("en")}

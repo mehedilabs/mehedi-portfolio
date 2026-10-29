@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Terminal,
   Menu,
@@ -74,20 +75,54 @@ export function Navbar({ locale, dict, activeSections, resumeUrl }: NavbarProps)
     };
   }, [isOverflowOpen, isOpen]);
 
+  const pathname = usePathname();
+  const isHomepage = pathname === `/${locale}` || pathname === `/${locale}/`;
+
+  // Handle hash scrolling when landing from another page or route transition
+  React.useEffect(() => {
+    if (isHomepage && typeof window !== "undefined" && window.location.hash) {
+      const hashId = window.location.hash.replace("#", "");
+      if (hashId) {
+        const timer = setTimeout(() => {
+          const el = document.getElementById(hashId);
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth" });
+          }
+        }, 150);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isHomepage, pathname]);
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    if (isHomepage) {
+      e.preventDefault();
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+        window.history.pushState(null, "", `#${id}`);
+      }
+      setIsOpen(false);
+    } else {
+      setIsOpen(false);
+    }
+  };
+
   const allNavLinks = [
-    { id: "about", href: `#about`, label: dict.nav.about },
-    { id: "skills", href: `#skills`, label: dict.nav.skills },
-    { id: "projects", href: `#projects`, label: dict.nav.projects },
-    { id: "experience", href: `#experience`, label: dict.nav.experience },
-    { id: "blog", href: `#blog`, label: dict.nav.blog },
-    { id: "contact", href: `#contact`, label: dict.nav.contact },
+    { id: "about", href: isHomepage ? `#about` : `/${locale}#about`, label: dict.nav.about },
+    { id: "skills", href: isHomepage ? `#skills` : `/${locale}#skills`, label: dict.nav.skills },
+    { id: "projects", href: isHomepage ? `#projects` : `/${locale}#projects`, label: dict.nav.projects },
+    { id: "experience", href: isHomepage ? `#experience` : `/${locale}#experience`, label: dict.nav.experience },
+    { id: "blog", href: isHomepage ? `#blog` : `/${locale}#blog`, label: dict.nav.blog },
+    { id: "contact", href: isHomepage ? `#contact` : `/${locale}#contact`, label: dict.nav.contact },
   ];
 
   const navLinks = activeSections
     ? allNavLinks.filter((link) => activeSections[link.id] !== false)
     : allNavLinks;
 
-  const targetResumeUrl = resumeUrl || "/documents/resume-mehedi-hasan.pdf";
+  const hasResume = Boolean(resumeUrl && resumeUrl.trim() !== "");
+  const targetResumeUrl = resumeUrl || "";
 
   return (
     <header
@@ -116,13 +151,14 @@ export function Navbar({ locale, dict, activeSections, resumeUrl }: NavbarProps)
         {/* Desktop Navigation Links */}
         <nav className="hidden lg:flex items-center gap-6" aria-label="Main Navigation">
           {navLinks.map((link) => (
-            <a
-              key={link.href}
+            <Link
+              key={link.id}
               href={link.href}
+              onClick={(e) => handleNavClick(e, link.id)}
               className="text-xs font-mono uppercase tracking-wider text-slate-400 hover:text-emerald-400 transition-colors"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -132,17 +168,19 @@ export function Navbar({ locale, dict, activeSections, resumeUrl }: NavbarProps)
           <div className="hidden lg:flex items-center gap-2.5">
             <LanguageSwitcher currentLocale={locale} />
             <ThemeToggle />
-            <a
-              href={targetResumeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button variant="terminal" size="sm" className="gap-1.5 text-xs">
-                <FileText className="h-3.5 w-3.5" />
-                <span>{dict.nav.resume}</span>
-                <ArrowUpRight className="h-3 w-3 opacity-70" />
-              </Button>
-            </a>
+            {hasResume && (
+              <a
+                href={targetResumeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button variant="terminal" size="sm" className="gap-1.5 text-xs">
+                  <FileText className="h-3.5 w-3.5" />
+                  <span>{dict.nav.resume}</span>
+                  <ArrowUpRight className="h-3 w-3 opacity-70" />
+                </Button>
+              </a>
+            )}
           </div>
 
           {/* Mobile Three-Dot Overflow Button */}
@@ -224,31 +262,33 @@ export function Navbar({ locale, dict, activeSections, resumeUrl }: NavbarProps)
         <div className="lg:hidden border-b border-slate-800 bg-[#0c101a] px-4 pt-3 pb-6 animate-in slide-in-from-top-2 duration-150 shadow-2xl">
           <nav className="flex flex-col space-y-3 font-mono text-sm" aria-label="Mobile Navigation">
             {navLinks.map((link) => (
-              <a
-                key={link.href}
+              <Link
+                key={link.id}
                 href={link.href}
-                onClick={() => setIsOpen(false)}
+                onClick={(e) => handleNavClick(e, link.id)}
                 className="flex items-center justify-between rounded-md px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-emerald-400 transition-colors"
               >
                 <span>{link.label}</span>
                 <span className="text-xs text-slate-600">→</span>
-              </a>
+              </Link>
             ))}
-            <div className="pt-2 border-t border-slate-800 flex justify-between items-center">
-              <a
-                href={targetResumeUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setIsOpen(false)}
-                className="w-full"
-              >
-                <Button variant="terminal" size="sm" className="w-full justify-center gap-2">
-                  <FileText className="h-4 w-4" />
-                  <span>{dict.nav.resume}</span>
-                  <ArrowUpRight className="h-3.5 w-3.5" />
-                </Button>
-              </a>
-            </div>
+            {hasResume && (
+              <div className="pt-2 border-t border-slate-800 flex justify-between items-center">
+                <a
+                  href={targetResumeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsOpen(false)}
+                  className="w-full"
+                >
+                  <Button variant="terminal" size="sm" className="w-full justify-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    <span>{dict.nav.resume}</span>
+                    <ArrowUpRight className="h-3.5 w-3.5" />
+                  </Button>
+                </a>
+              </div>
+            )}
           </nav>
         </div>
       )}

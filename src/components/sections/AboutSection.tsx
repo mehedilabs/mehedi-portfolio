@@ -5,10 +5,13 @@ import { Laptop, ArrowRight } from "lucide-react";
 import { Locale } from "@/types";
 import { Dictionary } from "@/data/dictionaries";
 import { Button } from "@/components/ui/Button";
+import { PublicProfileData } from "@/lib/api-client";
 
 interface AboutSectionProps {
   locale?: Locale;
   dict: Dictionary;
+  profile?: PublicProfileData | null;
+  sectionTag?: string;
 }
 
 // Visual illustration showing a developer working at a computer/laptop
@@ -140,7 +143,24 @@ function DeveloperWorkingIllustration() {
   );
 }
 
-export function AboutSection({ locale, dict }: AboutSectionProps) {
+export function AboutSection({ locale = "en", dict, profile, sectionTag }: AboutSectionProps) {
+  const isBn = locale === "bn";
+  const localizedProfile = isBn ? profile?.bn : profile?.en;
+
+  const displayTag = sectionTag || dict.about.sectionTag;
+  const title = localizedProfile?.aboutTitle || dict.about.title;
+  const headline = localizedProfile?.aboutHeadline || (isBn
+    ? "পরিচ্ছন্ন, আধুনিক ও ব্যবহারকারী-বান্ধব ওয়েব অ্যাপ্লিকেশন নির্মাণে নিবেদিত।"
+    : "Building clean, modern, and user-friendly web applications.");
+
+  const paragraphs = localizedProfile?.aboutParagraphs && localizedProfile.aboutParagraphs.length > 0
+    ? localizedProfile.aboutParagraphs
+    : [dict.about.bioParagraph1, dict.about.bioParagraph2, dict.about.bioParagraph3];
+
+  const aboutPhotoUrl = profile?.aboutPhotoUrl || "";
+  const aboutPhotoAlt = profile?.aboutPhotoAlt || (isBn ? "মেহেদী হাসান — কর্মক্ষেত্র" : "Mehedi Hasan — Developer Workspace");
+  const [photoError, setPhotoError] = React.useState(false);
+
   const coreSkills = [
     "React",
     "Next.js",
@@ -153,42 +173,52 @@ export function AboutSection({ locale, dict }: AboutSectionProps) {
   ];
 
   return (
-    <section id="about" className="py-16 sm:py-24 border-t border-slate-900 relative">
+    <section id="about" className="py-16 sm:py-24 border-t border-slate-200 dark:border-slate-900 relative transition-colors">
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8 space-y-10">
         {/* Section Heading */}
         <div className="space-y-2 text-left">
-          <div className="inline-flex items-center gap-2 font-mono text-xs text-emerald-400 font-semibold tracking-wider uppercase">
+          <div className="inline-flex items-center gap-2 font-mono text-xs text-emerald-600 dark:text-emerald-400 font-semibold tracking-wider uppercase">
             <span className="w-2 h-2 rounded bg-emerald-500" />
-            <span>{dict.about.sectionTag}</span>
+            <span>{displayTag}</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-white">
-            {dict.about.title}
+          <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
+            {title}
           </h2>
         </div>
 
         {/* Balanced Two-Column Layout (Desktop) / Natural Stack (Mobile) */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-14 items-center">
-          {/* Column 1: Separate Developer-At-Work Image / Illustration (Not Profile Photo) */}
+          {/* Column 1: Separate Developer-At-Work Image / Illustration */}
           <div className="md:col-span-5 flex justify-center">
-            <div className="relative w-full max-w-[340px] sm:max-w-[380px] aspect-[4/3] sm:aspect-square rounded-2xl border border-slate-800 bg-[#0c101a] p-4 sm:p-5 shadow-2xl flex flex-col items-center justify-between overflow-hidden group">
+            <div className="relative w-full max-w-[340px] sm:max-w-[380px] aspect-[4/3] sm:aspect-square rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c101a] p-4 sm:p-5 shadow-2xl flex flex-col items-center justify-between overflow-hidden group transition-colors">
               {/* Subtle background glow */}
               <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/10 via-transparent to-cyan-500/10 opacity-60 pointer-events-none" />
               <div className="absolute inset-0 terminal-grid opacity-20 pointer-events-none" />
 
-              {/* Developer Working At Computer Illustration */}
-              <div className="relative z-10 w-full flex-1 flex items-center justify-center p-2 group-hover:scale-[1.02] transition-transform duration-300">
-                <DeveloperWorkingIllustration />
+              {/* Developer Workspace Image or Illustration */}
+              <div className="relative z-10 w-full flex-1 flex items-center justify-center p-2 group-hover:scale-[1.02] transition-transform duration-300 overflow-hidden">
+                {aboutPhotoUrl && !photoError ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={aboutPhotoUrl}
+                    alt={aboutPhotoAlt}
+                    onError={() => setPhotoError(true)}
+                    className="w-full h-full object-cover rounded-xl shadow-md"
+                  />
+                ) : (
+                  <DeveloperWorkingIllustration />
+                )}
               </div>
 
               {/* Separate Developer Workspace Caption */}
-              <div className="relative z-10 w-full pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs font-mono text-slate-400">
+              <div className="relative z-10 w-full pt-2 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between text-xs font-mono text-slate-600 dark:text-slate-400">
                 <div className="flex items-center gap-1.5">
-                  <Laptop className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="text-slate-300 font-medium">
-                    {locale === "bn" ? "ডেভেলপমেন্ট স্পেস" : "Developer at Work"}
+                  <Laptop className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span className="text-slate-800 dark:text-slate-300 font-medium">
+                    {isBn ? "ডেভেলপমেন্ট স্পেস" : "Developer at Work"}
                   </span>
                 </div>
-                <span className="text-[11px] text-emerald-400/90 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded">
+                <span className="text-[11px] text-emerald-700 dark:text-emerald-400/90 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded font-medium">
                   Coding & Building
                 </span>
               </div>
@@ -197,28 +227,26 @@ export function AboutSection({ locale, dict }: AboutSectionProps) {
 
           {/* Column 2: Concise, Friendly Introduction */}
           <div className="md:col-span-7 space-y-5 text-left">
-            <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight leading-snug">
-              {locale === "bn"
-                ? "পরিচ্ছন্ন, আধুনিক ও ব্যবহারকারী-বান্ধব ওয়েব অ্যাপ্লিকেশন নির্মাণে নিবেদিত।"
-                : "Building clean, modern, and user-friendly web applications."}
+            <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-snug">
+              {headline}
             </h3>
 
-            <div className="space-y-4 text-slate-300 text-sm sm:text-base lg:text-[17px] leading-relaxed">
-              <p>{dict.about.bioParagraph1}</p>
-              <p>{dict.about.bioParagraph2}</p>
-              <p>{dict.about.bioParagraph3}</p>
+            <div className="space-y-4 text-slate-700 dark:text-slate-300 text-sm sm:text-base lg:text-[17px] leading-relaxed">
+              {paragraphs.map((p, idx) => (
+                <p key={idx}>{p}</p>
+              ))}
             </div>
 
             {/* Core Technologies Pills */}
             <div className="pt-2 space-y-2">
-              <p className="text-xs font-mono text-slate-400 uppercase tracking-wider font-semibold">
-                {locale === "bn" ? "প্রধান প্রযুক্তিসমূহ:" : "Primary Technologies:"}
+              <p className="text-xs font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">
+                {isBn ? "প্রধান প্রযুক্তিসমূহ:" : "Primary Technologies:"}
               </p>
               <div className="flex flex-wrap gap-2">
                 {coreSkills.map((tech) => (
                   <span
                     key={tech}
-                    className="text-xs font-mono px-3 py-1 rounded-md bg-slate-900/80 border border-slate-800 text-slate-300"
+                    className="text-xs font-mono px-3 py-1 rounded-md bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-300"
                   >
                     {tech}
                   </span>

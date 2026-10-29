@@ -5,6 +5,13 @@ export const metadata: Metadata = {
   title: "Mehedi Hasan — Senior Full-Stack Architect & Engineer",
   description:
     "Production-minded personal portfolio, engineering projects, case studies, and technical blog by Mehedi Hasan.",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({

@@ -49,6 +49,7 @@ html.light {
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
 }
 
 /* Standardized Content Container (1280px-1400px with balanced 24-40px side padding) */
@@ -276,8 +277,8 @@ html.light .border-slate-700\/40 {
   border-color: #cbd5e1 !important;
 }
 
-html.light .text-white,
-html.light .text-slate-100 {
+html.light :not(svg):not(svg *).text-white,
+html.light :not(svg):not(svg *).text-slate-100 {
   color: #0f172a !important;
 }
 

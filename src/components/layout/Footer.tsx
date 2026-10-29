@@ -1,7 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { Terminal, ArrowUp, Mail } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Terminal, ArrowUp, Mail, Shield } from "lucide-react";
 import { GithubIcon, LinkedinIcon, TwitterIcon } from "@/components/ui/Icons";
 import { Dictionary } from "@/data/dictionaries";
 import { CONTACT_INFO } from "@/data/portfolio-data";
@@ -12,6 +14,10 @@ interface FooterProps {
 
 export function Footer({ dict }: FooterProps) {
   const currentYear = 2026;
+  const pathname = usePathname();
+  const currentLocale = pathname?.startsWith("/bn") ? "bn" : "en";
+  const isHomepage = pathname === `/${currentLocale}` || pathname === `/${currentLocale}/`;
+  const getSectionHref = (id: string) => (isHomepage ? `#${id}` : `/${currentLocale}#${id}`);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -80,29 +86,29 @@ export function Footer({ dict }: FooterProps) {
             </h4>
             <ul className="space-y-2">
               <li>
-                <a href="#about" className="hover:text-emerald-400 transition-colors">
+                <Link href={getSectionHref("about")} className="hover:text-emerald-400 transition-colors">
                   &gt; {dict.nav.about}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#skills" className="hover:text-emerald-400 transition-colors">
+                <Link href={getSectionHref("skills")} className="hover:text-emerald-400 transition-colors">
                   &gt; {dict.nav.skills}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#experience" className="hover:text-emerald-400 transition-colors">
+                <Link href={getSectionHref("experience")} className="hover:text-emerald-400 transition-colors">
                   &gt; {dict.nav.experience}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#projects" className="hover:text-emerald-400 transition-colors">
+                <Link href={getSectionHref("projects")} className="hover:text-emerald-400 transition-colors">
                   &gt; {dict.nav.projects}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#blog" className="hover:text-emerald-400 transition-colors">
+                <Link href={getSectionHref("blog")} className="hover:text-emerald-400 transition-colors">
                   &gt; {dict.nav.blog}
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -126,6 +132,14 @@ export function Footer({ dict }: FooterProps) {
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-slate-500">
           <p>© {currentYear} {dict.footer.rights} {dict.site.name}</p>
           <div className="flex items-center gap-4">
+            <Link
+              href="/admin/login"
+              className="inline-flex items-center gap-1.5 text-slate-500 hover:text-emerald-400 transition-colors py-1 px-2 rounded hover:bg-slate-900 border border-transparent hover:border-slate-800"
+              title="Admin CMS Portal"
+            >
+              <Shield className="h-3.5 w-3.5 text-emerald-500/70" />
+              <span>Admin</span>
+            </Link>
             <button
               onClick={scrollToTop}
               className="inline-flex items-center gap-1.5 text-slate-400 hover:text-emerald-400 transition-colors py-1 px-2 rounded hover:bg-slate-900 border border-transparent hover:border-slate-800"

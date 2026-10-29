@@ -59,13 +59,12 @@ export function ReactLogo({ className = "w-5 h-5" }: { className?: string }) {
 export function NextjsLogo({ className = "w-5 h-5" }: { className?: string }) {
   return (
     <svg viewBox="0 0 180 180" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="90" cy="90" r="90" fill="currentColor" className="text-slate-800" />
+      <circle cx="90" cy="90" r="90" fill="#000000" />
       <path
         d="M149.508 157.438L69.147 54H54V125.97H66.1136V69.3836L139.999 164.845C143.333 162.614 146.509 160.134 149.508 157.438Z"
-        fill="currentColor"
-        className="text-white"
+        fill="#FFFFFF"
       />
-      <path d="M115.892 54H128V125.97H115.892V54Z" fill="currentColor" className="text-white" />
+      <path d="M115.892 54H128V125.97H115.892V54Z" fill="#FFFFFF" />
     </svg>
   );
 }
@@ -89,7 +88,7 @@ export function NodeLogo({ className = "w-5 h-5" }: { className?: string }) {
         d="M16 2.5L3.5 9.7V24.3L16 31.5L28.5 24.3V9.7L16 2.5Z"
         stroke="#10b981"
         strokeWidth="2"
-        fill="#022c22"
+        fill="#064e3b"
       />
       <path
         d="M11.5 21V13.5L16 16V23.5L11.5 21Z"
@@ -97,7 +96,7 @@ export function NodeLogo({ className = "w-5 h-5" }: { className?: string }) {
       />
       <path
         d="M20.5 13.5V21L16 23.5V16L20.5 13.5Z"
-        fill="#34d399"
+        fill="#6ee7b7"
       />
     </svg>
   );
@@ -173,7 +172,7 @@ export function RedisLogo({ className = "w-5 h-5" }: { className?: string }) {
 export function ExpressLogo({ className = "w-5 h-5" }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="24" height="24" rx="4" fill="#1e293b" />
+      <rect width="24" height="24" rx="4" fill="#0f172a" stroke="#334155" strokeWidth="1" />
       <text
         x="12"
         y="16"
@@ -181,7 +180,7 @@ export function ExpressLogo({ className = "w-5 h-5" }: { className?: string }) {
         fontFamily="monospace"
         fontWeight="bold"
         fontSize="12"
-        fill="#f1f5f9"
+        fill="#f8fafc"
       >
         ex
       </text>
