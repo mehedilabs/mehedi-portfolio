@@ -1,3 +1,4 @@
+
 import path from "node:path";
 import fs from "node:fs";
 import { v2 as cloudinary } from "cloudinary";
@@ -6,17 +7,18 @@ import { env } from "../config/env.js";
 import { MediaAssetModel } from "../models/MediaAsset.js";
 import { ProfileModel } from "../models/Profile.js";
 
-// Ensure local uploads directory exists
+const isProduction = process.env.NODE_ENV === "production";
 const UPLOADS_DIR = path.resolve(process.cwd(), "uploads");
-if (!fs.existsSync(UPLOADS_DIR)) {
+
+// Local development only: create the local uploads directory.
+if (!isProduction && !fs.existsSync(UPLOADS_DIR)) {
   fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 }
 
-// Configure Cloudinary if credentials are provided
 const isCloudinaryConfigured = Boolean(
   env.CLOUDINARY_CLOUD_NAME &&
-  env.CLOUDINARY_API_KEY &&
-  env.CLOUDINARY_API_SECRET
+    env.CLOUDINARY_API_KEY &&
+    env.CLOUDINARY_API_SECRET
 );
 
 if (isCloudinaryConfigured) {
@@ -28,7 +30,6 @@ if (isCloudinaryConfigured) {
   });
 }
 
-// Allowed MIME types
 const ALLOWED_IMAGE_TYPES = [
   "image/jpeg",
   "image/png",
@@ -36,9 +37,9 @@ const ALLOWED_IMAGE_TYPES = [
   "image/gif",
   "image/svg+xml",
 ];
+
 const ALLOWED_DOC_TYPES = ["application/pdf"];
 
-// Multer Storage: Disk storage fallback
 const diskStorage = multer.diskStorage({
   destination: (_req, _file, cb) => {
     cb(null, UPLOADS_DIR);
@@ -49,15 +50,17 @@ const diskStorage = multer.diskStorage({
       .basename(file.originalname, ext)
       .replace(/[^a-zA-Z0-9_-]/g, "_")
       .toLowerCase();
+
     const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e5)}`;
     cb(null, `${cleanName}-${uniqueSuffix}${ext}`);
   },
 });
 
+// Vercel production uses memory storage; local development uses disk.
 export const uploadMiddleware = multer({
-  storage: diskStorage,
+  storage: isProduction ? multer.memoryStorage() : diskStorage,
   limits: {
-    fileSize: 20 * 1024 * 1024, // 20 MB max
+    fileSize: 20 * 1024 * 1024,
   },
   fileFilter: (_req, file, cb) => {
     if (
@@ -84,42 +87,101 @@ export interface UploadResult {
   category: "avatar" | "project" | "blog" | "video" | "document" | "other";
 }
 
+type UploadCategory = UploadResult["category"];
+
+async function uploadBufferToCloudinary(
+  file: Express.Multer.File,
+  category: UploadCategory
+): Promise<Awaited<ReturnType<typeof cloudinary.uploader.upload>>> {
+  const resourceType = file.mimetype === "application/pdf" ? "raw" : "image";
+  const ext = path.extname(file.originalname).toLowerCase();
+  const safeName = path
+    .basename(file.originalname, ext)
+    .replace(/[^a-zA-Z0-9_-]/g, "_")
+    .toLowerCase();
+
+  const uniqueName = `${safeName}-${Date.now()}-${Math.round(Math.random() * 1e5)}`;
+
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: `mehedi-portfolio/${category}`,
+        resource_type: resourceType,
+        public_id:
+          resourceType === "raw" ? `${uniqueName}${ext}` : uniqueName,
+      },
+      (error, result) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        if (!result) {
+          reject(new Error("Cloudinary returned no upload result."));
+          return;
+        }
+
+        resolve(result);
+      }
+    );
+
+    stream.end(file.buffer);
+  });
+}
+
 /**
- * Uploads a local file to Cloudinary if configured, or keeps local storage
+ * Uploads to Cloudinary in production.
+ * Local development can use disk storage as a fallback.
  */
 export async function processUploadedFile(
   file: Express.Multer.File,
-  category: "avatar" | "project" | "blog" | "video" | "document" | "other" = "other",
+  category: UploadCategory = "other",
   uploadedBy?: string
 ): Promise<UploadResult> {
   const ext = path.extname(file.originalname).replace(".", "").toLowerCase();
-  let finalUrl = `/uploads/${file.filename}`;
-  let publicId: string | undefined = undefined;
+  const filename = file.filename || `${Date.now()}-${path.basename(file.originalname)}`;
+
+  let finalUrl = `/uploads/${filename}`;
+  let publicId: string | undefined;
+
+  if (isProduction && !isCloudinaryConfigured) {
+    throw new Error(
+      "Cloudinary is not configured. Please set the Cloudinary environment variables in Vercel."
+    );
+  }
 
   if (isCloudinaryConfigured) {
     try {
-      const resourceType = file.mimetype === "application/pdf" ? "raw" : "image";
-      const result = await cloudinary.uploader.upload(file.path, {
-        folder: `mehedi-portfolio/${category}`,
-        resource_type: resourceType,
-      });
+      const result = file.buffer
+        ? await uploadBufferToCloudinary(file, category)
+        : await cloudinary.uploader.upload(file.path, {
+            folder: `mehedi-portfolio/${category}`,
+            resource_type:
+              file.mimetype === "application/pdf" ? "raw" : "image",
+          });
 
       finalUrl = result.secure_url;
       publicId = result.public_id;
 
-      // Clean up local temp file after Cloudinary upload
-      if (fs.existsSync(file.path)) {
+      if (file.path && fs.existsSync(file.path)) {
         fs.unlinkSync(file.path);
       }
-    } catch (err) {
+    } catch (error) {
+      if (isProduction) {
+        throw new Error(
+          `Cloudinary upload failed: ${
+            error instanceof Error ? error.message : "Unknown error"
+          }`
+        );
+      }
+
       console.warn(
-        "[MediaService] Cloudinary upload failed, falling back to local storage:",
-        err instanceof Error ? err.message : err
+        "[MediaService] Cloudinary upload failed; using local storage:",
+        error instanceof Error ? error.message : error
       );
     }
   }
 
-  // Create database record
   await MediaAssetModel.create({
     filename: file.originalname,
     publicId,
@@ -141,7 +203,7 @@ export async function processUploadedFile(
 }
 
 /**
- * Handles Resume/CV PDF upload: saves asset and immediately updates Profile.resumeUrl
+ * Uploads a PDF resume and updates the profile record.
  */
 export async function updateResumePdf(
   file: Express.Multer.File,
@@ -153,8 +215,8 @@ export async function updateResumePdf(
 
   const upload = await processUploadedFile(file, "document", uploadedBy);
 
-  // Update Profile record
   let profile = await ProfileModel.findOne();
+
   if (!profile) {
     profile = await ProfileModel.create({});
   }
@@ -167,4 +229,3 @@ export async function updateResumePdf(
     filename: upload.filename,
   };
 }
-
