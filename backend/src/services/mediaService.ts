@@ -7,7 +7,9 @@ import { env } from "../config/env.js";
 import { MediaAssetModel } from "../models/MediaAsset.js";
 import { ProfileModel } from "../models/Profile.js";
 
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction =
+  process.env.VERCEL === "1" ||
+  process.env.NODE_ENV === "production";
 const UPLOADS_DIR = path.resolve(process.cwd(), "uploads");
 
 // Local development only: create the local uploads directory.
