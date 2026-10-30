@@ -1,6 +1,7 @@
 
 import mongoose from "mongoose";
 import { env } from "./env.js";
+import { inspect } from "node:util";
 
 let isConnected = false;
 
@@ -78,13 +79,17 @@ export async function connectDatabase(): Promise<void> {
       isConnected = false;
     });
   } catch (error) {
-    isConnected = false;
+  isConnected = false;
 
-    console.error(
-      "[Database] MongoDB connection failed. Diagnostic details:",
-      getConnectionErrorDetails(error)
-    );
-  }
+  console.error(
+    "[Database] Full MongoDB connection error:",
+    inspect(error, {
+      depth: 10,
+      colors: false,
+      compact: false,
+    })
+  );
+}
 }
 
 export function isDatabaseConnected(): boolean {
