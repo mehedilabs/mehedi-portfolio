@@ -57,10 +57,7 @@ export async function connectDatabase(): Promise<void> {
   }
 
   try {
-    const conn = await mongoose.connect(env.MONGODB_URI, {
-      serverSelectionTimeoutMS: 15000,
-      autoIndex: env.NODE_ENV !== "production",
-    });
+  const conn = await mongoose.connect(env.MONGODB_URI);
 
     isConnected = conn.connection.readyState === 1;
 
